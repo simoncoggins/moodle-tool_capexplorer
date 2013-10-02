@@ -22,9 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Capability Explorer';
-$string['username'] = 'Username';
-$string['context'] = 'Context';
-$string['systemcontext'] = 'System context';
+$string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
+$string['contextlevel'] = 'Context level';
+$string['coursecatcontext'] = 'Course category context';
+$string['coursecontext'] = 'Course context';
+$string['instances'] = 'Instance';
+$string['modulecontext'] = 'Module (Activity) context';
+$string['none'] = 'None';
+$string['pluginname'] = 'Capability Explorer';
 $string['selectortitle'] = 'Select the capability to explore.';
+$string['systemcontext'] = 'System (Site) context';
+$string['usercontext'] = 'User context';
+$string['username'] = 'Username';
+$string['xsitecourse'] = '{$a} (Site course)';
+

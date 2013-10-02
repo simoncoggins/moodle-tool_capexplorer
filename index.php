@@ -29,6 +29,8 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('pluginname', 'tool_capexplorer'));
 $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
+$PAGE->requires->js_init_call('M.tool_capexplorer.init', array(), true);
+
 admin_externalpage_setup('toolcapexplorer');
 
 echo $OUTPUT->header();

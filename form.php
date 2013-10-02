@@ -30,23 +30,64 @@ class capexplorer_selector_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        global $CFG, $PAGE;
+        global $CFG, $PAGE, $DB;
 
         $mform    = $this->_form;
 
         $mform->addElement('header', 'selector', get_string('selectortitle', 'tool_capexplorer'));
 
+        // TODO AJAX auto-complete.
         $mform->addElement('text', 'username', get_string('username', 'tool_capexplorer'), 'maxlength="254" size="50"');
 
         $mform->setType('username', PARAM_TEXT);
 
+        // TODO AJAX auto-complete.
         $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'), 'maxlength="254" size="50"');
         $mform->setType('capability', PARAM_TEXT);
 
         $choices = array();
-        $choices['0'] = get_string('systemcontext', 'tool_capexplorer');
-        $mform->addElement('select', 'context_system', get_string('context', 'tool_capexplorer'), $choices);
+        $choices['system'] = get_string('systemcontext', 'tool_capexplorer');
+        $choices['user'] = get_string('usercontext', 'tool_capexplorer');
+        $choices['category'] = get_string('coursecatcontext', 'tool_capexplorer');
+        $choices['course'] = get_string('coursecontext', 'tool_capexplorer');
+        $choices['module'] = get_string('modulecontext', 'tool_capexplorer');
+        $choices['block'] = get_string('blockcontext', 'tool_capexplorer');
+        $mform->addElement('select', 'contextlevel', get_string('contextlevel', 'tool_capexplorer'), $choices);
 
+        $instances = array();
+
+        $nonestr = html_writer::tag('span', get_string('none', 'tool_capexplorer'), array('id' => 'id_systeminstances'));
+        $instances[] = &$mform->createElement('static', 'systeminstances', '', $nonestr, array('class' => 'hidden-field'));
+
+        // TODO AJAX auto-complete.
+        $users = $DB->get_records_select_menu('user', 'deleted = 0', null, 'username', 'id, username');
+        $options = array('' => '') + $users;
+        $instances[] = &$mform->createElement('select', 'userinstances', '', $options, array('class' => 'hidden-field'));
+
+        $categories = make_categories_options();
+        $options = array('' => '') + $categories;
+        $instances[] = &$mform->createElement('select', 'categoryinstances', '', $options, array('class' => 'hidden-field'));
+
+        $options = array('' => '');
+        $instances[] = &$mform->createElement('select', 'courseinstances', '', $options, array('class' => 'hidden-field'));
+        /*
+        $courses = get_courses('all', 'c.fullname ASC', 'c.id,c.fullname');
+        foreach ($courses as $course) {
+            if ($course->id == 1) {
+                $options[$course->id] = get_string('xsitecourse', 'tool_capexplorer', format_string($course->fullname));
+            } else {
+                $options[$course->id] = format_string($course->fullname);
+            }
+        }
+         */
+
+        $options = array('' => '');
+        $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options, array('class' => 'hidden-field'));
+
+        $options = array('' => '');
+        $instances[] = &$mform->createElement('select', 'blockinstances', '', $options, array('class' => 'hidden-field'));
+
+        $mform->addGroup($instances, 'instances', get_string('instances', 'tool_capexplorer'), array(' '), false);
         /*
          * Need to represent this via selectors:
          *
