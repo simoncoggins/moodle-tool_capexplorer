@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Explore how Moodle's permission system works.
+ * Defines the capabilities used by the Language customization admin tool
  *
  * @package    tool_capexplorer
  * @copyright  Simon Coggins
@@ -24,11 +24,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $ADMIN->add('roles', new admin_externalpage(
-        'toolcapexplorer',
-        get_string('pluginname', 'tool_capexplorer'),
-        "/{$CFG->admin}/tool/capexplorer/index.php",
-        'tool/capexplorer:view'
-    ));
-}
+$capabilities = array(
+
+    /* allows the user to view the capability explorer tool */
+    'tool/capexplorer:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+    ),
+
+);
