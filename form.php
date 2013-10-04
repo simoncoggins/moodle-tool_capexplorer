@@ -36,12 +36,9 @@ class capexplorer_selector_form extends moodleform {
 
         $mform->addElement('header', 'selector', get_string('selectortitle', 'tool_capexplorer'));
 
-        // TODO AJAX auto-complete.
         $mform->addElement('text', 'username', get_string('username', 'tool_capexplorer'), 'maxlength="254" size="50"');
-
         $mform->setType('username', PARAM_TEXT);
 
-        // TODO AJAX auto-complete.
         $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'), 'maxlength="254" size="50"');
         $mform->setType('capability', PARAM_TEXT);
 
@@ -70,6 +67,7 @@ class capexplorer_selector_form extends moodleform {
 
         $options = array('' => '');
         $instances[] = &$mform->createElement('select', 'courseinstances', '', $options, array('class' => 'hidden-field'));
+        $mform->disabledIf('courseinstances', 'categoryinstances', 'eq', '');
         /*
         $courses = get_courses('all', 'c.fullname ASC', 'c.id,c.fullname');
         foreach ($courses as $course) {
@@ -83,9 +81,11 @@ class capexplorer_selector_form extends moodleform {
 
         $options = array('' => '');
         $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options, array('class' => 'hidden-field'));
+        $mform->disabledIf('moduleinstances', 'courseinstances', 'eq', '');
 
         $options = array('' => '');
         $instances[] = &$mform->createElement('select', 'blockinstances', '', $options, array('class' => 'hidden-field'));
+        $mform->disabledIf('blockinstances', 'courseinstances', 'eq', '');
 
         $mform->addGroup($instances, 'instances', get_string('instances', 'tool_capexplorer'), array(' '), false);
         /*

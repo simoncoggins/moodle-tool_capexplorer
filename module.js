@@ -67,7 +67,7 @@ M.tool_capexplorer.update_instance_visibility = function() {
         'category' : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 0, 'module' : 0, 'block' : 0 },
         'course'   : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 0, 'block' : 0 },
         'module'   : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 1, 'block' : 0 },
-        'block'    : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 1, 'block' : 1 }
+        'block'    : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 0, 'block' : 1 }
     };
 
     // Menu states for the current context choice.
