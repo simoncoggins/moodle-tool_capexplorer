@@ -29,7 +29,18 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('pluginname', 'tool_capexplorer'));
 $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
-$PAGE->requires->js_init_call('M.tool_capexplorer.init', array(), true);
+$jsmodule = array(
+    'name' => 'tool_capexplorer',
+    'fullpath' => '/'.$CFG->admin.'/tool/capexplorer/module.js'
+);
+
+$args = array(
+    'admin' => $CFG->admin,
+    'users' => $DB->get_fieldset_select('user', 'username', 'deleted = 0', null, 'username'),
+    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '', null)
+);
+
+$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
 
 admin_externalpage_setup('toolcapexplorer');
 

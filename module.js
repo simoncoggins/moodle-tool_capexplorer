@@ -34,13 +34,27 @@ M.tool_capexplorer.Y = {};
  *
  * @param {Object} Y YUI instance
  */
-M.tool_capexplorer.init = function(Y) {
+M.tool_capexplorer.init = function(Y, args) {
     M.tool_capexplorer.Y = Y;
 
     Y.one('#id_contextlevel').on('change', M.tool_capexplorer.update_instance_visibility);
 
-}
+    Y.use('autocomplete', 'autocomplete-filters', 'autocomplete-highlighters', function (Y) {
+        Y.one('body').addClass('yui3-skin-sam');
 
+        Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
+            resultHighlighter: 'phraseMatch',
+            resultFilters: 'phraseMatch',
+            source: args['users']
+        });
+
+        Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
+            resultHighlighter: 'phraseMatch',
+            resultFilters: 'phraseMatch',
+            source: args['capabilities']
+        });
+    });
+}
 
 M.tool_capexplorer.update_instance_visibility = function() {
     // Value of the contextlevel menu.
