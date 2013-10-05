@@ -31,7 +31,8 @@ $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
 $jsmodule = array(
     'name' => 'tool_capexplorer',
-    'fullpath' => '/'.$CFG->admin.'/tool/capexplorer/module.js'
+    'fullpath' => '/'.$CFG->admin.'/tool/capexplorer/module.js',
+    'requires' => array('json', 'autocomplete', 'autocomplete-filters', 'autocomplete-highlighters')
 );
 
 $args = array(

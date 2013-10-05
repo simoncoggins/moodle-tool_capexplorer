@@ -37,22 +37,85 @@ M.tool_capexplorer.Y = {};
 M.tool_capexplorer.init = function(Y, args) {
     M.tool_capexplorer.Y = Y;
 
+    // Show/hide instance menus depending on context level.
     Y.one('#id_contextlevel').on('change', M.tool_capexplorer.update_instance_visibility);
 
-    Y.use('autocomplete', 'autocomplete-filters', 'autocomplete-highlighters', function (Y) {
-        Y.one('body').addClass('yui3-skin-sam');
+    // Initialise autocomplete on username and capability fields.
+    M.tool_capexplorer.init_autocomplete(Y, args);
 
-        Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
-            resultHighlighter: 'phraseMatch',
-            resultFilters: 'phraseMatch',
-            source: args['users']
-        });
+    // Update course menu when category is changed.
+    Y.one('#id_categoryinstances').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getcourses.php', 'categoryid', 'id_courseinstances'
+    );
 
-        Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
-            resultHighlighter: 'phraseMatch',
-            resultFilters: 'phraseMatch',
-            source: args['capabilities']
-        });
+    // Update module menu when course is changed.
+    Y.one('#id_courseinstances').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getmodules.php', 'courseid', 'id_moduleinstances'
+    );
+
+    // Update block menu when course is changed.
+    Y.one('#id_courseinstances').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getblocks.php', 'courseid', 'id_blockinstances'
+    );
+}
+
+M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
+    var requestdata = {}
+    requestdata[ajaxarg] = this.get('value');
+
+    // TODO Pass admin via config.
+    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/' + ajaxfile, {
+        on:   {success:
+            function(id, r) {
+                try {
+                    parsedResponse = Y.JSON.parse(r.responseText);
+                }
+                catch (e) {
+                    alert("JSON Parse failed!");
+                    return;
+                }
+                if (parsedResponse.error !== undefined) {
+                    alert(parsedResponse.error);
+                    return;
+                }
+                M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse);
+            }
+        },
+        data: requestdata
+    });
+}
+
+M.tool_capexplorer.populate_menu = function(id, options) {
+    // Cache select node and clear existing options.
+    var select = Y.one('#'+id).empty();
+
+    // Append new options.
+    for (value in options) {
+        var option = '<option value="' + value + '">' + options[value] + '</options>';
+        Y.Node.create(option).appendTo(select);
+    }
+
+}
+
+M.tool_capexplorer.init_autocomplete = function(Y, args) {
+    Y.one('body').addClass('yui3-skin-sam');
+
+    Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
+        resultHighlighter: 'phraseMatch',
+        resultFilters: 'phraseMatch',
+        source: args['users']
+    });
+
+    Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
+        resultHighlighter: 'phraseMatch',
+        resultFilters: 'phraseMatch',
+        source: args['capabilities']
     });
 }
 

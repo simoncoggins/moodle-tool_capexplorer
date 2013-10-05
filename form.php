@@ -62,22 +62,14 @@ class capexplorer_selector_form extends moodleform {
         $instances[] = &$mform->createElement('select', 'userinstances', '', $options, array('class' => 'hidden-field'));
 
         $categories = make_categories_options();
-        $options = array('' => '') + $categories;
+        $options = array('' => '') + array('0' => '(site)') + $categories;
         $instances[] = &$mform->createElement('select', 'categoryinstances', '', $options, array('class' => 'hidden-field'));
 
         $options = array('' => '');
         $instances[] = &$mform->createElement('select', 'courseinstances', '', $options, array('class' => 'hidden-field'));
         $mform->disabledIf('courseinstances', 'categoryinstances', 'eq', '');
-        /*
-        $courses = get_courses('all', 'c.fullname ASC', 'c.id,c.fullname');
-        foreach ($courses as $course) {
-            if ($course->id == 1) {
-                $options[$course->id] = get_string('xsitecourse', 'tool_capexplorer', format_string($course->fullname));
-            } else {
-                $options[$course->id] = format_string($course->fullname);
-            }
-        }
-         */
+        $mform->disabledIf('moduleinstances', 'categoryinstances', 'eq', '');
+        $mform->disabledIf('blockinstances', 'categoryinstances', 'eq', '');
 
         $options = array('' => '');
         $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options, array('class' => 'hidden-field'));
