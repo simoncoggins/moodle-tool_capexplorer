@@ -26,8 +26,9 @@ define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$courseid = required_param('courseid', PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 
 require_login();
 
@@ -35,16 +36,28 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-$modules = get_array_of_activities($courseid);
-
-// TODO handle if empty.
-
-$response = array();
-foreach ($modules as $module) {
-    $key = "{$module->id}_{$module->mod}";
-    $response[$key] = format_string($module->name);
+if (!$courseid) {
+    $options = array(
+        '0' => get_string('chooseacoursefirst', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
 }
 
-$OUTPUT->header();
-echo json_encode($response);
-$OUTPUT->footer();
+$modules = get_array_of_activities($courseid);
+
+if (empty($modules)) {
+    $options = array(
+        '0' => get_string('nomodulesfound', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
+}
+
+$options = array(
+    '0' => get_string('chooseamodule', 'tool_capexplorer')
+);
+foreach ($modules as $module) {
+    $key = "{$module->id}_{$module->mod}";
+    $options[$key] = format_string($module->name);
+}
+
+tool_capexplorer_render_json($options);

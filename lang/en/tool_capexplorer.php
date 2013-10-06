@@ -24,16 +24,26 @@
 
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
+$string['chooseablock'] = 'Choose a block...';
+$string['chooseacategory'] = 'Choose a category...';
+$string['chooseacategoryfirst'] = 'Choose a category first';
+$string['chooseacourse'] = 'Choose a course...';
+$string['chooseacoursefirst'] = 'Choose a course first';
+$string['chooseamodule'] = 'Choose a module...';
+$string['chooseauser'] = 'Choose a user...';
 $string['contextlevel'] = 'Context level';
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
 $string['instances'] = 'Instance';
 $string['modulecontext'] = 'Module (Activity) context';
+$string['noblocksfound'] = 'No blocks found';
+$string['nocoursesfound'] = 'No courses found';
+$string['nomodulesfound'] = 'No modules found';
 $string['none'] = 'None';
 $string['pluginname'] = 'Capability Explorer';
 $string['selectortitle'] = 'Select the capability to explore.';
 $string['systemcontext'] = 'System (Site) context';
 $string['usercontext'] = 'User context';
 $string['username'] = 'Username';
-$string['xsitecourse'] = '{$a} (Site course)';
+$string['xfrontpage'] = '{$a} (Front page)';
 

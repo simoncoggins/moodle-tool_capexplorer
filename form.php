@@ -58,26 +58,26 @@ class capexplorer_selector_form extends moodleform {
 
         // TODO AJAX auto-complete.
         $users = $DB->get_records_select_menu('user', 'deleted = 0', null, 'username', 'id, username');
-        $options = array('' => '') + $users;
+        $options = array('0' => get_string('chooseauser', 'tool_capexplorer')) + $users;
         $instances[] = &$mform->createElement('select', 'userinstances', '', $options, array('class' => 'hidden-field'));
 
         $categories = make_categories_options();
-        $options = array('' => '') + array('0' => '(site)') + $categories;
-        $instances[] = &$mform->createElement('select', 'categoryinstances', '', $options, array('class' => 'hidden-field'));
+        // TODO lang string.
+        $options = array('0' => get_string('chooseacategory', 'tool_capexplorer')) + array('-1' => '(site)') + $categories;
+        $instances[] = &$mform->createElement('select', 'categoryinstances', '', $options,
+            array('class' => 'hidden-field'));
 
-        $options = array('' => '');
-        $instances[] = &$mform->createElement('select', 'courseinstances', '', $options, array('class' => 'hidden-field'));
-        $mform->disabledIf('courseinstances', 'categoryinstances', 'eq', '');
-        $mform->disabledIf('moduleinstances', 'categoryinstances', 'eq', '');
-        $mform->disabledIf('blockinstances', 'categoryinstances', 'eq', '');
+        $options = array('' => get_string('chooseacategoryfirst', 'tool_capexplorer'));
+        $instances[] = &$mform->createElement('select', 'courseinstances', '', $options,
+            array('class' => 'hidden-field', 'disabled' => 'disabled'));
 
-        $options = array('' => '');
-        $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options, array('class' => 'hidden-field'));
-        $mform->disabledIf('moduleinstances', 'courseinstances', 'eq', '');
+        $options = array('' => get_string('chooseacoursefirst', 'tool_capexplorer'));
+        $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options,
+            array('class' => 'hidden-field', 'disabled' => 'disabled'));
 
-        $options = array('' => '');
-        $instances[] = &$mform->createElement('select', 'blockinstances', '', $options, array('class' => 'hidden-field'));
-        $mform->disabledIf('blockinstances', 'courseinstances', 'eq', '');
+        $options = array('' => get_string('chooseacoursefirst', 'tool_capexplorer'));
+        $instances[] = &$mform->createElement('select', 'blockinstances', '', $options,
+            array('class' => 'hidden-field', 'disabled' => 'disabled'));
 
         $mform->addGroup($instances, 'instances', get_string('instances', 'tool_capexplorer'), array(' '), false);
         /*

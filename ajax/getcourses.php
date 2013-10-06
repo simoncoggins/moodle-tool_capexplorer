@@ -25,8 +25,9 @@
 define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$categoryid = optional_param('categoryid', 'all', PARAM_INT);
+$categoryid = optional_param('categoryid', 0, PARAM_INT);
 
 require_login();
 
@@ -34,20 +35,38 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
+if (!$categoryid) {
+    $options = array(
+        '0' => get_string('chooseacategoryfirst', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
+}
+
+if ($categoryid == -1) {
+    $sitename = $DB->get_field('course', 'fullname', array('id' => SITEID));
+    $options = array(
+        0 => get_string('chooseacourse', 'tool_capexplorer'),
+        SITEID => get_string('xfrontpage', 'tool_capexplorer', format_string($sitename))
+    );
+    tool_capexplorer_render_json($options);
+}
+
 $courses = get_courses($categoryid, 'c.sortorder ASC', 'c.id,c.fullname');
 
-// TODO handle if empty.
+if (empty($courses)) {
+    $options = array(
+        '0' => get_string('nocoursesfound', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
+}
 
-$response = array();
+$options = array(0 => get_string('chooseacourse', 'tool_capexplorer'));
 foreach ($courses as $course) {
     if ($course->id == SITEID) {
-        $response[$course->id] = get_string('xsitecourse', 'tool_capexplorer',
-            format_string($course->fullname));
+        continue;
     } else {
-        $response[$course->id] = format_string($course->fullname);
+        $options[$course->id] = format_string($course->fullname);
     }
 }
 
-$OUTPUT->header();
-echo json_encode($response);
-$OUTPUT->footer();
+tool_capexplorer_render_json($options);

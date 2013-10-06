@@ -50,6 +50,20 @@ M.tool_capexplorer.init = function(Y, args) {
         'getcourses.php', 'categoryid', 'id_courseinstances'
     );
 
+    // Also reset module and block menus when category is changed.
+    // Passing an unknown url parameter causes menus to reset back
+    // to the right value.
+    Y.one('#id_categoryinstances').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getmodules.php', 'unused', 'id_moduleinstances'
+    );
+    Y.one('#id_categoryinstances').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getblocks.php', 'unused', 'id_blockinstances'
+    );
+
     // Update module menu when course is changed.
     Y.one('#id_courseinstances').on(
         'change',
@@ -84,11 +98,21 @@ M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
                     alert(parsedResponse.error);
                     return;
                 }
-                M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse);
+                M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse.options);
+                M.tool_capexplorer.set_menu_state(targetmenuid, parsedResponse.disabled);
             }
         },
         data: requestdata
     });
+}
+
+M.tool_capexplorer.set_menu_state = function(id, disabled) {
+    var select = Y.one('#'+id);
+    if (disabled) {
+        select.setAttribute('disabled', 'disabled');
+    } else {
+        select.removeAttribute('disabled');
+    }
 }
 
 M.tool_capexplorer.populate_menu = function(id, options) {

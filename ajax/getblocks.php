@@ -26,8 +26,9 @@ define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$courseid = required_param('courseid', PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 
 require_login();
 
@@ -35,15 +36,30 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-$blockinstances = get_block_instances($courseid);
-$response = array();
-foreach ($blockinstances as $blockinstance) {
-    $response[$blockinstance->id] = $blockinstance->blockname;
+if (!$courseid) {
+    $options = array(
+        '0' => get_string('chooseacoursefirst', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
 }
 
-$OUTPUT->header();
-echo json_encode($response);
-$OUTPUT->footer();
+$blockinstances = get_block_instances($courseid);
+
+if (empty($blockinstances)) {
+    $options = array(
+        '0' => get_string('noblocksfound', 'tool_capexplorer')
+    );
+    tool_capexplorer_render_json($options, true);
+}
+
+$options = array(
+    '0' => get_string('chooseablock', 'tool_capexplorer')
+);
+foreach ($blockinstances as $blockinstance) {
+    $options[$blockinstance->id] = $blockinstance->blockname;
+}
+
+tool_capexplorer_render_json($options);
 
 /**
  * Return a list of blocks used in a particular course.

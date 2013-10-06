@@ -1,0 +1,7 @@
+
+Make "Front page course" category, which:
+- switches course menu to show "Front page course" only when selected
+  - use categoryid = -1 in getcourses as we do now?
+- only appears in category menu if category level NOT selected
+- disappears from category menu if category level selected
+  - add getcategories.php and populate based on contextlevel=X parameter?
