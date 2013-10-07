@@ -29,11 +29,17 @@ require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
 $courseid = optional_param('courseid', 0, PARAM_INT);
+$categoryid = optional_param('categoryid', 0, PARAM_INT);
 
 require_login();
 
 if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
+}
+
+// Handle category being set to "No category (Front page)".
+if ($categoryid == -1) {
+    $courseid = SITEID;
 }
 
 if (!$courseid) {

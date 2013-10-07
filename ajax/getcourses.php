@@ -45,7 +45,6 @@ if (!$categoryid) {
 if ($categoryid == -1) {
     $sitename = $DB->get_field('course', 'fullname', array('id' => SITEID));
     $options = array(
-        0 => get_string('chooseacourse', 'tool_capexplorer'),
         SITEID => get_string('xfrontpage', 'tool_capexplorer', format_string($sitename))
     );
     tool_capexplorer_render_json($options);

@@ -95,5 +95,31 @@ class capexplorer_selector_form extends moodleform {
          *    Block
          *
          */
+
+        $this->add_action_buttons(false, get_string('submit'));
+    }
+
+    /**
+     * Form validation.
+     *
+     * @param array $data
+     * @param array $files
+     * @return void
+     */
+    public function validation($data, $files) {
+        global $DB;
+        $errors = array();
+
+        $context = $data['contextlevel'];
+
+        if ($context == 'system') {
+            return $errors;
+        }
+
+        if ($data["{$context}instances"] == 0) {
+            $errors['instances'] = get_string("error:no{$context}", 'tool_capexplorer');
+        }
+
+        return $errors;
     }
 }

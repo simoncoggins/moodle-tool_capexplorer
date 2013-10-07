@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Return a list of modules in a specific course.
+ * Return a list of categories, optionally including the "Front page" option.
  *
  * @package     tool_capexplorer
  * @copyright   Simon Coggins
@@ -25,11 +25,10 @@
 define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
+require_once($CFG->dirroot . '/course/lib.php');
 
-$courseid = optional_param('courseid', 0, PARAM_INT);
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
+$contextlevel = optional_param('contextlevel', '', PARAM_ALPHA);
 
 require_login();
 
@@ -37,33 +36,15 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-// Handle category being set to "No category (Front page)".
-if ($categoryid == -1) {
-    $courseid = SITEID;
+$chooseoption = array('0' => get_string('chooseacategory', 'tool_capexplorer'));
+
+$categoryoptions = make_categories_options();
+
+$frontpageoption = array();
+if ($contextlevel != 'category') {
+    $frontpageoption['-1'] = get_string('nocatfrontpage', 'tool_capexplorer');
 }
 
-if (!$courseid) {
-    $options = array(
-        '0' => get_string('chooseacoursefirst', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
-
-$modules = get_array_of_activities($courseid);
-
-if (empty($modules)) {
-    $options = array(
-        '0' => get_string('nomodulesfound', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
-
-$options = array(
-    '0' => get_string('chooseamodule', 'tool_capexplorer')
-);
-foreach ($modules as $module) {
-    $key = "{$module->id}_{$module->mod}";
-    $options[$key] = format_string($module->name);
-}
+$options = $chooseoption + $frontpageoption + $categoryoptions;
 
 tool_capexplorer_render_json($options);

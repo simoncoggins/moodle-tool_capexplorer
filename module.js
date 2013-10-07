@@ -43,6 +43,13 @@ M.tool_capexplorer.init = function(Y, args) {
     // Initialise autocomplete on username and capability fields.
     M.tool_capexplorer.init_autocomplete(Y, args);
 
+    // Update category menu when context level is changed.
+    Y.one('#id_contextlevel').on(
+        'change',
+        M.tool_capexplorer.update_menu, null,
+        'getcategories.php', 'contextlevel', 'id_categoryinstances'
+    );
+
     // Update course menu when category is changed.
     Y.one('#id_categoryinstances').on(
         'change',
@@ -51,17 +58,17 @@ M.tool_capexplorer.init = function(Y, args) {
     );
 
     // Also reset module and block menus when category is changed.
-    // Passing an unknown url parameter causes menus to reset back
-    // to the right value.
+    // The category id is passed as different behaviour is required
+    // if selecting "No category (Front page)".
     Y.one('#id_categoryinstances').on(
         'change',
         M.tool_capexplorer.update_menu, null,
-        'getmodules.php', 'unused', 'id_moduleinstances'
+        'getmodules.php', 'categoryid', 'id_moduleinstances'
     );
     Y.one('#id_categoryinstances').on(
         'change',
         M.tool_capexplorer.update_menu, null,
-        'getblocks.php', 'unused', 'id_blockinstances'
+        'getblocks.php', 'categoryid', 'id_blockinstances'
     );
 
     // Update module menu when course is changed.
@@ -98,6 +105,7 @@ M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
                     alert(parsedResponse.error);
                     return;
                 }
+                console.log(parsedResponse.options);
                 M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse.options);
                 M.tool_capexplorer.set_menu_state(targetmenuid, parsedResponse.disabled);
             }
