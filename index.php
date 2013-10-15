@@ -23,6 +23,7 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once('form.php');
+require_once('locallib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
 $PAGE->set_context(context_system::instance());
@@ -50,13 +51,32 @@ echo $OUTPUT->header();
 // First create the form.
 $mform = new capexplorer_selector_form();
 
+$userid = 2;
+$capability = 'mod/forum:addnews';
+$contextid = 30;
+
+$context = context_module::instance(5);
+$out = tool_capexplorer_get_parent_context_info($context);
+echo '<pre>';
+var_dump($out);
+echo '</pre>';
+
+
+$funcresult = has_capability($capability, $context, $userid, true);
+$isadmin = is_siteadmin();
+
+
+
+/*
 if ($mform->is_cancelled()) {
     // TODO.
     echo 'Cancelled';
 } else if ($data = $mform->get_data()) {
     // Process data if submitted.
+    var_dump($data);
     echo 'Processed';
 }
 
 echo $mform->display();
+*/
 echo $OUTPUT->footer();

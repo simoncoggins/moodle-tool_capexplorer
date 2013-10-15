@@ -43,3 +43,39 @@ function tool_capexplorer_render_json($options, $disabled = false) {
     $OUTPUT->footer();
     exit;
 }
+
+function tool_capexplorer_get_parent_context_info($context) {
+    global $DB;
+    $parentcontexts = $context->get_parent_contexts(true);
+
+    $out = array();
+    foreach ($parentcontexts as $pcontext) {
+        $item = new stdClass();
+        $item->contextlevel = $pcontext->get_level_name();
+        switch ($pcontext->contextlevel) {
+        case CONTEXT_SYSTEM:
+            $item->instance = get_string('none', 'tool_capexplorer');
+            break;
+        case CONTEXT_USER:
+            // TODO Fullname.
+            $item->instance = $DB->get_field('user', 'firstname', array('id' => $pcontext->instanceid));
+            break;
+        case CONTEXT_COURSECAT:
+            $item->instance = $DB->get_field('course_categories', 'name', array('id' => $pcontext->instanceid));
+            break;
+        case CONTEXT_COURSE:
+            $item->instance = $DB->get_field('course', 'fullname', array('id' => $pcontext->instanceid));
+            break;
+        case CONTEXT_MODULE:
+            // TODO Module name.
+            $item->instance = $DB->get_field('course_modules', 'instance', array('id' => $pcontext->instanceid));
+            break;
+        case CONTEXT_BLOCK:
+            $item->instance = $DB->get_field('block_instance', 'blockname', array('id' => $pcontext->instanceid));
+            break;
+        }
+        $out[] = $item;
+
+    }
+    return $out;
+}

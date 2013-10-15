@@ -69,15 +69,15 @@ class capexplorer_selector_form extends moodleform {
 
         $options = array('' => get_string('chooseacategoryfirst', 'tool_capexplorer'));
         $instances[] = &$mform->createElement('select', 'courseinstances', '', $options,
-            array('class' => 'hidden-field', 'disabled' => 'disabled'));
+            array('class' => 'hidden-field'));
 
         $options = array('' => get_string('chooseacoursefirst', 'tool_capexplorer'));
         $instances[] = &$mform->createElement('select', 'moduleinstances', '', $options,
-            array('class' => 'hidden-field', 'disabled' => 'disabled'));
+            array('class' => 'hidden-field'));
 
         $options = array('' => get_string('chooseacoursefirst', 'tool_capexplorer'));
         $instances[] = &$mform->createElement('select', 'blockinstances', '', $options,
-            array('class' => 'hidden-field', 'disabled' => 'disabled'));
+            array('class' => 'hidden-field'));
 
         $mform->addGroup($instances, 'instances', get_string('instances', 'tool_capexplorer'), array(' '), false);
         /*
@@ -106,6 +106,7 @@ class capexplorer_selector_form extends moodleform {
      * @param array $files
      * @return void
      */
+    /*
     public function validation($data, $files) {
         global $DB;
         $errors = array();
@@ -116,10 +117,12 @@ class capexplorer_selector_form extends moodleform {
             return $errors;
         }
 
+        var_dump($data);
         if ($data["{$context}instances"] == 0) {
             $errors['instances'] = get_string("error:no{$context}", 'tool_capexplorer');
         }
 
         return $errors;
     }
+*/
 }
