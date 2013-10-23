@@ -34,9 +34,29 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      *
      * @return string HTML
      */
-    public function render_tool_capexplorer_parent_context_table($parentcontexts) {
-        $output = '';
-        return $this->box($output);
+    public function print_parent_context_table($parentcontexts) {
+        $html = '';
+        $table = new html_table();
+        $table->head = array(
+            get_string('contextlevel', 'tool_capexplorer'),
+            get_string('instancename', 'tool_capexplorer')
+        );
+        $table->colclasses = array(
+            'contextlevel',
+            'instancename'
+        );
+        $table->data = array();
+        foreach ($parentcontexts as $context) {
+            $instance = isset($context->url) ?
+                html_writer::link($context->url, $context->instance) : $context->instance;
+            $row = new html_table_row(array(
+                $context->contextlevel,
+                $instance
+            ));
+            $table->data[] = $row;
+        }
+        $html .= html_writer::table($table);
+        return $html;
     }
 
 }

@@ -55,12 +55,17 @@ $userid = 2;
 $capability = 'mod/forum:addnews';
 $contextid = 30;
 
-$context = context_module::instance(5);
+$context = context_module::instance(1);
 $out = tool_capexplorer_get_parent_context_info($context);
-echo '<pre>';
-var_dump($out);
-echo '</pre>';
 
+$output = $PAGE->get_renderer('tool_capexplorer');
+
+echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
+echo $output->print_parent_context_table($out);
+
+echo '<pre>';
+var_dump(get_roles_with_capability($capability));
+echo '</pre>';
 
 $funcresult = has_capability($capability, $context, $userid, true);
 $isadmin = is_siteadmin();

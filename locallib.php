@@ -44,9 +44,16 @@ function tool_capexplorer_render_json($options, $disabled = false) {
     exit;
 }
 
+/**
+ * Given a context object, return information about all parent contexts
+ *
+ * @param object $context Context object.
+ * @return array Array of parent context info.
+ */
 function tool_capexplorer_get_parent_context_info($context) {
-    global $DB;
+    global $CFG, $DB;
     $parentcontexts = $context->get_parent_contexts(true);
+    $parentcontexts = array_reverse($parentcontexts);
 
     $out = array();
     foreach ($parentcontexts as $pcontext) {
@@ -57,21 +64,42 @@ function tool_capexplorer_get_parent_context_info($context) {
             $item->instance = get_string('none', 'tool_capexplorer');
             break;
         case CONTEXT_USER:
-            // TODO Fullname.
-            $item->instance = $DB->get_field('user', 'firstname', array('id' => $pcontext->instanceid));
+            $item->instance = format_string($DB->get_field('user',
+                $DB->sql_fullname(), array('id' => $pcontext->instanceid)));
+            $item->url = new moodle_url('/user/profile.php',
+                array('id' => $pcontext->instanceid));
             break;
         case CONTEXT_COURSECAT:
-            $item->instance = $DB->get_field('course_categories', 'name', array('id' => $pcontext->instanceid));
+            $item->instance = format_string($DB->get_field('course_categories',
+                'name', array('id' => $pcontext->instanceid)));
+            $item->url = new moodle_url('/course/index.php',
+                array('categoryid' => $pcontext->instanceid));
             break;
         case CONTEXT_COURSE:
-            $item->instance = $DB->get_field('course', 'fullname', array('id' => $pcontext->instanceid));
+            $coursename = format_string($DB->get_field('course', 'fullname',
+                array('id' => $pcontext->instanceid)));
+            if ($pcontext->instanceid == 1) {
+                $item->instance = get_string('xfrontpage', 'tool_capexplorer', $coursename);
+            } else {
+                $item->instance = $coursename;
+            }
+            $item->url = new moodle_url('/course/view.php',
+                array('id' => $pcontext->instanceid));
             break;
         case CONTEXT_MODULE:
-            // TODO Module name.
-            $item->instance = $DB->get_field('course_modules', 'instance', array('id' => $pcontext->instanceid));
+            $sql = "SELECT cm.id,cm.instance,m.name
+                FROM {course_modules} cm JOIN {modules} m
+                ON m.id = cm.module
+                WHERE cm.id = ?";
+            $modinfo = $DB->get_record_sql($sql, array($pcontext->instanceid));
+            $item->instance = format_string($DB->get_field($modinfo->name, 'name',
+                array('id' => $modinfo->instance)));
+            $item->url = new moodle_url("/mod/{$modinfo->name}/view.php",
+                array('id' => $modinfo->instance));
             break;
         case CONTEXT_BLOCK:
-            $item->instance = $DB->get_field('block_instance', 'blockname', array('id' => $pcontext->instanceid));
+            $blockname = $DB->get_field('block_instances', 'blockname', array('id' => $pcontext->instanceid));
+            $item->instance = get_string('pluginname', "block_{$blockname}");
             break;
         }
         $out[] = $item;
