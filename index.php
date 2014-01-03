@@ -61,7 +61,8 @@ $isadmin = is_siteadmin();
 $output = $PAGE->get_renderer('tool_capexplorer');
 
 $user = $DB->get_record('user', array('id' => $userid));
-echo $output->print_capability_check_result($capability, $context, $user, $isadmin, $result);
+echo $output->heading(get_string('hascapreturns', 'tool_capexplorer'));
+echo $output->print_capability_check_result($result, $isadmin);
 
 echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
 $out = tool_capexplorer_get_parent_context_info($context);

@@ -187,43 +187,19 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $out;
     }
 
-    public function print_capability_check_result($capability, $context, $user, $isadmin, $result) {
+    public function print_capability_check_result($result, $isadmin) {
         $html = '';
+
+        $result = ($result) ? 'capgranted' : 'capdenied';
+        $html .= $this->output->container(
+            get_string($result, 'tool_capexplorer'),
+            $result
+        );
 
         if ($isadmin) {
             $url = new moodle_url('/admin/roles/admins.php');
             $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $url->out()), 'notifyproblem');
         }
-
-        $contextinfo = tool_capexplorer_get_context_info($context);
-        $result = ($result) ? 'granted' : 'denied';
-        $resultstr = html_writer::tag('span',
-            get_string($result, 'tool_capexplorer'),
-            array('class' => 'cap' . $result)
-        );
-
-        $data = array(
-            get_string('capability', 'tool_capexplorer') => $capability,
-            get_string('user', 'tool_capexplorer') => fullname($user),
-            get_string('contextlevel', 'tool_capexplorer') => $contextinfo->contextlevel,
-            get_string('instancename', 'tool_capexplorer') => $contextinfo->instance,
-            get_string('result', 'tool_capexplorer') => $resultstr
-        );
-        $table = new html_table();
-        $table->data = array();
-
-        foreach ($data as $heading => $value) {
-            $row = new html_table_row();
-            $cell1 = new html_table_cell();
-            $cell1->header = true;
-            $cell1->text = $heading;
-            $cell2 = new html_table_cell();
-            $cell2->text = $value;
-            $row->cells = array($cell1, $cell2);
-            $table->data[] = $row;
-        }
-
-        $html .= html_writer::table($table);
 
         return $html;
     }
