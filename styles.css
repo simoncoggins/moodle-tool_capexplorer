@@ -2,3 +2,30 @@
 .hidden-field {
     display: none;
 }
+
+.perm-allow {
+    color: green;
+}
+
+.perm-prevent {
+    color: red;
+}
+
+.perm-prohibit {
+    color: red;
+    font-weight: bold;
+}
+
+.perm-notset {
+    color: gray;
+}
+
+.capgranted {
+    color: green;
+    font-weight: bold;
+}
+
+.capdenied {
+    color: red;
+    font-weight: bold;
+}

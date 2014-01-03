@@ -42,7 +42,7 @@ $args = array(
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '', null)
 );
 
-$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
+//$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
 
 admin_externalpage_setup('toolcapexplorer');
 
@@ -53,24 +53,31 @@ $mform = new capexplorer_selector_form();
 
 $userid = 2;
 $capability = 'mod/forum:addnews';
-$contextid = 30;
-
 $context = context_module::instance(1);
-$out = tool_capexplorer_get_parent_context_info($context);
+
+$result = has_capability($capability, $context, $userid, false);
+$isadmin = is_siteadmin();
 
 $output = $PAGE->get_renderer('tool_capexplorer');
 
+$user = $DB->get_record('user', array('id' => $userid));
+echo $output->print_capability_check_result($capability, $context, $user, $isadmin, $result);
+
 echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
+$out = tool_capexplorer_get_parent_context_info($context);
 echo $output->print_parent_context_table($out);
 
+echo $output->heading(get_string('rolepermsforcapx', 'tool_capexplorer', $capability));
+
+echo $output->heading(get_string('roleassignandoverridesforcapx', 'tool_capexplorer', $capability));
+
+$roles = get_roles_with_capability($capability);
+$parentcontexts = $context->get_parent_contexts(true);
+$contexts = array_reverse($parentcontexts);
+echo $output->print_role_capability_table($contexts, $roles, $userid, $capability);
+
 echo '<pre>';
-var_dump(get_roles_with_capability($capability));
 echo '</pre>';
-
-$funcresult = has_capability($capability, $context, $userid, true);
-$isadmin = is_siteadmin();
-
-
 
 /*
 if ($mform->is_cancelled()) {

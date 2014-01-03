@@ -22,8 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
+$string['capexplorer:view'] = 'View Capability Explorer';
 $string['chooseablock'] = 'Choose a block...';
 $string['chooseacategory'] = 'Choose a category...';
 $string['chooseacategoryfirst'] = 'Choose a category first';
@@ -35,11 +37,13 @@ $string['contextlevel'] = 'Context level';
 $string['contextlineage'] = 'Context lineage';
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
+$string['denied'] = 'Denied';
 $string['error:noblock'] = 'You must select a block instance.';
 $string['error:nocategory'] = 'You must select a category instance.';
 $string['error:nocourse'] = 'You must select a course instance.';
 $string['error:nomodule'] = 'You must select a module instance.';
 $string['error:nouser'] = 'You must select a user instance.';
+$string['granted'] = 'Granted';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
 $string['modulecontext'] = 'Module (Activity) context';
@@ -48,10 +52,23 @@ $string['nocatfrontpage'] = 'No category (Front page course)';
 $string['nocoursesfound'] = 'No courses found';
 $string['nomodulesfound'] = 'No modules found';
 $string['none'] = 'None';
+$string['permissionallow'] = 'Allow';
+$string['permissioninherit'] = 'Inherit';
+$string['permissionnotset'] = 'Not set';
+$string['permissionprevent'] = 'Prevent';
+$string['permissionprohibit'] = 'Prohibit';
+$string['permissionunknown'] = 'Unknown';
 $string['pluginname'] = 'Capability Explorer';
+$string['result'] = 'Result';
+$string['roleassignandoverridesforcapx'] = 'Role assignments and overrides for capability "{$a}"';
+$string['rolepermsforcapx'] = 'Role permissions for capability "{$a}"';
 $string['selectortitle'] = 'Select the capability to explore.';
 $string['systemcontext'] = 'System (Site) context';
+$string['user'] = 'User';
 $string['usercontext'] = 'User context';
+$string['userisadmin'] = 'Note: this user is a <a href="{$a}">site administrator</a>, so is automatically granted all capabilities. The result below treats the user as if they were\'t an admin.';
 $string['username'] = 'Username';
+$string['viaassignment'] = 'Via <a href="{$a}">role assignment</a>';
+$string['viaoverride'] = 'Via <a href="{$a}">role override</a>';
 $string['xfrontpage'] = '{$a} (Front page)';
 
