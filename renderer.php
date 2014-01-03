@@ -61,6 +61,40 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
     /**
      * Displays a tables showing the permissions for a particular capability for
+     * a set of roles.
+     *
+     * @param array $rolepermissions An array contains roleids as keys and
+     *                               the roles permission as values.
+     * @param array $roles An array of role objects keyed by roleid.
+     *
+     * @return string HTML to display the table.
+     */
+    public function print_role_permission_table($rolepermissions, $roles) {
+        $html = '';
+        $table = new html_table();
+        $table->head = array(
+            get_string('role', 'tool_capexplorer'),
+            get_string('permission', 'tool_capexplorer')
+        );
+        $table->colclasses = array(
+            'role',
+            'permission'
+        );
+        $table->data = array();
+        foreach ($rolepermissions as $roleid => $permission) {
+            $role = role_get_name($roles[$roleid]);
+            $row = new html_table_row(array(
+                $role,
+                $this->print_permission_value($permission)
+            ));
+            $table->data[] = $row;
+        }
+        $html .= html_writer::table($table);
+        return $html;
+    }
+
+    /**
+     * Displays a tables showing the permissions for a particular capability for
      * a set of roles in a set of contexts.
      *
      * @param array $contexts An array of context objects.
@@ -82,38 +116,41 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $html = '';
         $table = new html_table();
         $table->head = array(
-            'Role' //get_string('role', 'tool_capexplorer'),
+            get_string('contextlevel', 'tool_capexplorer'),
+            get_string('instancename', 'tool_capexplorer'),
         );
         $table->colclasses = array(
-            'role',
+            'contextlevel',
+            'instancename',
         );
-        foreach ($contexts as $context) {
-            $contextinfo = tool_capexplorer_get_context_info($context);
-            $table->head[] = $contextinfo->instance;
-            $table->colclasses[] = 'context-' . $contextinfo->contextlevel;
+        foreach ($roles as $role) {
+            $table->head[] = role_get_name($role);
+            $table->colclasses[] = 'role-' . $role->id;
         }
         $table->data = array();
 
-        foreach ($roles as $role) {
-            $roleid = $role->id;
-            $row = array(role_get_name($role));
-            foreach ($contexts as $context) {
-                $contextid = $context->id;
-                if (isset($assignmentdata[$roleid][$contextid]) ||
-                    isset($overridedata[$roleid][$contextid])) {
+        foreach ($contexts as $context) {
+            $contextid = $context->id;
+            $contextinfo = tool_capexplorer_get_context_info($context);
+            $instance = isset($contextinfo->url) ?
+                html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
+            $row = array($contextinfo->contextlevel, $instance);
+            foreach ($roles as $role) {
+                $roleid = $role->id;
+                if (isset($assignmentdata[$contextid][$roleid]) ||
+                    isset($overridedata[$contextid][$roleid])) {
                     $cell = '';
-                    if (isset($assignmentdata[$roleid][$contextid])) {
-                        $cell .= $this->print_permission($assignmentdata[$roleid][$contextid], $contextid, $roleid, $capability, 'assignment');
+                    if (isset($assignmentdata[$contextid][$roleid])) {
+                        $cell .= $this->print_permission($assignmentdata[$contextid][$roleid], $contextid, $roleid, $capability, 'assignment');
                     }
-                    if (isset($overridedata[$roleid][$contextid], $contextid, $roleid, $capability)) {
-                        $cell .= $this->print_permission($overridedata[$roleid][$contextid], $contextid, $roleid, $capability, 'override');
+                    if (isset($overridedata[$contextid][$roleid], $contextid, $roleid, $capability)) {
+                        $cell .= $this->print_permission($overridedata[$contextid][$roleid], $contextid, $roleid, $capability, 'override');
                     }
                 } else {
                     $cell = $this->print_permission(null, $contextid, $roleid, $capability);
                 }
 
                 $row[] = $cell;
-                //$this->print_permission($overridedata[$roleid][$contextid], $contextid, $roleid, $capability);
             }
             $table->data[] = new html_table_row($row);
         }
@@ -121,6 +158,37 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Format a permission constant to print a formatted HTML string description.
+     *
+     * @param int $permission CAP_* integer permission.
+     * @return string HTML to display the string by name.
+     */
+    public function print_permission_value($permission) {
+        // Need to be strict on values but not types so cast everything to strings.
+        if ((string)$permission === (string)CAP_INHERIT) {
+            $permstr = 'inherit';
+        } else if ((string)$permission === (string)CAP_ALLOW) {
+            $permstr = 'allow';
+        } else if ((string)$permission === (string)CAP_PREVENT) {
+            $permstr = 'prevent';
+        } else if ((string)$permission === (string)CAP_PROHIBIT) {
+            $permstr = 'prohibit';
+        } else if (is_null($permission)) {
+            $permstr = 'notset';
+        } else {
+            $permstr = 'unknown';
+        }
+
+        $out = $this->output->container(
+            get_string('permission' . $permstr, 'tool_capexplorer'),
+            'perm-' . $permstr
+        );
+
+        return $out;
+    }
+
+    // TODO fix to use print_permission_value() and focus on other tasks.
     public function print_permission($permission, $contextid, $roleid, $capability, $via = false) {
         global $CFG;
         switch ($via) {

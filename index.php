@@ -55,24 +55,24 @@ $userid = 2;
 $capability = 'mod/forum:addnews';
 $context = context_module::instance(1);
 
-$result = has_capability($capability, $context, $userid, false);
-$isadmin = is_siteadmin();
-
 $output = $PAGE->get_renderer('tool_capexplorer');
 
-$user = $DB->get_record('user', array('id' => $userid));
 echo $output->heading(get_string('hascapreturns', 'tool_capexplorer'));
+$result = has_capability($capability, $context, $userid, false);
+$isadmin = is_siteadmin();
 echo $output->print_capability_check_result($result, $isadmin);
 
 echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
-$out = tool_capexplorer_get_parent_context_info($context);
-echo $output->print_parent_context_table($out);
+$parentcontexts = tool_capexplorer_get_parent_context_info($context);
+echo $output->print_parent_context_table($parentcontexts);
 
 echo $output->heading(get_string('rolepermsforcapx', 'tool_capexplorer', $capability));
+$roles = get_roles_with_capability($capability);
+$rolepermissions = tool_capexplorer_get_system_role_permissions($roles, $capability);
+echo $output->print_role_permission_table($rolepermissions, $roles);
 
 echo $output->heading(get_string('roleassignandoverridesforcapx', 'tool_capexplorer', $capability));
 
-$roles = get_roles_with_capability($capability);
 $parentcontexts = $context->get_parent_contexts(true);
 $contexts = array_reverse($parentcontexts);
 echo $output->print_role_capability_table($contexts, $roles, $userid, $capability);

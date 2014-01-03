@@ -122,11 +122,36 @@ function tool_capexplorer_get_parent_context_info($context) {
     return $out;
 }
 
+
+/**
+ * @param array $roles Array of role objects keyed by roleid.
+ * @param string $capability A capability to check against.
+ * @return array Array of roleid/permission pairs for the specified capability.
+ */
+function tool_capexplorer_get_system_role_permissions($roles, $capability) {
+    global $DB;
+
+    $systemcontext = context_system::instance();
+    $systemcontextid = $systemcontext->id;
+    $roleids = array_keys($roles);
+
+    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
+
+    // Get the system level role permissions.
+    $rolepermissions = $DB->get_records_select_menu('role_capabilities',
+        "roleid {$rolesql} AND contextid = ? AND capability = ?",
+        array_merge($roleparams, array($systemcontextid, $capability)),
+        '', 'roleid, permission'
+    );
+
+    return $rolepermissions;
+}
+
 /**
  * Given a set of contexts and a set of roles, determine if any roles override
  * a specific user is assigned to those roles in those contexts.
  *
- * The output array is a 2D array keyed on roleid then contextid, with
+ * The output array is a 2D array keyed on contextid then roleid, with
  * values of the permission constant for the role and capability if assigned
  * to the user in that context, or null otherwise.
  *
@@ -143,35 +168,28 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
         return false;
     }
 
-    $systemcontext = context_system::instance();
-    $systemcontextid = $systemcontext->id;
 
     list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
     list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
 
     // Get the system level role permissions.
-    $rolepermissions = $DB->get_records_select_menu('role_capabilities',
-        "roleid {$rolesql} AND contextid = ? AND capability = ?",
-        array_merge($roleparams, array($systemcontextid, $capability)),
-        '', 'roleid, permission'
-    );
+    $rolepermissions = tool_capexplorer_get_system_role_permissions($roleids, $capability);
 
     // Build a 2D array to store results.
     $out = array();
-    foreach ($roleids as $roleid) {
-        $out[$roleid] = array();
-        foreach ($contextids as $contextid) {
-            $out[$roleid][$contextid] = null;
+    foreach ($contextids as $contextid) {
+        $out[$contextid] = array();
+        foreach ($roleids as $roleid) {
+            $out[$contextid][$roleid] = null;
         }
     }
 
-    // Exclude the system context since we can't override at that level.
     $sql = "contextid {$contextsql} AND roleid {$rolesql} AND userid = ?";
     $params = array_merge($contextparams, $roleparams, array($userid));
     $rs = $DB->get_recordset_select('role_assignments', $sql, $params);
 
     foreach ($rs as $record) {
-        $out[$record->roleid][$record->contextid] = isset($rolepermissions[$roleid]) ? $rolepermissions[$roleid] : null;
+        $out[$record->contextid][$record->roleid] = isset($rolepermissions[$roleid]) ? $rolepermissions[$roleid] : null;
     }
     $rs->close();
 
@@ -182,7 +200,7 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
  * Given a set of contexts and a set of roles, determine if any roles override
  * a specific capability in any of the contexts.
  *
- * The output array is a 2D array keyed on roleid then contextid, with
+ * The output array is a 2D array keyed on contextid then roleid, with
  * values of the permission constant for that role and context, or null
  * if nothing set.
  *
@@ -200,10 +218,10 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
 
     // Build a 2D array to store results.
     $out = array();
-    foreach ($roleids as $roleid) {
-        $out[$roleid] = array();
-        foreach ($contextids as $contextid) {
-            $out[$roleid][$contextid] = null;
+    foreach ($contextids as $contextid) {
+        $out[$contextid] = array();
+        foreach ($roleids as $roleid) {
+            $out[$contextid][$roleid] = null;
         }
     }
 
@@ -217,7 +235,7 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
     $params = array_merge($contextparams, $roleparams, array($capability, $systemcontextid));
     $rs = $DB->get_recordset_select('role_capabilities', $sql, $params);
     foreach ($rs as $record) {
-        $out[$record->roleid][$record->contextid] = $record->permission;
+        $out[$record->contextid][$record->roleid] = $record->permission;
     }
     $rs->close();
 
