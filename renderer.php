@@ -59,35 +59,81 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $html;
     }
 
+
     /**
-     * Displays a tables showing the permissions for a particular capability for
-     * a set of roles.
+     * Displays a tables showing the role permissions for a particular capability for
+     * a set of roles in a set of contexts.
      *
-     * @param array $rolepermissions An array contains roleids as keys and
-     *                               the roles permission as values.
-     * @param array $roles An array of role objects keyed by roleid.
+     * @param array $contexts An array of context objects.
+     * @param array $roles An array of role objects.
+     * @param string $capability A capability to display results for.
      *
      * @return string HTML to display the table.
      */
-    public function print_role_permission_table($rolepermissions, $roles) {
+    public function print_role_permission_and_overrides_table($contexts, $roles, $capability) {
+        $roleids = array_keys($roles);
+        $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+
         $html = '';
         $table = new html_table();
         $table->head = array(
-            get_string('role', 'tool_capexplorer'),
-            get_string('permission', 'tool_capexplorer')
+            get_string('contextlevel', 'tool_capexplorer'),
+            get_string('instancename', 'tool_capexplorer'),
         );
         $table->colclasses = array(
-            'role',
-            'permission'
+            'contextlevel',
+            'instancename',
         );
+        foreach ($roles as $role) {
+            $table->head[] = role_get_name($role);
+            $table->colclasses[] = 'role-' . $role->id;
+        }
         $table->data = array();
-        foreach ($rolepermissions as $roleid => $permission) {
-            $role = role_get_name($roles[$roleid]);
-            $row = new html_table_row(array(
-                $role,
-                $this->print_permission_value($permission)
-            ));
-            $table->data[] = $row;
+
+        $systemcontext = context_system::instance();
+        $systemcontextid = $systemcontext->id;
+
+        foreach ($contexts as $context) {
+            $contextid = $context->id;
+            $issystemcontext = ($contextid == $systemcontextid);
+            $contextinfo = tool_capexplorer_get_context_info($context);
+            $instance = isset($contextinfo->url) ?
+                html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
+            $row = array($contextinfo->contextlevel, $instance);
+            foreach ($roles as $role) {
+                $roleid = $role->id;
+                $cell = $this->print_permission_value($overridedata[$contextid][$roleid]);
+
+                $overrideurl = new moodle_url('/admin/roles/override.php',
+                    array('contextid' => $contextid, 'roleid' => $roleid));
+                $defineurl = new moodle_url('/admin/roles/define.php',
+                    array('action' => 'view', 'roleid' => $roleid));
+                $url = ($issystemcontext) ? $defineurl : $overrideurl;
+
+                // not set (null) and inherit (0) are matched by empty, others aren't.
+                $linkstr = empty($overridedata[$contextid][$roleid]) ? 'set' : 'change';
+                $link = html_writer::link($url, get_string($linkstr, 'tool_capexplorer'));
+
+                $cell .= html_writer::tag('small', $link);
+                /*
+                if (isset($assignmentdata[$contextid][$roleid]) ||
+                    isset($overridedata[$contextid][$roleid])) {
+                    $cell = '';
+                    if (isset($assignmentdata[$contextid][$roleid])) {
+                        $cell .= $this->print_permission($assignmentdata[$contextid][$roleid], $contextid, $roleid, $capability, 'assignment');
+                    }
+                    if (isset($overridedata[$contextid][$roleid], $contextid, $roleid, $capability)) {
+                        $cell .= $this->print_permission($overridedata[$contextid][$roleid], $contextid, $roleid, $capability, 'override');
+                    }
+                } else {
+                    $cell = $this->print_permission(null, $contextid, $roleid, $capability);
+                }
+*/
+
+                $row[] = $cell;
+            }
+            $table->data[] = new html_table_row($row);
         }
         $html .= html_writer::table($table);
         return $html;
@@ -108,9 +154,6 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
         $assignmentdata = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid, $capability);
-        echo '<pre>';
-        //var_dump($assignmentdata);
-        echo '</pre>';
         $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
 
         $html = '';

@@ -207,9 +207,10 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
  * @param array $contextids Array of context ids.
  * @param array $roleids Array of role ids.
  * @param string $capability A capability to check against.
+ * @param bool $excludesystemcontext If true, exclude system level permissions (overrides only).
  * @return array Array of role override info.
  */
-function tool_capexplorer_get_role_override_info($contextids, $roleids, $capability) {
+function tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, $excludesystemcontext = true) {
     global $DB;
 
     if (empty($contextids) || empty($roleids)) {
@@ -228,11 +229,16 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
     list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
     list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
 
-    // Exclude the system context since we can't override at that level.
-    $systemcontext = context_system::instance();
-    $systemcontextid = $systemcontext->id;
-    $sql = "contextid {$contextsql} AND roleid {$rolesql} AND capability = ? AND contextid <> ?";
-    $params = array_merge($contextparams, $roleparams, array($capability, $systemcontextid));
+    $sql = "contextid {$contextsql} AND roleid {$rolesql} AND capability = ?";
+    $params = array_merge($contextparams, $roleparams, array($capability));
+
+    // Exclude the system context if specified.
+    if ($excludesystemcontext) {
+        $systemcontext = context_system::instance();
+        $sql .= " AND contextid <> ?";
+        $params = array_merge($params, array($systemcontext->id));
+    }
+
     $rs = $DB->get_recordset_select('role_capabilities', $sql, $params);
     foreach ($rs as $record) {
         $out[$record->contextid][$record->roleid] = $record->permission;
