@@ -163,14 +163,6 @@ function tool_capexplorer_get_system_role_permissions($roles, $capability) {
 function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid) {
     global $DB;
 
-    if (empty($contextids) || empty($roleids)) {
-        return false;
-    }
-
-
-    list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
-    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
-
     // Build a 2D array to store results.
     $out = array();
     foreach ($contextids as $contextid) {
@@ -179,6 +171,13 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
             $out[$contextid][$roleid] = false;
         }
     }
+
+    if (empty($contextids) || empty($roleids)) {
+        return $out;
+    }
+
+    list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
+    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
 
     $sql = "contextid {$contextsql} AND roleid {$rolesql} AND userid = ?";
     $params = array_merge($contextparams, $roleparams, array($userid));
@@ -191,6 +190,42 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
 
     return $out;
 }
+
+
+/**
+ * Check system config to see if the specified user should be assigned any additional
+ * roles.
+ *
+ * The output array is a 2D array keyed on contextid then roleid, with
+ * boolean true values to indicate a role assignment.
+ *
+ * @param int $userid A userid to check for automatic assignments.
+ * @return array Sparse array of role assignment data.
+ */
+function tool_capexplorer_get_auto_role_assignment_info($userid) {
+    global $CFG;
+
+    $systemcontext = context_system::instance();
+    $out = array();
+    $out[$systemcontext->id] = array();
+
+    // User is guest user.
+    if (isguestuser($userid)) {
+        // Assign guest role in system context.
+        if (!empty($CFG->guestroleid)) {
+            $out[$systemcontext->id][$CFG->guestroleid] = true;
+        }
+    } else {
+        // Treat them as if they are logged in and give them the default role
+        // in the system context.
+        if (!empty($CFG->defaultuserroleid)) {
+            $out[$systemcontext->id][$CFG->defaultuserroleid] = true;
+        }
+    }
+
+    return $out;
+}
+
 
 /**
  * Given a set of contexts and a set of roles, determine if any roles override
@@ -209,10 +244,6 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
 function tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, $excludesystemcontext = true) {
     global $DB;
 
-    if (empty($contextids) || empty($roleids)) {
-        return false;
-    }
-
     // Build a 2D array to store results.
     $out = array();
     foreach ($contextids as $contextid) {
@@ -220,6 +251,10 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
         foreach ($roleids as $roleid) {
             $out[$contextid][$roleid] = null;
         }
+    }
+
+    if (empty($contextids) || empty($roleids)) {
+        return $out;
     }
 
     list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
