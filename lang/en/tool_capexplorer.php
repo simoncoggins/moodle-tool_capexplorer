@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['assigned'] = 'Assigned';
 $string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
@@ -46,6 +47,7 @@ $string['error:nocourse'] = 'You must select a course instance.';
 $string['error:nomodule'] = 'You must select a module instance.';
 $string['error:nouser'] = 'You must select a user instance.';
 $string['hascapreturns'] = 'has_capability() returns:';
+$string['inherited'] = 'Inherited';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
 $string['modulecontext'] = 'Module (Activity) context';
@@ -54,6 +56,7 @@ $string['nocatfrontpage'] = 'No category (Front page course)';
 $string['nocoursesfound'] = 'No courses found';
 $string['nomodulesfound'] = 'No modules found';
 $string['none'] = 'None';
+$string['notassigned'] = 'Not Assigned';
 $string['permission'] = 'Permission';
 $string['permissionallow'] = 'Allow';
 $string['permissioninherit'] = 'Inherit';
@@ -63,6 +66,7 @@ $string['permissionprohibit'] = 'Prohibit';
 $string['permissionunknown'] = 'Unknown';
 $string['pluginname'] = 'Capability Explorer';
 $string['role'] = 'Role';
+$string['roleassignmentsforuserx'] = 'Role assignments for user "{$a}"';
 $string['rolepermissionsandoverridesforcapx'] = 'All role permissions and overrides for capability "{$a}"';
 $string['selectortitle'] = 'Select the capability to explore.';
 $string['set'] = 'Set';

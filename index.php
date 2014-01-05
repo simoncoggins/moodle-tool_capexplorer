@@ -74,7 +74,10 @@ $roles = get_roles_with_capability($capability);
 
 echo $output->print_role_permission_and_overrides_table($contexts, $roles, $capability);
 
-//echo $output->print_role_capability_table($contexts, $roles, $userid, $capability);
+$user = $DB->get_record('user', array('id' => $userid));
+echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
+
+echo $output->print_role_assignment_table($contexts, $roles, $userid);
 
 echo '<pre>';
 echo '</pre>';

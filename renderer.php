@@ -108,7 +108,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $overrideurl = new moodle_url('/admin/roles/override.php',
                     array('contextid' => $contextid, 'roleid' => $roleid));
                 $defineurl = new moodle_url('/admin/roles/define.php',
-                    array('action' => 'view', 'roleid' => $roleid));
+                    array('action' => 'edit', 'roleid' => $roleid));
                 $url = ($issystemcontext) ? $defineurl : $overrideurl;
 
                 // not set (null) and inherit (0) are matched by empty, others aren't.
@@ -116,21 +116,6 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $link = html_writer::link($url, get_string($linkstr, 'tool_capexplorer'));
 
                 $cell .= html_writer::tag('small', $link);
-                /*
-                if (isset($assignmentdata[$contextid][$roleid]) ||
-                    isset($overridedata[$contextid][$roleid])) {
-                    $cell = '';
-                    if (isset($assignmentdata[$contextid][$roleid])) {
-                        $cell .= $this->print_permission($assignmentdata[$contextid][$roleid], $contextid, $roleid, $capability, 'assignment');
-                    }
-                    if (isset($overridedata[$contextid][$roleid], $contextid, $roleid, $capability)) {
-                        $cell .= $this->print_permission($overridedata[$contextid][$roleid], $contextid, $roleid, $capability, 'override');
-                    }
-                } else {
-                    $cell = $this->print_permission(null, $contextid, $roleid, $capability);
-                }
-*/
-
                 $row[] = $cell;
             }
             $table->data[] = new html_table_row($row);
@@ -140,21 +125,19 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Displays a tables showing the permissions for a particular capability for
+     * Displays a tables showing the role assignments for a particular user for
      * a set of roles in a set of contexts.
      *
      * @param array $contexts An array of context objects.
      * @param array $roles An array of role objects.
      * @param int $userid A userid to display results for.
-     * @param string $capability A capability to display results for.
      *
      * @return string HTML to display the table.
      */
-    public function print_role_capability_table($contexts, $roles, $userid, $capability) {
+    public function print_role_assignment_table($contexts, $roles, $userid) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
-        $assignmentdata = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid, $capability);
-        $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
+        $assignmentdata = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid);
 
         $html = '';
         $table = new html_table();
@@ -172,6 +155,10 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         }
         $table->data = array();
 
+        // Create array for tracking if roles are assigned or not.
+        // Initially no roles are assigned so all start as false.
+        $roleassignstatus = array_fill_keys($roleids, false);
+
         foreach ($contexts as $context) {
             $contextid = $context->id;
             $contextinfo = tool_capexplorer_get_context_info($context);
@@ -180,18 +167,26 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $row = array($contextinfo->contextlevel, $instance);
             foreach ($roles as $role) {
                 $roleid = $role->id;
-                if (isset($assignmentdata[$contextid][$roleid]) ||
-                    isset($overridedata[$contextid][$roleid])) {
-                    $cell = '';
-                    if (isset($assignmentdata[$contextid][$roleid])) {
-                        $cell .= $this->print_permission($assignmentdata[$contextid][$roleid], $contextid, $roleid, $capability, 'assignment');
-                    }
-                    if (isset($overridedata[$contextid][$roleid], $contextid, $roleid, $capability)) {
-                        $cell .= $this->print_permission($overridedata[$contextid][$roleid], $contextid, $roleid, $capability, 'override');
+
+                // not set (null) and inherit (0) are matched by empty, others aren't.
+                if (empty($assignmentdata[$contextid][$roleid])) {
+                    if ($roleassignstatus[$roleid]) {
+                        $textkey = 'inherited';
+                    } else {
+                        $textkey = 'notassigned';
                     }
                 } else {
-                    $cell = $this->print_permission(null, $contextid, $roleid, $capability);
+                    $textkey = 'assigned';
+                    $roleassignstatus[$roleid] = true;
                 }
+                $cell = $this->output->container(get_string($textkey, 'tool_capexplorer'));
+
+                // TODO need to take role override rules into account
+                // (some roles can't be assigned in some contexts).
+                $url = new moodle_url('/admin/roles/assign.php',
+                    array('contextid' => $contextid, 'roleid' => $roleid));
+                $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
+                $cell .= html_writer::tag('small', $link);
 
                 $row[] = $cell;
             }

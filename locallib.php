@@ -148,20 +148,19 @@ function tool_capexplorer_get_system_role_permissions($roles, $capability) {
 }
 
 /**
- * Given a set of contexts and a set of roles, determine if any roles override
+ * Given a set of contexts and a set of roles, determine if
  * a specific user is assigned to those roles in those contexts.
  *
  * The output array is a 2D array keyed on contextid then roleid, with
- * values of the permission constant for the role and capability if assigned
- * to the user in that context, or null otherwise.
+ * boolean values to indicate if the role is assigned to the user in the context
+ * or not.
  *
  * @param array $contextids Array of context ids.
  * @param array $roleids Array of role ids.
  * @param int $userid A userid to check for assignments.
- * @param string $capability A capability to check against.
- * @return array Array of role assignment info.
+ * @return array Array of role assignment data.
  */
-function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid, $capability) {
+function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid) {
     global $DB;
 
     if (empty($contextids) || empty($roleids)) {
@@ -172,15 +171,12 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
     list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
     list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
 
-    // Get the system level role permissions.
-    $rolepermissions = tool_capexplorer_get_system_role_permissions($roleids, $capability);
-
     // Build a 2D array to store results.
     $out = array();
     foreach ($contextids as $contextid) {
         $out[$contextid] = array();
         foreach ($roleids as $roleid) {
-            $out[$contextid][$roleid] = null;
+            $out[$contextid][$roleid] = false;
         }
     }
 
@@ -189,7 +185,7 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
     $rs = $DB->get_recordset_select('role_assignments', $sql, $params);
 
     foreach ($rs as $record) {
-        $out[$record->contextid][$record->roleid] = isset($rolepermissions[$roleid]) ? $rolepermissions[$roleid] : null;
+        $out[$record->contextid][$record->roleid] = true;
     }
     $rs->close();
 
