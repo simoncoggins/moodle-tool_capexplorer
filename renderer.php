@@ -168,16 +168,17 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             foreach ($roles as $role) {
                 $roleid = $role->id;
 
-                // not set (null) and inherit (0) are matched by empty, others aren't.
-                if (empty($assignmentdata[$contextid][$roleid])) {
+                if (isset($assignmentdata[$contextid][$roleid])
+                    && $assignmentdata[$contextid][$roleid] != CAP_INHERIT) {
+
+                    $textkey = 'assigned';
+                    $roleassignstatus[$roleid] = true;
+                } else {
                     if ($roleassignstatus[$roleid]) {
                         $textkey = 'inherited';
                     } else {
                         $textkey = 'notassigned';
                     }
-                } else {
-                    $textkey = 'assigned';
-                    $roleassignstatus[$roleid] = true;
                 }
                 $cell = $this->output->container(get_string($textkey, 'tool_capexplorer'));
 

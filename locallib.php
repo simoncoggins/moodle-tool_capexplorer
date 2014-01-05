@@ -152,25 +152,17 @@ function tool_capexplorer_get_system_role_permissions($roles, $capability) {
  * a specific user is assigned to those roles in those contexts.
  *
  * The output array is a 2D array keyed on contextid then roleid, with
- * boolean values to indicate if the role is assigned to the user in the context
- * or not.
+ * boolean true values to indicate a role assignment.
  *
  * @param array $contextids Array of context ids.
  * @param array $roleids Array of role ids.
  * @param int $userid A userid to check for assignments.
- * @return array Array of role assignment data.
+ * @return array Sparse array of role assignment data.
  */
 function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid) {
     global $DB;
 
-    // Build a 2D array to store results.
     $out = array();
-    foreach ($contextids as $contextid) {
-        $out[$contextid] = array();
-        foreach ($roleids as $roleid) {
-            $out[$contextid][$roleid] = false;
-        }
-    }
 
     if (empty($contextids) || empty($roleids)) {
         return $out;
@@ -205,8 +197,9 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
 function tool_capexplorer_get_auto_role_assignment_info($userid) {
     global $CFG;
 
-    $systemcontext = context_system::instance();
     $out = array();
+
+    $systemcontext = context_system::instance();
     $out[$systemcontext->id] = array();
 
     // User is guest user.

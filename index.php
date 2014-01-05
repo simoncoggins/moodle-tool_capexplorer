@@ -66,20 +66,20 @@ echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
 $parentcontexts = tool_capexplorer_get_parent_context_info($context);
 echo $output->print_parent_context_table($parentcontexts);
 
-echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
-
+$user = $DB->get_record('user', array('id' => $userid));
 $parentcontexts = $context->get_parent_contexts(true);
 $contexts = array_reverse($parentcontexts);
 $roles = get_roles_with_capability($capability);
 
-echo $output->print_role_permission_and_overrides_table($contexts, $roles, $capability);
-
-$user = $DB->get_record('user', array('id' => $userid));
 echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
-
 echo $output->print_role_assignment_table($contexts, $roles, $userid);
 
+echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
+echo $output->print_role_permission_and_overrides_table($contexts, $roles, $capability);
+
+
 echo '<pre>';
+var_dump(tool_capexplorer_get_auto_role_assignment_info($userid));
 echo '</pre>';
 
 /*
