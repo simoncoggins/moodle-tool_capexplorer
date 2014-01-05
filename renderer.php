@@ -137,7 +137,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     public function print_role_assignment_table($contexts, $roles, $userid) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
-        $assignmentdata = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid);
+        $manualassignments = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid);
+        $autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
 
         $html = '';
         $table = new html_table();
@@ -168,8 +169,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             foreach ($roles as $role) {
                 $roleid = $role->id;
 
-                if (isset($assignmentdata[$contextid][$roleid])
-                    && $assignmentdata[$contextid][$roleid] != CAP_INHERIT) {
+                if (isset($manualassignments[$contextid][$roleid])
+                    && $manualassignments[$contextid][$roleid] != CAP_INHERIT) {
 
                     $textkey = 'assigned';
                     $roleassignstatus[$roleid] = true;

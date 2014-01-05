@@ -189,10 +189,11 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
  * roles.
  *
  * The output array is a 2D array keyed on contextid then roleid, with
- * boolean true values to indicate a role assignment.
+ * strings as values to indicate a role assignment. The string text describes
+ * the name of the config variable that caused the assignment, e.g. 'guestroleid'.
  *
  * @param int $userid A userid to check for automatic assignments.
- * @return array Sparse array of role assignment data.
+ * @return array Sparse array of automatic role assignment data.
  */
 function tool_capexplorer_get_auto_role_assignment_info($userid) {
     global $CFG;
@@ -206,13 +207,13 @@ function tool_capexplorer_get_auto_role_assignment_info($userid) {
     if (isguestuser($userid)) {
         // Assign guest role in system context.
         if (!empty($CFG->guestroleid)) {
-            $out[$systemcontext->id][$CFG->guestroleid] = true;
+            $out[$systemcontext->id][$CFG->guestroleid] = 'guestroleid';
         }
     } else {
         // Treat them as if they are logged in and give them the default role
         // in the system context.
         if (!empty($CFG->defaultuserroleid)) {
-            $out[$systemcontext->id][$CFG->defaultuserroleid] = true;
+            $out[$systemcontext->id][$CFG->defaultuserroleid] = 'defaultuserroleid';
         }
     }
 
