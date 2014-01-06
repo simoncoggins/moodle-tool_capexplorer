@@ -176,6 +176,9 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
     $rs = $DB->get_recordset_select('role_assignments', $sql, $params);
 
     foreach ($rs as $record) {
+        if (!isset($out[$record->contextid])) {
+            $out[$record->contextid] = array();
+        }
         $out[$record->contextid][$record->roleid] = true;
     }
     $rs->close();
