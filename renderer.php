@@ -190,6 +190,11 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
                 $cell .= html_writer::tag('small', $link);
 
+                if (isset($autoassignments[$contextid][$roleid])) {
+                    $cell .= $this->output->container('Auto assign: ' . $autoassignments[$contextid][$roleid]);
+                    $roleassignstatus[$roleid] = true;
+                }
+
                 $row[] = $cell;
             }
             $table->data[] = new html_table_row($row);
