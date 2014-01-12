@@ -148,31 +148,30 @@ function tool_capexplorer_get_system_role_permissions($roles, $capability) {
 }
 
 /**
- * Given a set of contexts and a set of roles, determine if
- * a specific user is assigned to those roles in those contexts.
+ * Given a set of contexts, determine if a specific user is assigned to
+ * any roles in those contexts.
  *
  * The output array is a 2D array keyed on contextid then roleid, with
  * boolean true values to indicate a role assignment.
  *
- * @param array $contextids Array of context ids.
- * @param array $roleids Array of role ids.
+ * @param array $contexts Array of context objects.
  * @param int $userid A userid to check for assignments.
  * @return array Sparse array of role assignment data.
  */
-function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid) {
+function tool_capexplorer_get_role_assignment_info($contexts, $userid) {
     global $DB;
 
     $out = array();
 
-    if (empty($contextids) || empty($roleids)) {
+    if (empty($contexts)) {
         return $out;
     }
 
+    $contextids = array_map(function($context) {return $context->id;}, $contexts);
     list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
-    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
 
-    $sql = "contextid {$contextsql} AND roleid {$rolesql} AND userid = ?";
-    $params = array_merge($contextparams, $roleparams, array($userid));
+    $sql = "contextid {$contextsql} AND userid = ?";
+    $params = array_merge($contextparams, array($userid));
     $rs = $DB->get_recordset_select('role_assignments', $sql, $params);
 
     foreach ($rs as $record) {
@@ -184,6 +183,89 @@ function tool_capexplorer_get_role_assignment_info($contextids, $roleids, $useri
     $rs->close();
 
     return $out;
+}
+
+/**
+ * Given a set of contextids and roleids and some override data as generated
+ * by {@link tool_capexplorer_get_role_override_info()}, return an array
+ * keyed on roleids with the per-role result of calculating each role's
+ * overall permission.
+ *
+ * @param array $contextids Array of integer context ids.
+ * @param array $roleids Array of integer role ids.
+ * @param array $overridedata 2D array of override data for a set of contexts/roles.
+ *
+ * @return array Array with roleids as keys, merged permissions for each role as values.
+ */
+function tool_capexplorer_merge_permissions_across_contexts($contextids, $roleids, $overridedata) {
+    // Each role starts with not set.
+    $roletotals = array_fill_keys($roleids, null);
+    foreach ($contextids as $contextid) {
+        // Go through each context, starting from least specific.
+        foreach ($roleids as $roleid) {
+            // Aggregate to get overall permission for the role in the lowest context.
+            $roletotals[$roleid] = tool_capexplorer_merge_permissions(
+                $roletotals[$roleid],
+                $overridedata[$contextid][$roleid]
+            );
+        }
+    }
+    return $roletotals;
+}
+
+
+/**
+ * Given a pair of permissions, combine them using the appropriate rules, returning
+ * a single permission.
+ *
+ * @param int $permission1 The first (least specific) permission constant (CAP_*).
+ * @param int $permission2 The second (more specific) permission constant (CAP_*).
+ * @return int The calculated combined permission.
+ */
+function tool_capexplorer_merge_permissions($permission1, $permission2) {
+
+    // Prohibit always wins.
+    if ($permission1 == CAP_PROHIBIT || $permission2 == CAP_PROHIBIT) {
+        return CAP_PROHIBIT;
+    }
+    // If one permission not set, return the other.
+    // This will return not set if neither is set which is correct.
+    if ($permission2 == CAP_INHERIT) {
+        return $permission1;
+    }
+    if ($permission1 == CAP_INHERIT) {
+        return $permission2;
+    }
+    // Otherwise return the most specific one.
+    return $permission2;
+}
+
+
+/**
+ * Given an array of role total permissions, determine if the user should
+ * be granted the capability or not. It is assumed that the user is assigned
+ * to all roles in the specified context or above.
+ *
+ * Note only PROHIBIT and ALLOW are of any consequence when aggregating here,
+ * PREVENT is only useful for nullifying a less specific ALLOW within a role.
+ * Only one ALLOW is required but all roles must be checked for PROHIBITS.
+ *
+ * @param array $roletotals Array keyed on roleid with role total permission as value.
+ * @return bool True if the user should be granted the capability based on the totals.
+ */
+function tool_capexplorer_merge_permissions_across_roles($roletotals) {
+    $status = false;
+    foreach ($roletotals as $roleid => $permission) {
+        switch ($permission) {
+        case CAP_PROHIBIT:
+            // Any prohibit prevents access.
+            return false;
+        case CAP_ALLOW:
+            // Any allow gives access (as long as there isn't a PROHIBIT).
+            $status = true;
+        }
+    }
+    return $status;
 }
 
 
@@ -221,6 +303,41 @@ function tool_capexplorer_get_auto_role_assignment_info($userid) {
     }
 
     return $out;
+}
+
+/**
+ * Given a manual and automatic assignment arrays (as generated by
+ * {@link tool_capexplorer_get_role_assignment_info()} and
+ * {@link tool_capexplorer_get_auto_role_assignment_info()}, return an array
+ * of role objects for each role that has an assignment.
+ */
+function tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments) {
+    global $DB;
+    $roleids = array();
+
+    // Collect manual assigned role ids.
+    foreach ($manualassignments as $contextid => $roledata) {
+        foreach ($roledata as $roleid => $assigned) {
+            if ($assigned) {
+                $roleids[$roleid] = $roleid;
+            }
+        }
+    }
+    // Collect automatically assigned role ids.
+    foreach ($autoassignments as $contextid => $roledata) {
+        foreach ($roledata as $roleid => $assigned) {
+            if ($assigned) {
+                $roleids[$roleid] = $roleid;
+            }
+        }
+    }
+
+    if (empty($roleids)) {
+        return array();
+    }
+
+    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
+    return $DB->get_records_select('role', "id $rolesql", $roleparams);
 }
 
 

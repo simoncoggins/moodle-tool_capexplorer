@@ -67,13 +67,22 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      * @param array $contexts An array of context objects.
      * @param array $roles An array of role objects.
      * @param string $capability A capability to display results for.
+     * @param bool $includetotals If true include a row of role totals.
      *
      * @return string HTML to display the table.
      */
-    public function print_role_permission_and_overrides_table($contexts, $roles, $capability) {
+    public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
         $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+
+        if ($includetotals) {
+            $roletotals = tool_capexplorer_merge_permissions_across_contexts(
+                $contextids,
+                $roleids,
+                $overridedata
+            );
+        }
 
         $html = '';
         $table = new html_table();
@@ -117,8 +126,23 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
                 $cell .= html_writer::tag('small', $link);
                 $row[] = $cell;
+
             }
             $table->data[] = new html_table_row($row);
+        }
+        if ($includetotals && count($roletotals)) {
+            $cell1 = new html_table_cell();
+            $cell1->text = html_writer::tag('strong', get_string('roletotals', 'tool_capexplorer'));
+            $cell1->colspan = 2;
+            $row = new html_table_row();
+            $row->cells[] = $cell1;
+            foreach ($roles as $role) {
+                $roletotal = $roletotals[$role->id];
+                $cell = new html_table_cell();
+                $cell->text = html_writer::tag('strong', $this->print_permission_value($roletotal));
+                $row->cells[] = $cell;
+            }
+            $table->data[] = $row;
         }
         $html .= html_writer::table($table);
         return $html;
@@ -130,15 +154,16 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      *
      * @param array $contexts An array of context objects.
      * @param array $roles An array of role objects.
-     * @param int $userid A userid to display results for.
+     * @param array $manualassignments 2D array as output by {@link tool_capexplorer_get_role_assignment_info()}
+     * @param array $autoassignments 2D array as output by {@link tool_capexplorer_get_auto_role_assignment_info()}
      *
      * @return string HTML to display the table.
      */
-    public function print_role_assignment_table($contexts, $roles, $userid) {
+    public function print_role_assignment_table($contexts, $roles, $manualassignments, $autoassignments) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
-        $manualassignments = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid);
-        $autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
+        //$manualassignments = tool_capexplorer_get_role_assignment_info($contextids, $roleids, $userid);
+        //$autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
 
         $html = '';
         $table = new html_table();
@@ -156,10 +181,6 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         }
         $table->data = array();
 
-        // Create array for tracking if roles are assigned or not.
-        // Initially no roles are assigned so all start as false.
-        $roleassignstatus = array_fill_keys($roleids, false);
-
         foreach ($contexts as $context) {
             $contextid = $context->id;
             $contextinfo = tool_capexplorer_get_context_info($context);
@@ -173,13 +194,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                     && $manualassignments[$contextid][$roleid] != CAP_INHERIT) {
 
                     $textkey = 'assigned';
-                    $roleassignstatus[$roleid] = true;
                 } else {
-                    if ($roleassignstatus[$roleid]) {
-                        $textkey = 'inherited';
-                    } else {
-                        $textkey = 'notassigned';
-                    }
+                    $textkey = 'notassigned';
                 }
                 $cell = $this->output->container(get_string($textkey, 'tool_capexplorer'));
 
@@ -192,7 +208,6 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
                 if (isset($autoassignments[$contextid][$roleid])) {
                     $cell .= $this->output->container('Auto assign: ' . $autoassignments[$contextid][$roleid]);
-                    $roleassignstatus[$roleid] = true;
                 }
 
                 $row[] = $cell;

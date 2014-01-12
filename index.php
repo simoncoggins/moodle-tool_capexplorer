@@ -69,17 +69,28 @@ echo $output->print_parent_context_table($parentcontexts);
 $user = $DB->get_record('user', array('id' => $userid));
 $parentcontexts = $context->get_parent_contexts(true);
 $contexts = array_reverse($parentcontexts);
-$roles = get_roles_with_capability($capability);
+
+$manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $userid);
+$autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
+$assignedroles = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
 
 echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
-echo $output->print_role_assignment_table($contexts, $roles, $userid);
+echo $output->print_role_assignment_table($contexts, $assignedroles, $manualassignments, $autoassignments);
 
 echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
-echo $output->print_role_permission_and_overrides_table($contexts, $roles, $capability);
+echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability);
 
-
+$roleids = array_keys($assignedroles);
+$contextids = array_map(function($context) {return $context->id;}, $contexts);
+$overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+$roletotals = tool_capexplorer_merge_permissions_across_contexts(
+    $contextids,
+    $roleids,
+    $overridedata
+);
+$overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
 echo '<pre>';
-var_dump(tool_capexplorer_get_auto_role_assignment_info($userid));
+var_dump($overallresult);
 echo '</pre>';
 
 /*
