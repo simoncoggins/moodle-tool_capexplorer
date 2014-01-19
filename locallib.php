@@ -392,3 +392,43 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
 
     return $out;
 }
+
+/**
+ * Local implementation of {@link has_capability()} using the logic implemented
+ * in this module.
+ *
+ * Useful for testing results match real method.
+ *
+ * @param string $capability The capability to check.
+ * @param context $context The context to check the capability in.
+ * @param int $userid The ID of the user to check.
+ * @return bool True if the user should be granted the capability in the specified context.
+ */
+function tool_capexplorer_has_capability($capability, $context, $userid) {
+    // Obtain all parent contexts.
+    $parentcontexts = $context->get_parent_contexts(true);
+    $contexts = array_reverse($parentcontexts);
+
+    // Calculate role assignments.
+    $manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $userid);
+    $autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
+    $assignedroles = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
+
+    // Calculate any role overrides.
+    $roleids = array_keys($assignedroles);
+    $contextids = array_map(function($context) {return $context->id;}, $contexts);
+    $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+
+    // Aggregate role totals.
+    $roletotals = tool_capexplorer_merge_permissions_across_contexts(
+        $contextids,
+        $roleids,
+        $overridedata
+    );
+
+    // Aggregate across roles.
+    $overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
+
+    // Return result.
+    return $overallresult;
+}
