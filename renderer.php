@@ -110,6 +110,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $instance = isset($contextinfo->url) ?
                 html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
+            $overridableroles = get_overridable_roles($context);
             foreach ($roles as $role) {
                 $roleid = $role->id;
                 $cell = $this->print_permission_value($overridedata[$contextid][$roleid]);
@@ -124,7 +125,11 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $linkstr = empty($overridedata[$contextid][$roleid]) ? 'set' : 'change';
                 $link = html_writer::link($url, get_string($linkstr, 'tool_capexplorer'));
 
-                $cell .= html_writer::tag('small', $link);
+                if (array_key_exists($roleid, $overridableroles)) {
+                    $cell .= html_writer::tag('small', $link);
+                } else {
+                    $cell .= get_string('nopermtooverride', 'tool_capexplorer');
+                }
                 $row[] = $cell;
 
             }
@@ -204,7 +209,11 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $url = new moodle_url('/admin/roles/assign.php',
                     array('contextid' => $contextid, 'roleid' => $roleid));
                 $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
-                $cell .= html_writer::tag('small', $link);
+                if (user_can_assign($context, $roleid)) {
+                    $cell .= html_writer::tag('small', $link);
+                } else {
+                    $cell .= get_string('nopermtoassign', 'tool_capexplorer');
+                }
 
                 if (isset($autoassignments[$contextid][$roleid])) {
                     $cell .= $this->output->container('Auto assign: ' . $autoassignments[$contextid][$roleid]);
