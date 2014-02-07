@@ -36,10 +36,14 @@ class capexplorer_selector_form extends moodleform {
 
         $mform->addElement('header', 'selector', get_string('selectortitle', 'tool_capexplorer'));
 
-        $mform->addElement('text', 'username', get_string('username', 'tool_capexplorer'), 'maxlength="254" size="50"');
+        $mform->addElement('text', 'username', get_string('username', 'tool_capexplorer'),
+            'maxlength="254" size="75" placeholder="' . get_string('usernameplaceholder', 'tool_capexplorer') .
+            '"');
         $mform->setType('username', PARAM_TEXT);
 
-        $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'), 'maxlength="254" size="50"');
+        $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'),
+            'maxlength="254" size="75" placeholder="' . get_string('capabilityplaceholder', 'tool_capexplorer') .
+            '"');
         $mform->setType('capability', PARAM_TEXT);
 
         $choices = array();

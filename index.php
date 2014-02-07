@@ -38,7 +38,6 @@ $jsmodule = array(
 
 $args = array(
     'admin' => $CFG->admin,
-    'users' => $DB->get_fieldset_select('user', 'username', 'deleted = 0', null, 'username'),
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '', null)
 );
 
@@ -51,13 +50,8 @@ echo $OUTPUT->header();
 // First create the form.
 $mform = new capexplorer_selector_form();
 
-if ($mform->is_cancelled()) {
-    // TODO.
-    echo 'Cancelled';
-    exit;
-} else if ($data = $mform->get_data()) {
+if ($data = $mform->get_data()) {
     // Process data if submitted.
-    // TODO get form to return userid.
     $userid = $DB->get_field('user', 'id', array('username' => $data->username));
     $capability = $data->capability;
     switch ($data->contextlevel) {

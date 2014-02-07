@@ -139,9 +139,14 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
     Y.one('body').addClass('yui3-skin-sam');
 
     Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
-        resultHighlighter: 'phraseMatch',
         resultFilters: 'phraseMatch',
-        source: args['users']
+        resultTextLocator: 'username',
+        source: M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getusers.php?search={query}',
+        resultFormatter: function(query, results) {
+            return Y.Array.map(results, function(result) {
+                return Y.Highlight.all(result.raw.data, query);
+            });
+        },
     });
 
     Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
