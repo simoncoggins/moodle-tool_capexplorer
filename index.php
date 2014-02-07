@@ -42,7 +42,7 @@ $args = array(
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '', null)
 );
 
-//$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
+$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
 
 admin_externalpage_setup('toolcapexplorer');
 
@@ -51,9 +51,57 @@ echo $OUTPUT->header();
 // First create the form.
 $mform = new capexplorer_selector_form();
 
-$userid = 2;
-$capability = 'mod/forum:addnews';
-$context = context_module::instance(1);
+if ($mform->is_cancelled()) {
+    // TODO.
+    echo 'Cancelled';
+    exit;
+} else if ($data = $mform->get_data()) {
+    // Process data if submitted.
+    // TODO get form to return userid.
+    $userid = $DB->get_field('user', 'id', array('username' => $data->username));
+    $capability = $data->capability;
+    switch ($data->contextlevel) {
+    case 'system':
+        $context = context_system::instance();
+        break;
+    case 'user':
+        $context = context_user::instance($data->userinstances);
+        break;
+    case 'category':
+        $context = context_coursecat::instance($data->categoryinstances);
+        break;
+    case 'course':
+        $context = context_course::instance($data->courseinstances);
+        break;
+    case 'module':
+        $context = context_module::instance($data->moduleinstances);
+        break;
+    case 'block':
+        $context = context_block::instance($data->blockinstances);
+        break;
+    }
+
+    var_dump($data);
+} else {
+    // No data yet, just display the form.
+    echo $mform->display();
+    echo $OUTPUT->footer();
+    exit;
+}
+
+echo $mform->display();
+
+// Temporarily set any undefined vars until form finished.
+// TODO remove.
+if (!isset($userid)) {
+    $userid = 2;
+}
+if (!isset($capability)) {
+    $capability = 'mod/forum:addnews';
+}
+if (!isset($context)) {
+    $context = context_module::instance(1);
+}
 
 $output = $PAGE->get_renderer('tool_capexplorer');
 
@@ -93,16 +141,4 @@ echo '<pre>';
 var_dump($overallresult);
 echo '</pre>';
 
-/*
-if ($mform->is_cancelled()) {
-    // TODO.
-    echo 'Cancelled';
-} else if ($data = $mform->get_data()) {
-    // Process data if submitted.
-    var_dump($data);
-    echo 'Processed';
-}
-
-echo $mform->display();
-*/
 echo $OUTPUT->footer();
