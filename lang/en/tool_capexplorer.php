@@ -38,8 +38,18 @@ $string['chooseacourse'] = 'Choose a course...';
 $string['chooseacoursefirst'] = 'Choose a course first';
 $string['chooseamodule'] = 'Choose a module...';
 $string['chooseauser'] = 'Choose a user...';
+$string['contextaggrrules'] = 'Context aggregation rules';
+$string['contextaggrrules_help'] = '<p>To determine the role total for a particular role, aggregate the permissions at each context using the rules below:</p>
+<ol>
+    <li>If "Prohibit" appears in any context, the role total is "Prohibit".</li>
+    <li>If all contexts have the permission "Not set", the role total is "Not set".</li>
+    <li>Otherwise, the role total is the same as the most specific permission that is set (i.e. the allow or prevent that\'s closest to the bottom of the context lineage).</li>
+</ol>';
 $string['contextlevel'] = 'Context level';
 $string['contextlineage'] = 'Context lineage';
+// TODO write this help:
+$string['contextlineage_help'] = 'Context lineage help';
+$string['contextlineagesummary'] = '<p>Determine all context levels between the system level and the context being checked.</p>';
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
 $string['error:noblock'] = 'You must select a block instance.';
@@ -47,7 +57,7 @@ $string['error:nocategory'] = 'You must select a category instance.';
 $string['error:nocourse'] = 'You must select a course instance.';
 $string['error:nomodule'] = 'You must select a module instance.';
 $string['error:nouser'] = 'You must select a user instance.';
-$string['hascapreturns'] = 'has_capability() returns:';
+$string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
 $string['modulecontext'] = 'Module (Activity) context';
@@ -59,6 +69,7 @@ $string['none'] = 'None';
 $string['nopermtoassign'] = ''; // TODO what string?
 $string['nopermtooverride'] = ''; // TODO what string?
 $string['notassigned'] = 'Not Assigned';
+$string['overallresult'] = 'Overall result';
 $string['permission'] = 'Permission';
 $string['permissionallow'] = 'Allow';
 $string['permissioninherit'] = 'Inherit';
@@ -67,16 +78,27 @@ $string['permissionprevent'] = 'Prevent';
 $string['permissionprohibit'] = 'Prohibit';
 $string['permissionunknown'] = 'Unknown';
 $string['pluginname'] = 'Capability Explorer';
+$string['resultdiffersfromaccesslib'] = '<p>The result calculated by this tool does not match the result from core code!</p><p>You could try <a href="{$a->cacheurl}">clearing your cache</a> but if that doesn\'t help this is probably a bug in Capability Explorer. Please <a href="{$a->bugurl}">let us know about it</a> and if you can include a screenshot of this page to help us track down the problem.</p>';
 $string['role'] = 'Role';
+$string['roleaggrrules'] = 'Role aggregation rules';
+$string['roleaggrrules_help'] = '<p>To determine the overall result, aggregate the permissions from all role totals using the rules below:</p>
+<ol>
+    <li>If "Prohibit" appears in any role total, the overall result is "Denied".</li>
+    <li>Otherwise, if any one role total is "Allow" the overall result is "Granted".</li>
+    <li>If none of the role totals are "Allow", the overall result is "Denied".</li>
+</ol>';
 $string['roleassignmentsforuserx'] = 'Role assignments for user "{$a}"';
+$string['roleassignmentsummary'] = '<p>Determine which roles are assigned to the user in any of the parent contexts. Roles can either be assigned manually via role assignments or automatically based on system configuration. Only roles assigned in one of the parent contexts contribute to the final result.</p>';
 $string['rolepermissionsandoverridesforcapx'] = 'All role permissions and overrides for capability "{$a}"';
+$string['rolepermissionsummary'] = '<p>For each assigned role, list the permission from the role definition for the system context. Also list any role overrides in any other contexts in the context lineage.</p><p>Combine the individual permissions using context aggregation rules{$a} to get a set of role totals.</p>';
+$string['roletotal'] = 'Role total';
 $string['roletotals'] = 'Role totals';
 $string['selectortitle'] = 'Select the capability to explore.';
 $string['set'] = 'Set';
 $string['systemcontext'] = 'System (Site) context';
 $string['user'] = 'User';
 $string['usercontext'] = 'User context';
-$string['userisadmin'] = 'Note: this user is a <a href="{$a}">site administrator</a>, so is automatically granted all capabilities. The result above treats the user as if they weren\'t an admin.';
+$string['userisadmin'] = 'Note: "{$a->user}" is a <a href="{$a->url}">site administrator</a>, and as such they are automatically granted all capabilities. The results below show how their access would be calculated if they weren\'t an admin.';
 $string['username'] = 'Username';
 $string['usernameplaceholder'] = 'Enter name, username or email';
 $string['viaassignment'] = 'Via <a href="{$a}">role assignment</a>';

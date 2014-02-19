@@ -257,6 +257,25 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $out;
     }
 
+    /**
+     * Display a boolean permission result (true/false) as a nicely formatted string
+     * (e.g. granted/denied). Optionally include HTML to style the output.
+     *
+     * @param bool $permission The boolean permission to display.
+     * @param bool $includestyles Whether to include HTML to style the text or not.
+     *
+     * @return string Text or HTML containing the permission value.
+     */
+    public function print_boolean_permission_value($permission, $includestyles = true) {
+        $result = ($permission) ? 'capgranted' : 'capdenied';
+        $text = get_string($result, 'tool_capexplorer');
+        if ($includestyles) {
+            $text = html_writer::tag('span', $text, array('class' => $result));
+        }
+
+        return $text;
+    }
+
     // TODO fix to use print_permission_value() and focus on other tasks.
     public function print_permission($permission, $contextid, $roleid, $capability, $via = false) {
         global $CFG;
@@ -324,20 +343,70 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $out;
     }
 
-    public function print_capability_check_result($result, $isadmin) {
+    public function print_warning_messages($overallresult, $result, $user) {
         $html = '';
 
-        $result = ($result) ? 'capgranted' : 'capdenied';
-        $html .= $this->output->container(
-            get_string($result, 'tool_capexplorer'),
-            $result
-        );
-
-        if ($isadmin) {
-            $url = new moodle_url('/admin/roles/admins.php');
-            $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $url->out()), 'notifyproblem');
+        if ($overallresult != $result) {
+            // TODO Define bug URL.
+            $bugurl = new moodle_url('/');
+            $cacheurl = new moodle_url('/admin/purgecaches.php');
+            $a = new stdClass();
+            $a->cacheurl = $cacheurl->out();
+            $a->bugurl = $bugurl->out();
+            $html .= $this->container(get_string('resultdiffersfromaccesslib', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
+        if (is_siteadmin($user)) {
+            $url = new moodle_url('/admin/roles/admins.php');
+            $a = new stdClass();
+            $a->url = $url->out();
+            $a->user = fullname($user);
+            $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $a), 'notifyproblem');
+        }
+
+        return $html;
+    }
+
+    /**
+     * Displays a tables showing the role totals and the final overall result.
+     *
+     * @param array $roletotals An array of roles and their individual totals.
+     * @param int $overallresult The overall aggregated result.
+     *
+     * @return string HTML to display the table.
+     */
+    public function print_role_totals_table($roletotals, $overallresult) {
+        $roles = role_get_names();
+
+        $html = '';
+        $table = new html_table();
+        $table->head = array(
+            get_string('role', 'tool_capexplorer'),
+            get_string('roletotal', 'tool_capexplorer'),
+        );
+        $table->colclasses = array(
+            'role',
+            'roletotal',
+        );
+        $table->data = array();
+
+        foreach ($roletotals as $roleid => $permission) {
+            $role = $roles[$roleid];
+            $row = array(
+                $role->localname,
+                $this->print_permission_value($permission)
+            );
+
+            $table->data[] = new html_table_row($row);
+        }
+
+        $totalrow = array(
+            html_writer::tag('strong', get_string('overallresult', 'tool_capexplorer')),
+            $this->print_boolean_permission_value($overallresult)
+        );
+        $table->data[] = new html_table_row($totalrow);
+
+        $html .= html_writer::table($table);
         return $html;
     }
 }

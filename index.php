@@ -75,7 +75,6 @@ if ($data = $mform->get_data()) {
         break;
     }
 
-    var_dump($data);
 } else {
     // No data yet, just display the form.
     echo $mform->display();
@@ -87,40 +86,22 @@ echo $mform->display();
 
 // Temporarily set any undefined vars until form finished.
 // TODO remove.
-if (!isset($userid)) {
-    $userid = 2;
-}
-if (!isset($capability)) {
-    $capability = 'mod/forum:addnews';
-}
 if (!isset($context)) {
     $context = context_module::instance(1);
 }
 
 $output = $PAGE->get_renderer('tool_capexplorer');
 
-echo $output->heading(get_string('hascapreturns', 'tool_capexplorer'));
 $result = has_capability($capability, $context, $userid, false);
-$isadmin = is_siteadmin();
-echo $output->print_capability_check_result($result, $isadmin);
-
-echo $output->heading(get_string('contextlineage', 'tool_capexplorer'));
-$parentcontexts = tool_capexplorer_get_parent_context_info($context);
-echo $output->print_parent_context_table($parentcontexts);
-
 $user = $DB->get_record('user', array('id' => $userid));
+$parentcontextinfo = tool_capexplorer_get_parent_context_info($context);
+
 $parentcontexts = $context->get_parent_contexts(true);
 $contexts = array_reverse($parentcontexts);
 
 $manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $userid);
 $autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
 $assignedroles = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
-
-echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
-echo $output->print_role_assignment_table($contexts, $assignedroles, $manualassignments, $autoassignments);
-
-echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
-echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability);
 
 $roleids = array_keys($assignedroles);
 $contextids = array_map(function($context) {return $context->id;}, $contexts);
@@ -131,8 +112,24 @@ $roletotals = tool_capexplorer_merge_permissions_across_contexts(
     $overridedata
 );
 $overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
-echo '<pre>';
-var_dump($overallresult);
-echo '</pre>';
+
+echo $output->print_warning_messages($overallresult, $result, $user);
+
+echo $output->heading_with_help(get_string('contextlineage', 'tool_capexplorer'), 'contextlineage', 'tool_capexplorer');
+echo $output->container(get_string('contextlineagesummary', 'tool_capexplorer'));
+echo $output->print_parent_context_table($parentcontextinfo);
+
+echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
+echo $output->container(get_string('roleassignmentsummary', 'tool_capexplorer'));
+echo $output->print_role_assignment_table($contexts, $assignedroles, $manualassignments, $autoassignments);
+
+echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
+$contextaggrhelpicon = $output->help_icon('contextaggrrules', 'tool_capexplorer');
+echo $output->container(get_string('rolepermissionsummary', 'tool_capexplorer', $contextaggrhelpicon));
+echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability);
+
+$roleaggrhelpicon = $output->help_icon('roleaggrrules', 'tool_capexplorer');
+echo $output->container(get_string('finalresultsummary', 'tool_capexplorer', $roleaggrhelpicon));
+echo $output->print_role_totals_table($roletotals, $overallresult);
 
 echo $OUTPUT->footer();

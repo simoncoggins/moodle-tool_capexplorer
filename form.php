@@ -40,11 +40,13 @@ class capexplorer_selector_form extends moodleform {
             'maxlength="254" size="75" placeholder="' . get_string('usernameplaceholder', 'tool_capexplorer') .
             '"');
         $mform->setType('username', PARAM_TEXT);
+        $mform->addRule('username', get_string('required'), 'required');
 
         $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'),
             'maxlength="254" size="75" placeholder="' . get_string('capabilityplaceholder', 'tool_capexplorer') .
             '"');
         $mform->setType('capability', PARAM_TEXT);
+        $mform->addRule('capability', get_string('required'), 'required');
 
         $choices = array();
         $choices['system'] = get_string('systemcontext', 'tool_capexplorer');
