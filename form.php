@@ -112,23 +112,18 @@ class capexplorer_selector_form extends moodleform {
      * @param array $files
      * @return void
      */
-    /*
     public function validation($data, $files) {
         global $DB;
         $errors = array();
 
-        $context = $data['contextlevel'];
-
-        if ($context == 'system') {
-            return $errors;
+        if (!$DB->record_exists('user', array('username' => $data['username']))) {
+            $errors['username'] = get_string('error:invalidusername', 'tool_capexplorer', $data['username']);
         }
 
-        var_dump($data);
-        if ($data["{$context}instances"] == 0) {
-            $errors['instances'] = get_string("error:no{$context}", 'tool_capexplorer');
+        if (!$DB->record_exists('capabilities', array('name' => $data['capability']))) {
+            $errors['capability'] = get_string('error:invalidcapability', 'tool_capexplorer', $data['capability']);
         }
 
         return $errors;
     }
-*/
 }

@@ -84,12 +84,6 @@ if ($data = $mform->get_data()) {
 
 echo $mform->display();
 
-// Temporarily set any undefined vars until form finished.
-// TODO remove.
-if (!isset($context)) {
-    $context = context_module::instance(1);
-}
-
 $output = $PAGE->get_renderer('tool_capexplorer');
 
 $result = has_capability($capability, $context, $userid, false);
