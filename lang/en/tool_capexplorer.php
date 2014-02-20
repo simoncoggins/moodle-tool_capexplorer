@@ -24,6 +24,7 @@
 
 $string['assigned'] = 'Assigned';
 $string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
+$string['autoassign'] = 'Auto assign';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
 $string['capabilityplaceholder'] = 'Enter a capability';
@@ -62,6 +63,7 @@ $string['error:nouser'] = 'You must select a user instance.';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
+$string['manualassign'] = 'Manual assign';
 $string['modulecontext'] = 'Module (Activity) context';
 $string['noblocksfound'] = 'No blocks found';
 $string['nocatfrontpage'] = 'No category (Front page course)';
