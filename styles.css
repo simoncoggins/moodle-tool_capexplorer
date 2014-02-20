@@ -29,3 +29,7 @@
     color: red;
     font-weight: bold;
 }
+
+.option-disabled {
+    color: grey;
+}

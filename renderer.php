@@ -208,6 +208,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         foreach ($contexts as $context) {
             $contextid = $context->id;
             $contextinfo = tool_capexplorer_get_context_info($context);
+            $assignableroles = get_assignable_roles($context);
             $instance = isset($contextinfo->url) ?
                 html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
@@ -224,15 +225,19 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 }
                 $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'));
 
-                // TODO need to take role override rules into account
-                // (some roles can't be assigned in some contexts).
                 $url = new moodle_url('/admin/roles/assign.php',
                     array('contextid' => $contextid, 'roleid' => $roleid));
                 $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
-                if (user_can_assign($context, $roleid)) {
-                    $cell->text .= html_writer::tag('small', $link);
+                if (!array_key_exists($roleid, $assignableroles)) {
+                    $text = get_string('notassignable', 'tool_capexplorer');
+                    $text .= $this->help_icon('notassignable', 'tool_capexplorer');
+                    $cell->text .= html_writer::tag('small', $text, array('class' => 'option-disabled'));
+                } else if (!user_can_assign($context, $roleid)) {
+                    $text = get_string('nopermtoassign', 'tool_capexplorer');
+                    $text .= $this->help_icon('nopermtoassign', 'tool_capexplorer');
+                    $cell->text .= html_writer::tag('small', $text, array('class' => 'option-disabled'));
                 } else {
-                    $cell->text .= get_string('nopermtoassign', 'tool_capexplorer');
+                    $cell->text .= html_writer::tag('small', $link);
                 }
 
                 $row[] = $cell;
