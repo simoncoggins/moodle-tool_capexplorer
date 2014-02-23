@@ -115,21 +115,46 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 $roleid = $role->id;
                 $cell = $this->print_permission_value($overridedata[$contextid][$roleid]);
 
-                $overrideurl = new moodle_url('/admin/roles/override.php',
-                    array('contextid' => $contextid, 'roleid' => $roleid));
-                $defineurl = new moodle_url('/admin/roles/define.php',
-                    array('action' => 'edit', 'roleid' => $roleid));
-                $url = ($issystemcontext) ? $defineurl : $overrideurl;
+                if ($issystemcontext) {
+                    // Role definition.
 
-                // not set (null) and inherit (0) are matched by empty, others aren't.
-                $linkstr = empty($overridedata[$contextid][$roleid]) ? 'set' : 'change';
-                $link = html_writer::link($url, get_string($linkstr, 'tool_capexplorer'));
-
-                if (array_key_exists($roleid, $overridableroles)) {
-                    $cell .= html_writer::tag('small', $link);
+                    $url = new moodle_url('/admin/roles/define.php',
+                        array('action' => 'edit', 'roleid' => $roleid));
+                    if (has_capability('moodle/role:manage', $systemcontext)) {
+                        $error = '';
+                    } else {
+                        $error = 'nopermtodefinerole';
+                    }
                 } else {
-                    $cell .= get_string('nopermtooverride', 'tool_capexplorer');
+                    // Role override.
+
+                    $url = new moodle_url('/admin/roles/override.php',
+                        array('contextid' => $contextid, 'roleid' => $roleid));
+
+                    // Get capabilities associated with this context level.
+                    $contextcaps = $context->get_capabilities();
+                    // TODO switch to array_filter if we can access $capability.
+                    $contextfound = false;
+                    foreach ($contextcaps as $cap) {
+                        if ($cap->name == $capability) {
+                            $contextfound = true;
+                        }
+                    }
+                    if (!$contextfound) {
+                        $error = 'notoverridable';
+                    } else if (!array_key_exists($roleid, $overridableroles)) {
+                        $error = 'nopermtooverride';
+                    } else {
+                        $error = '';
+                    }
                 }
+
+                if (empty($error)) {
+                    $cell .= $this->print_change_link($url);
+                } else {
+                    $cell .= $this->print_message_with_help($error);
+                }
+
                 $row[] = $cell;
 
             }
@@ -225,19 +250,20 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                 }
                 $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'));
 
-                $url = new moodle_url('/admin/roles/assign.php',
-                    array('contextid' => $contextid, 'roleid' => $roleid));
-                $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
                 if (!array_key_exists($roleid, $assignableroles)) {
-                    $text = get_string('notassignable', 'tool_capexplorer');
-                    $text .= $this->help_icon('notassignable', 'tool_capexplorer');
-                    $cell->text .= html_writer::tag('small', $text, array('class' => 'option-disabled'));
+                    $error = 'notassignable';
                 } else if (!user_can_assign($context, $roleid)) {
-                    $text = get_string('nopermtoassign', 'tool_capexplorer');
-                    $text .= $this->help_icon('nopermtoassign', 'tool_capexplorer');
-                    $cell->text .= html_writer::tag('small', $text, array('class' => 'option-disabled'));
+                    $error = 'nopermtoassign';
                 } else {
-                    $cell->text .= html_writer::tag('small', $link);
+                    $error = '';
+                }
+
+                if (empty($error)) {
+                    $url = new moodle_url('/admin/roles/assign.php',
+                        array('contextid' => $contextid, 'roleid' => $roleid));
+                    $cell->text .= $this->print_change_link($url);
+                } else {
+                    $cell->text .= $this->print_message_with_help($error);
                 }
 
                 $row[] = $cell;
@@ -259,6 +285,29 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         }
         $html .= html_writer::table($table);
         return $html;
+    }
+
+    /**
+     * Display a message with an associated help button in the format used by this tool.
+     *
+     * @param string $key String key for the message and help (help text should be '{$key}_help').
+     * @return string HTML to display the message.
+     */
+    public function print_message_with_help($key) {
+        $text = get_string($key, 'tool_capexplorer');
+        $text .= $this->help_icon($key, 'tool_capexplorer');
+        return html_writer::tag('small', $text, array('class' => 'option-disabled'));
+    }
+
+    /**
+     * Display a link for changing a particular setting in the format used by this tool.
+     *
+     * @param string $url URL for link.
+     * @return string HTML to display the message.
+     */
+    public function print_change_link($url) {
+        $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
+        return html_writer::tag('small', $link);
     }
 
     /**
@@ -310,73 +359,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $text;
     }
 
-    // TODO fix to use print_permission_value() and focus on other tasks.
-    public function print_permission($permission, $contextid, $roleid, $capability, $via = false) {
-        global $CFG;
-        switch ($via) {
-        case 'assignment':
-            $url = new moodle_url('/admin/roles/assign.php',
-                array('contextid' => $contextid, 'roleid' => $roleid));
-            $via = html_writer::tag('small', get_string('viaassignment', 'tool_capexplorer', $url->out()));
-            break;
-        case 'override':
-            $url = new moodle_url('/admin/roles/override.php',
-                array('contextid' => $contextid, 'roleid' => $roleid));
-            $via = html_writer::tag('small', get_string('viaoverride', 'tool_capexplorer', $url->out()));
-            break;
-        default:
-            $via = '';
-        }
 
-        // Need to be strict on values but not types so cast everything to strings.
-        if ((string)$permission === (string)CAP_INHERIT) {
-            $out = $this->output->container(
-                get_string('permissioninherit', 'tool_capexplorer'),
-                'perm-inherit'
-            );
-            $out .= $this->output->container($via);
-        } else if ((string)$permission === (string)CAP_ALLOW) {
-            $out = $this->output->container(
-                get_string('permissionallow', 'tool_capexplorer'),
-                'perm-allow'
-            );
-            $out .= $this->output->container($via);
-        } else if ((string)$permission === (string)CAP_PREVENT) {
-            $out = $this->output->container(
-                get_string('permissionprevent', 'tool_capexplorer'),
-                'perm-prevent'
-            );
-            $out .= $this->output->container($via);
-        } else if ((string)$permission === (string)CAP_PROHIBIT) {
-            $out = $this->output->container(
-                get_string('permissionprohibit', 'tool_capexplorer'),
-                'perm-prohibit'
-            );
-            $out .= $this->output->container($via);
-        } else if (is_null($permission)) {
-            $out = $this->output->container(
-                get_string('permissionnotset', 'tool_capexplorer'),
-                'perm-notset'
-            );
-            $assignurl = new moodle_url('/admin/roles/assign.php',
-                array('contextid' => $contextid, 'roleid' => $roleid));
-            $overrideurl = new moodle_url('/admin/roles/override.php',
-                array('contextid' => $contextid, 'roleid' => $roleid));
-            $a = new stdClass();
-            $a->assignurl = $assignurl->out();
-            $a->overrideurl = $overrideurl->out();
-            $links = html_writer::tag('small', get_string('assignoverridelinks', 'tool_capexplorer', $a));
-            $out .= $this->output->container($links);
-        } else {
-            $out = $this->output->container(
-                get_string('permissionunknown', 'tool_capexplorer'),
-                'perm-unknown'
-            );
-            $out .= $this->output->container($via);
-        }
-        return $out;
-    }
-
+    // TODO docs.
     public function print_warning_messages($overallresult, $result, $user) {
         $html = '';
 

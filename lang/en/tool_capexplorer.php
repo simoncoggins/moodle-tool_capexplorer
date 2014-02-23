@@ -72,7 +72,13 @@ $string['nomodulesfound'] = 'No modules found';
 $string['none'] = 'None';
 $string['nopermtoassign'] = 'No permission';
 $string['nopermtoassign_help'] = 'Not all users have permission to assign roles to other users. The ability to assign roles is dependent on your own roles and can be controlled here:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define roles &gt; Allow role assignments</em></p><p>In addition the user must have the capability "moodle/role:assign" in the context where the role assignment is taking place.</p><p>Site administrators can assign all roles.</p>';
-$string['nopermtooverride'] = ''; // TODO what string?
+$string['nopermtodefinerole'] = 'No permission';
+$string['nopermtodefinerole_help'] = 'The ablity to define role permissions requires the capability "moodle/role:manage" in the system context. Users with permission can control role definitions here:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define roles </p><p>The current user does not have this permission so is not able to change role definitions.</p>';
+$string['nopermtooverride'] = 'No permission';
+$string['nopermtooverride_help'] = 'Not all users have permission to override roles. The ability to override roles is dependent on your own roles and can be controlled here:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define roles &gt; Allow role overrides</em></p><p>In addition the user must have the capability "moodle/role:override" or "moodle/role:safeoverride" in the context where the override is taking place.</p><p>Site administrators can override all roles.</p>';
+$string['notoverridable'] = 'Not overridable';
+// TODO read get_capabilities() code and improve description.
+$string['notoverridable_help'] = '<p>Each capability defines a context level which is the lowest level the context will be checked in. Below this level the capability is not available to override since the override will not have any effect.</p><p>This prevents capabilities that are clearly not applicable at more specific contexts from cluttering up the override page.</p><p>In this case the capability being checked has specified a higher context level so it is not possible to override this capability at this level.</p>';
 $string['notassignable'] = 'Not assignable';
 $string['notassignable_help'] = '<p>Each role defines the context levels where the role can be assigned.</p><p>This can be customised by changing the "Context types where this role may be assigned" setting in the role definition:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define Roles &gt; [Role name] &gt; Edit</em>.</p>';
 $string['notassigned'] = 'Not Assigned';
