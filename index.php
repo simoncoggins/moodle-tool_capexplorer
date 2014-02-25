@@ -38,7 +38,7 @@ $jsmodule = array(
 
 $args = array(
     'admin' => $CFG->admin,
-    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '', null)
+    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '')
 );
 
 $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);

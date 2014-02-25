@@ -1,5 +1,6 @@
 TODO:
 
+Remove 'change' link for user with no access to site policy link.
 Fix unit tests - instead of random, have some predefined data and expected results.
 More unit tests for functions in locallib.php
 Replace as much of styles.css with existing LESS colours as possible.
@@ -35,6 +36,10 @@ Select a context instance:
       * Top Level Course Module 2
     + BLOCK CONTEXT
       * Top Level Course Block 1
+
+Key:
++        = Expandable
+CAPITALS = Not selectable
 
 
 

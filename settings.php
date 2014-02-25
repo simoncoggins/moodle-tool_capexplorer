@@ -24,7 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
+// speedup for non-admins add all caps used on this page.
+if ($hassiteconfig or has_capability('tool/capexplorer:view', $systemcontext)) {
     $ADMIN->add('roles', new admin_externalpage(
         'toolcapexplorer',
         get_string('pluginname', 'tool_capexplorer'),
