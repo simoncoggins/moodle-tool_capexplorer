@@ -33,6 +33,7 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
+        'riskbitmask' => RISK_PERSONAL,
     ),
 
 );

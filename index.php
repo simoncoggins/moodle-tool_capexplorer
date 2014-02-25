@@ -99,7 +99,7 @@ $assignedroles = tool_capexplorer_get_assigned_roles($manualassignments, $autoas
 
 $roleids = array_keys($assignedroles);
 $contextids = array_map(function($context) {return $context->id;}, $contexts);
-$overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+$overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
 $roletotals = tool_capexplorer_merge_permissions_across_contexts(
     $contextids,
     $roleids,

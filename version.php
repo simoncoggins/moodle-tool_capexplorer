@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Cap Explorer
+ * Capability Explorer
  *
  * @package   tool_capexplorer
  * @copyright Simon Coggins

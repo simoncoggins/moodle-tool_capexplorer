@@ -1,4 +1,44 @@
+TODO:
 
+Fix unit tests - instead of random, have some predefined data and expected results.
+More unit tests for functions in locallib.php
+Replace as much of styles.css with existing LESS colours as possible.
+
+Context menu:
+
+Select a context instance:
+* System Context
++ Front Page Course
+  + MODULE CONTEXT
+    * Front Page Module 1
+    * Front Page Module 2
+    * ...
+  + BLOCK CONTEXT
+    * Front Page Block 1
+    * Front Page Block 2
+    * ...
++ USER CONTEXT
+  * Guest User
+  * User 1
+  * User 2
+  * ...
++ Top Level Cat 1
++ Top Level Cat 2
+  + Sub Cat 1
+    + Sub-sub Cat 1
+    + Sub cat level course
+  + Sub Cat 2
+  + Top Level Course 1
+  + Top Level Course 2
+    + MODULE CONTEXT
+      * Top Level Course Module 1
+      * Top Level Course Module 2
+    + BLOCK CONTEXT
+      * Top Level Course Block 1
+
+
+
+OLD MENU TODO:
 Make "Front page course" category, which:
 - switches course menu to show "Front page course" only when selected
   - use categoryid = -1 in getcourses as we do now?

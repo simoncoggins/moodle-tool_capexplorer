@@ -74,7 +74,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
-        $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability, false);
+        $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
 
         if ($includetotals) {
             $roletotals = tool_capexplorer_merge_permissions_across_contexts(
