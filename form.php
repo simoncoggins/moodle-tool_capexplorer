@@ -30,7 +30,7 @@ class capexplorer_selector_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        global $CFG, $PAGE, $DB;
+        global $DB;
 
         $mform    = $this->_form;
 
