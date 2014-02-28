@@ -360,7 +360,17 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     }
 
 
-    // TODO docs.
+    /**
+     * Display warning messages if:
+     * 1/ The result from this tool does not match the result from has_capability().
+     * 2/ The user being tested is an admin (so is automatically granted all capabilities).
+     *
+     * @param bool $overallresult The result calculated by this tool.
+     * @param bool $result The result calculated by has_capability().
+     * @param object $user User object for the user being tested.
+     *
+     * @return string HTML to display any warning messages.
+     */
     public function print_warning_messages($overallresult, $result, $user) {
         $html = '';
 

@@ -62,7 +62,6 @@ class capexplorer_selector_form extends moodleform {
         $nonestr = html_writer::tag('span', get_string('none', 'tool_capexplorer'), array('id' => 'id_systeminstances'));
         $instances[] = &$mform->createElement('static', 'systeminstances', '', $nonestr, array('class' => 'hidden-field'));
 
-        // TODO AJAX auto-complete.
         $users = $DB->get_records_select_menu('user', 'deleted = 0', null, 'username', 'id, username');
         $options = array('0' => get_string('chooseauser', 'tool_capexplorer')) + $users;
         $instances[] = &$mform->createElement('select', 'userinstances', '', $options, array('class' => 'hidden-field'));
