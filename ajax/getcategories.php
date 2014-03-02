@@ -28,7 +28,7 @@ require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 require_once($CFG->dirroot . '/course/lib.php');
 
-$contextlevel = optional_param('contextlevel', '', PARAM_ALPHA);
+$parentid = required_param('parentid', PARAM_INT);
 
 require_login();
 
@@ -36,15 +36,9 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-$chooseoption = array('0' => get_string('chooseacategory', 'tool_capexplorer'));
+// TODO handle hidden cats?
+$options = $DB->get_records_select_menu('course_categories', "parent = ?", array($parentid));
 
-$categoryoptions = make_categories_options();
-
-$frontpageoption = array();
-if ($contextlevel != 'category') {
-    $frontpageoption['-1'] = get_string('nocatfrontpage', 'tool_capexplorer');
-}
-
-$options = $chooseoption + $frontpageoption + $categoryoptions;
-
+// TODO rewrite or remove function - disabled param not needed now.
 tool_capexplorer_render_json($options);
+

@@ -48,6 +48,26 @@ class capexplorer_selector_form extends moodleform {
         $mform->setType('capability', PARAM_TEXT);
         $mform->addRule('capability', get_string('required'), 'required');
 
+        $mform->addElement('html', '<div id="contexttree" class="yui3-skin-sam"><div>');
+        $mform->addElement('hidden', 'contextid');
+        $mform->setType('contextid', PARAM_INT);
+
+        /*
+         * Need to represent this via selectors:
+         *
+         *        _______ System_______
+         *       /           |         \
+         *    Course     Front page    User
+         *    Category  (Site Course)
+         *      |            |
+         *    Course      Activity
+         *      |            |
+         *   Activity      Block
+         *      |
+         *    Block
+         *
+         */
+        /*
         $choices = array();
         $choices['system'] = get_string('systemcontext', 'tool_capexplorer');
         $choices['user'] = get_string('usercontext', 'tool_capexplorer');
@@ -85,20 +105,6 @@ class capexplorer_selector_form extends moodleform {
             array('class' => 'hidden-field'));
 
         $mform->addGroup($instances, 'instances', get_string('instances', 'tool_capexplorer'), array(' '), false);
-        /*
-         * Need to represent this via selectors:
-         *
-         *        _______ System_______
-         *       /           |         \
-         *    Course     Front page    User
-         *    Category  (Site Course)
-         *      |            |
-         *    Course      Activity
-         *      |            |
-         *   Activity      Block
-         *      |
-         *    Block
-         *
          */
 
         $this->add_action_buttons(false, get_string('submit'));

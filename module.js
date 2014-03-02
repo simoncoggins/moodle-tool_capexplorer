@@ -38,11 +38,114 @@ M.tool_capexplorer.init = function(Y, args) {
     M.tool_capexplorer.Y = Y;
 
     // Show/hide instance menus depending on context level.
-    Y.one('#id_contextlevel').on('change', M.tool_capexplorer.update_instance_visibility);
+    //Y.one('#id_contextlevel').on('change', M.tool_capexplorer.update_instance_visibility);
 
     // Initialise autocomplete on username and capability fields.
     M.tool_capexplorer.init_autocomplete(Y, args);
 
+    var tree = new Y.TreeView({
+        container : '#contexttree',
+        nodes : [
+            // TODO Lang strings.
+            {
+                label: "System Context",
+                data: {nodeType: 'system'}
+            },
+            {
+                label: "Front page Course",
+                // TODO pass in SITEID as an argument.
+                data: {nodeType: 'course', instanceId: 1},
+                canHaveChildren: true
+            },
+            {
+                label: "User Context",
+                data: {nodeType: 'user'},
+                canHaveChildren: true
+            }
+        ]
+    });
+
+    // Add top-level categories to top level of tree.
+    M.tool_capexplorer.menu_load_data(
+        'getcategories.php',
+        {parentid: 0}, // Top level categories.
+        M.tool_capexplorer.menu_load_data_categories,
+        tree.rootNode
+    );
+
+    tree.plug(Y.Plugin.Tree.Lazy, {
+
+        // Custom function that Plugin.Tree.Lazy will call when it needs to
+        // load the children for a node.
+        load: function (node, callback) {
+            var nodeType = node.data.nodeType;
+
+            // Depending on nodeType we might add nodes directly, or delegate task to
+            // a handler function called via an AJAX request.
+            switch (nodeType) {
+            case 'user':
+                M.tool_capexplorer.menu_load_data(
+                    'getusers.php',
+                    {},
+                    M.tool_capexplorer.menu_load_data_user,
+                    node
+                );
+                break;
+            case 'course':
+                var newnodes =  [
+                    {
+                        // TODO lang strings.
+                        label: "Module Context",
+                        data: {nodeType: 'module', instanceId: node.data.instanceId},
+                        canHaveChildren: true
+                    },
+                    {
+                        label: "Block Context",
+                        data: {nodeType: 'block', instanceId: node.data.instanceId},
+                        canHaveChildren: true
+                    }
+                ];
+                node.append(newnodes);
+                break;
+            case 'module':
+                M.tool_capexplorer.menu_load_data(
+                    'getmodules.php',
+                    {courseid: node.data.instanceId},
+                    M.tool_capexplorer.menu_load_data_module,
+                    node
+                );
+                break;
+            case 'block':
+                M.tool_capexplorer.menu_load_data(
+                    'getblocks.php',
+                    {courseid: node.data.instanceId},
+                    M.tool_capexplorer.menu_load_data_block,
+                    node
+                );
+                break;
+            case 'category':
+                M.tool_capexplorer.menu_load_data(
+                    'getcategories.php',
+                    {parentid: node.data.instanceId},
+                    M.tool_capexplorer.menu_load_data_categories,
+                    node
+                );
+                M.tool_capexplorer.menu_load_data(
+                    'getcourses.php',
+                    {categoryid: node.data.instanceId},
+                    M.tool_capexplorer.menu_load_data_courses,
+                    node
+                );
+                break;
+            }
+
+            callback();
+        }
+
+    });
+
+    tree.render();
+    /*
     // Update category menu when context level is changed.
     Y.one('#id_contextlevel').on(
         'change',
@@ -84,7 +187,91 @@ M.tool_capexplorer.init = function(Y, args) {
         M.tool_capexplorer.update_menu, null,
         'getblocks.php', 'courseid', 'id_blockinstances'
     );
+    */
 }
+
+M.tool_capexplorer.menu_load_data_categories = function(node, data) {
+    var subcats =  [];
+    for (var catid in data) {
+        if (data.hasOwnProperty(catid)) {
+            subcats.push({
+                label: data[catid],
+                data: {nodeType: 'category', instanceId: catid},
+                canHaveChildren: true
+            });
+        }
+    }
+    node.append(subcats);
+};
+
+M.tool_capexplorer.menu_load_data_courses = function(node, data) {
+    var courses =  [];
+    for (var courseid in data) {
+        if (data.hasOwnProperty(courseid)) {
+            courses.push({
+                label: data[courseid],
+                data: {nodeType: 'course', instanceId: courseid},
+                canHaveChildren: true
+            });
+        }
+    }
+    node.append(courses);
+};
+
+M.tool_capexplorer.menu_load_data_user = function(node, data) {
+    // Add nodes to tree based on data.
+    console.log('add nodes based on data:',data);
+};
+
+M.tool_capexplorer.menu_load_data_module = function(node, data) {
+    var modules =  [];
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            modules.push({
+                label: data[key],
+                data: {nodeType: 'module', instanceId: key}
+            });
+        }
+    }
+    node.append(modules);
+};
+
+M.tool_capexplorer.menu_load_data_block = function(node, data) {
+    var blocks =  [];
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            blocks.push({
+                label: data[key],
+                data: {nodeType: 'block', instanceId: key}
+            });
+        }
+    }
+    node.append(blocks);
+};
+
+// Generic function for loading data via IO request.
+M.tool_capexplorer.menu_load_data = function(ajaxfile, requestdata, handler, node) {
+    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/' + ajaxfile, {
+        on:   {success:
+            function(id, r) {
+                try {
+                    parsedResponse = Y.JSON.parse(r.responseText);
+                }
+                catch (e) {
+                    alert("JSON Parse failed!");
+                    return;
+                }
+                if (parsedResponse.error !== undefined) {
+                    alert(parsedResponse.error);
+                    return;
+                }
+                // Call handler method to add nodes based on data.
+                handler(node, parsedResponse.options);
+            }
+        },
+        data: requestdata
+    });
+};
 
 M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
     var requestdata = {}

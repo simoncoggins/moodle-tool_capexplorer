@@ -27,7 +27,7 @@ define('AJAX_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
+$categoryid = required_param('categoryid', PARAM_INT);
 
 require_login();
 
@@ -35,13 +35,7 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-if (!$categoryid) {
-    $options = array(
-        '0' => get_string('chooseacategoryfirst', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
-
+// TODO use or remove.
 if ($categoryid == -1) {
     $sitename = $DB->get_field('course', 'fullname', array('id' => SITEID));
     $options = array(
@@ -59,7 +53,7 @@ if (empty($courses)) {
     tool_capexplorer_render_json($options, true);
 }
 
-$options = array(0 => get_string('chooseacourse', 'tool_capexplorer'));
+$options = array();
 foreach ($courses as $course) {
     if ($course->id == SITEID) {
         continue;

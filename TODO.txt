@@ -50,3 +50,9 @@ Make "Front page course" category, which:
 - only appears in category menu if category level NOT selected
 - disappears from category menu if category level selected
   - add getcategories.php and populate based on contextlevel=X parameter?
+
+
+New context selector based on YUI menu
+Warning if capability can't be assigned in chosen context (e.g. system capability in course context etc.)
+Code review and tidy up.
+

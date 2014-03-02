@@ -28,25 +28,12 @@ require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$courseid = optional_param('courseid', 0, PARAM_INT);
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
+$courseid = required_param('courseid', PARAM_INT);
 
 require_login();
 
 if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
-}
-
-// Handle category being set to "No category (Front page)".
-if ($categoryid == -1) {
-    $courseid = SITEID;
-}
-
-if (!$courseid) {
-    $options = array(
-        '0' => get_string('chooseacoursefirst', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
 }
 
 $modules = get_array_of_activities($courseid);
@@ -58,9 +45,7 @@ if (empty($modules)) {
     tool_capexplorer_render_json($options, true);
 }
 
-$options = array(
-    '0' => get_string('chooseamodule', 'tool_capexplorer')
-);
+$options = array();
 foreach ($modules as $module) {
     $key = "{$module->id}_{$module->mod}";
     $options[$key] = format_string($module->name);
