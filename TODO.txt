@@ -1,58 +1,21 @@
-TODO:
+
+MENU TODO:
+- Store contextlevel and instanceid with nodes
+- Make some nodes not selectable
+- Change icons/styles to match type
+- Move into dialog with link to select?
+- Add event to insert chosen value into form
+- More refactoring to simplify/reduce duplication
+- Make 'no courses found' not expandable
+- Improve error handling
+- Improve messages when no items
+- A-Z sub-folders for large numbers
+
+
+GENERAL TODO:
 
 Remove 'change' link for user with no access to site policy link.
 Fix unit tests - instead of random, have some predefined data and expected results.
-More unit tests for functions in locallib.php
+More unit tests for functions in locallib.php (e.g. add automatic assignments to tests).
 Replace as much of styles.css with existing LESS colours as possible.
-
-Context menu:
-
-Select a context instance:
-* System Context
-+ Front Page Course
-  + MODULE CONTEXT
-    * Front Page Module 1
-    * Front Page Module 2
-    * ...
-  + BLOCK CONTEXT
-    * Front Page Block 1
-    * Front Page Block 2
-    * ...
-+ USER CONTEXT
-  * Guest User
-  * User 1
-  * User 2
-  * ...
-+ Top Level Cat 1
-+ Top Level Cat 2
-  + Sub Cat 1
-    + Sub-sub Cat 1
-    + Sub cat level course
-  + Sub Cat 2
-  + Top Level Course 1
-  + Top Level Course 2
-    + MODULE CONTEXT
-      * Top Level Course Module 1
-      * Top Level Course Module 2
-    + BLOCK CONTEXT
-      * Top Level Course Block 1
-
-Key:
-+        = Expandable
-CAPITALS = Not selectable
-
-
-
-OLD MENU TODO:
-Make "Front page course" category, which:
-- switches course menu to show "Front page course" only when selected
-  - use categoryid = -1 in getcourses as we do now?
-- only appears in category menu if category level NOT selected
-- disappears from category menu if category level selected
-  - add getcategories.php and populate based on contextlevel=X parameter?
-
-
-New context selector based on YUI menu
-Warning if capability can't be assigned in chosen context (e.g. system capability in course context etc.)
-Code review and tidy up.
 

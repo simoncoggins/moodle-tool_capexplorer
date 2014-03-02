@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Return a list of categories, optionally including the "Front page" option.
+ * Return a list of users, optionally filtered by search criteria.
  *
  * @package     tool_capexplorer
  * @copyright   Simon Coggins
@@ -27,7 +27,7 @@ define('AJAX_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$search = required_param('search', PARAM_ALPHANUMEXT);
+$search = optional_param('search', '', PARAM_ALPHANUMEXT);
 
 require_login();
 
@@ -35,10 +35,14 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
+$sql = 'deleted <> 1';
+$params = array();
 $fields = $DB->sql_concat_join("', '", array($DB->sql_fullname(), 'username', 'email'));
-$likesql = $DB->sql_like($fields, '?');
-$likeparam = "%{$search}%";
-$users = $DB->get_records_select('user',
-    " deleted <> 1 AND {$likesql}", array($likeparam), '', "id,username,{$fields} AS data");
 
-echo json_encode(array_values($users));
+if (!empty($search)) {
+    $sql .= " AND " . $DB->sql_like($fields, '?');
+    $params[] = "%{$search}%";
+}
+$users = $DB->get_records_select('user', $sql, $params, '', "id,username,{$fields} AS data, {$DB->sql_fullname()} AS fullname");
+
+tool_capexplorer_render_json(array_values($users));

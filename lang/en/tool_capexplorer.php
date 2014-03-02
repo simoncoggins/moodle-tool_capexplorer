@@ -61,6 +61,7 @@ $string['error:nocourse'] = 'You must select a course instance.';
 $string['error:nomodule'] = 'You must select a module instance.';
 $string['error:nouser'] = 'You must select a user instance.';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
+$string['frontpagecourse'] = 'Front Page Course';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
 $string['manualassign'] = 'Manual assign';

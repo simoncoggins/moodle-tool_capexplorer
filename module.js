@@ -46,20 +46,19 @@ M.tool_capexplorer.init = function(Y, args) {
     var tree = new Y.TreeView({
         container : '#contexttree',
         nodes : [
-            // TODO Lang strings.
             {
-                label: "System Context",
+                label: M.util.get_string('systemcontext', 'tool_capexplorer'),
                 data: {nodeType: 'system'}
             },
             {
-                label: "Front page Course",
+                label: M.util.get_string('frontpagecourse', 'tool_capexplorer'),
                 // TODO pass in SITEID as an argument.
                 data: {nodeType: 'course', instanceId: 1},
                 canHaveChildren: true
             },
             {
-                label: "User Context",
-                data: {nodeType: 'user'},
+                label: M.util.get_string('usercontext', 'tool_capexplorer'),
+                data: {nodeType: 'userdir'},
                 canHaveChildren: true
             }
         ]
@@ -83,7 +82,7 @@ M.tool_capexplorer.init = function(Y, args) {
             // Depending on nodeType we might add nodes directly, or delegate task to
             // a handler function called via an AJAX request.
             switch (nodeType) {
-            case 'user':
+            case 'userdir':
                 M.tool_capexplorer.menu_load_data(
                     'getusers.php',
                     {},
@@ -94,20 +93,19 @@ M.tool_capexplorer.init = function(Y, args) {
             case 'course':
                 var newnodes =  [
                     {
-                        // TODO lang strings.
-                        label: "Module Context",
-                        data: {nodeType: 'module', instanceId: node.data.instanceId},
+                        label: M.util.get_string('modulecontext', 'tool_capexplorer'),
+                        data: {nodeType: 'moduledir', instanceId: node.data.instanceId},
                         canHaveChildren: true
                     },
                     {
-                        label: "Block Context",
-                        data: {nodeType: 'block', instanceId: node.data.instanceId},
+                        label: M.util.get_string('blockcontext', 'tool_capexplorer'),
+                        data: {nodeType: 'blockdir', instanceId: node.data.instanceId},
                         canHaveChildren: true
                     }
                 ];
                 node.append(newnodes);
                 break;
-            case 'module':
+            case 'moduledir':
                 M.tool_capexplorer.menu_load_data(
                     'getmodules.php',
                     {courseid: node.data.instanceId},
@@ -115,7 +113,7 @@ M.tool_capexplorer.init = function(Y, args) {
                     node
                 );
                 break;
-            case 'block':
+            case 'blockdir':
                 M.tool_capexplorer.menu_load_data(
                     'getblocks.php',
                     {courseid: node.data.instanceId},
@@ -219,8 +217,16 @@ M.tool_capexplorer.menu_load_data_courses = function(node, data) {
 };
 
 M.tool_capexplorer.menu_load_data_user = function(node, data) {
-    // Add nodes to tree based on data.
-    console.log('add nodes based on data:',data);
+    var users =  [];
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            users.push({
+                label: data[key]['fullname'],
+                data: {nodeType: 'user', instanceId: data[key]['id']}
+            });
+        }
+    }
+    node.append(users);
 };
 
 M.tool_capexplorer.menu_load_data_module = function(node, data) {
@@ -292,7 +298,6 @@ M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
                     alert(parsedResponse.error);
                     return;
                 }
-                console.log(parsedResponse.options);
                 M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse.options);
                 M.tool_capexplorer.set_menu_state(targetmenuid, parsedResponse.disabled);
             }
@@ -328,6 +333,7 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
     Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
         resultFilters: 'phraseMatch',
         resultTextLocator: 'username',
+        resultListLocator: 'options',
         source: M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getusers.php?search={query}',
         resultFormatter: function(query, results) {
             return Y.Array.map(results, function(result) {

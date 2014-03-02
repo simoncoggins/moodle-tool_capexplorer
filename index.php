@@ -41,6 +41,7 @@ $args = array(
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '')
 );
 
+$PAGE->requires->strings_for_js(array('systemcontext', 'usercontext', 'modulecontext', 'blockcontext', 'frontpagecourse'), 'tool_capexplorer');
 $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
 
 admin_externalpage_setup('toolcapexplorer');
