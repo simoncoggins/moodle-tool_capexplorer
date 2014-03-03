@@ -55,27 +55,7 @@ if ($data = $mform->get_data()) {
     // Process data if submitted.
     $userid = $DB->get_field('user', 'id', array('username' => $data->username));
     $capability = $data->capability;
-    switch ($data->contextlevel) {
-    case 'system':
-        $context = context_system::instance();
-        break;
-    case 'user':
-        $context = context_user::instance($data->userinstances);
-        break;
-    case 'category':
-        $context = context_coursecat::instance($data->categoryinstances);
-        break;
-    case 'course':
-        $context = context_course::instance($data->courseinstances);
-        break;
-    case 'module':
-        $context = context_module::instance($data->moduleinstances);
-        break;
-    case 'block':
-        $context = context_block::instance($data->blockinstances);
-        break;
-    }
-
+    $context = context::instance_by_id($data->contextid);
 } else {
     // No data yet, just display the form.
     echo $mform->display();

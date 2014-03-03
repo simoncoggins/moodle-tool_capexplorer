@@ -50,6 +50,8 @@ class capexplorer_selector_form extends moodleform {
 
         $mform->addElement('html', '<div id="contexttree" class="yui3-skin-sam"><div>');
         $mform->addElement('hidden', 'contextid');
+        // TODO Remove once treeview is working.
+        $mform->setDefault('contextid', 1);
         $mform->setType('contextid', PARAM_INT);
 
         /*

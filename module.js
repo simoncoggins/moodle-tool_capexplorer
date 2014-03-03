@@ -72,6 +72,8 @@ M.tool_capexplorer.init = function(Y, args) {
         tree.rootNode
     );
 
+    tree.on('select', M.tool_capexplorer.menu_set_form_field);
+
     tree.plug(Y.Plugin.Tree.Lazy, {
 
         // Custom function that Plugin.Tree.Lazy will call when it needs to
@@ -257,6 +259,7 @@ M.tool_capexplorer.menu_load_data_block = function(node, data) {
 
 // Generic function for loading data via IO request.
 M.tool_capexplorer.menu_load_data = function(ajaxfile, requestdata, handler, node) {
+    // TODO Pass admin via config.
     Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/' + ajaxfile, {
         on:   {success:
             function(id, r) {
@@ -279,30 +282,41 @@ M.tool_capexplorer.menu_load_data = function(ajaxfile, requestdata, handler, nod
     });
 };
 
-M.tool_capexplorer.update_menu = function(e, ajaxfile, ajaxarg, targetmenuid) {
-    var requestdata = {}
-    requestdata[ajaxarg] = this.get('value');
+M.tool_capexplorer.menu_set_form_field = function(e) {
+    // TODO something going wrong with blocks and the ajax call.
+    var nodeType = e.node.data.nodeType;
+    switch (nodeType) {
+    case 'system':
+        var contextLevel = 10;
+        break;
+    case 'user':
+        var contextLevel = 30;
+        break;
+    case 'category':
+        var contextLevel = 40;
+        break;
+    case 'course':
+        var contextLevel = 50;
+        break;
+    case 'module':
+        var contextLevel = 70;
+        break;
+    case 'block':
+        var contextLevel = 80;
+        break;
+    }
+    var instanceId = (e.node.data.instanceId === undefined) ? 0 : e.node.data.instanceId;
 
     // TODO Pass admin via config.
-    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/' + ajaxfile, {
+    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getcontextid.php', {
         on:   {success:
             function(id, r) {
-                try {
-                    parsedResponse = Y.JSON.parse(r.responseText);
-                }
-                catch (e) {
-                    alert("JSON Parse failed!");
-                    return;
-                }
-                if (parsedResponse.error !== undefined) {
-                    alert(parsedResponse.error);
-                    return;
-                }
-                M.tool_capexplorer.populate_menu(targetmenuid, parsedResponse.options);
-                M.tool_capexplorer.set_menu_state(targetmenuid, parsedResponse.disabled);
+                var contextid = r.responseText;
+                var input = Y.one('input[name=contextid]');
+                input.set('value', contextid);
             }
         },
-        data: requestdata
+        data: {contextlevel: contextLevel, instanceid: instanceId}
     });
 }
 
@@ -334,6 +348,7 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
         resultFilters: 'phraseMatch',
         resultTextLocator: 'username',
         resultListLocator: 'options',
+        // TODO Pass admin via config.
         source: M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getusers.php?search={query}',
         resultFormatter: function(query, results) {
             return Y.Array.map(results, function(result) {
