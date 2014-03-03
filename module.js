@@ -37,9 +37,6 @@ M.tool_capexplorer.Y = {};
 M.tool_capexplorer.init = function(Y, args) {
     M.tool_capexplorer.Y = Y;
 
-    // Show/hide instance menus depending on context level.
-    //Y.one('#id_contextlevel').on('change', M.tool_capexplorer.update_instance_visibility);
-
     // Initialise autocomplete on username and capability fields.
     M.tool_capexplorer.init_autocomplete(Y, args);
 
@@ -145,49 +142,6 @@ M.tool_capexplorer.init = function(Y, args) {
     });
 
     tree.render();
-    /*
-    // Update category menu when context level is changed.
-    Y.one('#id_contextlevel').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getcategories.php', 'contextlevel', 'id_categoryinstances'
-    );
-
-    // Update course menu when category is changed.
-    Y.one('#id_categoryinstances').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getcourses.php', 'categoryid', 'id_courseinstances'
-    );
-
-    // Also reset module and block menus when category is changed.
-    // The category id is passed as different behaviour is required
-    // if selecting "No category (Front page)".
-    Y.one('#id_categoryinstances').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getmodules.php', 'categoryid', 'id_moduleinstances'
-    );
-    Y.one('#id_categoryinstances').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getblocks.php', 'categoryid', 'id_blockinstances'
-    );
-
-    // Update module menu when course is changed.
-    Y.one('#id_courseinstances').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getmodules.php', 'courseid', 'id_moduleinstances'
-    );
-
-    // Update block menu when course is changed.
-    Y.one('#id_courseinstances').on(
-        'change',
-        M.tool_capexplorer.update_menu, null,
-        'getblocks.php', 'courseid', 'id_blockinstances'
-    );
-    */
 }
 
 M.tool_capexplorer.menu_load_data_categories = function(node, data) {
@@ -320,27 +274,6 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
     });
 }
 
-M.tool_capexplorer.set_menu_state = function(id, disabled) {
-    var select = Y.one('#'+id);
-    if (disabled) {
-        select.setAttribute('disabled', 'disabled');
-    } else {
-        select.removeAttribute('disabled');
-    }
-}
-
-M.tool_capexplorer.populate_menu = function(id, options) {
-    // Cache select node and clear existing options.
-    var select = Y.one('#'+id).empty();
-
-    // Append new options.
-    for (value in options) {
-        var option = '<option value="' + value + '">' + options[value] + '</options>';
-        Y.Node.create(option).appendTo(select);
-    }
-
-}
-
 M.tool_capexplorer.init_autocomplete = function(Y, args) {
     Y.one('body').addClass('yui3-skin-sam');
 
@@ -364,30 +297,3 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
     });
 }
 
-M.tool_capexplorer.update_instance_visibility = function() {
-    // Value of the contextlevel menu.
-    var value       = this.get('value');
-
-    // Defines which menus to show under instance field when context menu changed.
-    var states = {
-        'system'   : { 'system' : 1, 'user' : 0, 'category' : 0, 'course' : 0, 'module' : 0, 'block' : 0 },
-        'user'     : { 'system' : 0, 'user' : 1, 'category' : 0, 'course' : 0, 'module' : 0, 'block' : 0 },
-        'category' : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 0, 'module' : 0, 'block' : 0 },
-        'course'   : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 0, 'block' : 0 },
-        'module'   : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 1, 'block' : 0 },
-        'block'    : { 'system' : 0, 'user' : 0, 'category' : 1, 'course' : 1, 'module' : 0, 'block' : 1 }
-    };
-
-    // Menu states for the current context choice.
-    var menustate = states[value];
-
-    // Add or remove 'hidden-field' class as required.
-    for (var context in menustate) {
-        var element = Y.one('#id_'+context+'instances');
-        if (menustate[context]) {
-            element.removeClass('hidden-field');
-        } else {
-            element.addClass('hidden-field');
-        }
-    }
-}

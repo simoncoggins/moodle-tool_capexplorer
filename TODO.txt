@@ -14,6 +14,8 @@ MENU TODO:
 
 GENERAL TODO:
 
+Figure out why some blocks inside a course only have system as parent context.
+Warning if user checks a capability in an invalid context.
 Remove 'change' link for user with no access to site policy link.
 Fix unit tests - instead of random, have some predefined data and expected results.
 More unit tests for functions in locallib.php (e.g. add automatic assignments to tests).

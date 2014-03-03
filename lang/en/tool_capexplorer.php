@@ -32,13 +32,6 @@ $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';
 $string['capgranted'] = 'True (Granted)';
 $string['change'] = 'Change';
-$string['chooseablock'] = 'Choose a block...';
-$string['chooseacategory'] = 'Choose a category...';
-$string['chooseacategoryfirst'] = 'Choose a category first';
-$string['chooseacourse'] = 'Choose a course...';
-$string['chooseacoursefirst'] = 'Choose a course first';
-$string['chooseamodule'] = 'Choose a module...';
-$string['chooseauser'] = 'Choose a user...';
 $string['contextaggrrules'] = 'Context aggregation rules';
 $string['contextaggrrules_help'] = '<p>To determine the role total for a particular role, aggregate the permissions at each context using the rules below:</p>
 <ol>
