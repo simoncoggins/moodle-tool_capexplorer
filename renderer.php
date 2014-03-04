@@ -133,14 +133,13 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
                     // Get capabilities associated with this context level.
                     $contextcaps = $context->get_capabilities();
-                    // TODO switch to array_filter if we can access $capability.
-                    $contextfound = false;
-                    foreach ($contextcaps as $cap) {
-                        if ($cap->name == $capability) {
-                            $contextfound = true;
+                    // See if capability being checked is one of them.
+                    $result = array_filter($contextcaps,
+                        function($contextcap) use ($capability) {
+                            return ($contextcap->name == $capability);
                         }
-                    }
-                    if (!$contextfound) {
+                    );
+                    if (empty($result)) {
                         $error = 'notoverridable';
                     } else if (!array_key_exists($roleid, $overridableroles)) {
                         $error = 'nopermtooverride';
