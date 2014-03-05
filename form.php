@@ -48,10 +48,9 @@ class capexplorer_selector_form extends moodleform {
         $mform->setType('capability', PARAM_TEXT);
         $mform->addRule('capability', get_string('required'), 'required');
 
-        $mform->addElement('html', '<div id="contexttree" class="yui3-skin-sam"><div>');
+        $mform->addElement('static', 'contexttree', get_string('context', 'tool_capexplorer'), '<div id="contexttree" class="yui3-skin-sam"><div>');
+
         $mform->addElement('hidden', 'contextid');
-        // TODO Remove once treeview is working.
-        $mform->setDefault('contextid', 1);
         $mform->setType('contextid', PARAM_INT);
 
         $this->add_action_buttons(false, get_string('submit'));
@@ -74,6 +73,10 @@ class capexplorer_selector_form extends moodleform {
 
         if (!$DB->record_exists('capabilities', array('name' => $data['capability']))) {
             $errors['capability'] = get_string('error:invalidcapability', 'tool_capexplorer', $data['capability']);
+        }
+
+        if (empty($data['contextid'])) {
+            $errors['contexttree'] = get_string('error:invalidcontext', 'tool_capexplorer');
         }
 
         return $errors;

@@ -32,6 +32,7 @@ $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';
 $string['capgranted'] = 'True (Granted)';
 $string['change'] = 'Change';
+$string['context'] = 'Context';
 $string['contextaggrrules'] = 'Context aggregation rules';
 $string['contextaggrrules_help'] = '<p>To determine the role total for a particular role, aggregate the permissions at each context using the rules below:</p>
 <ol>
@@ -47,6 +48,7 @@ $string['contextlineagesummary'] = '<p>Determine all context levels between the 
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
 $string['error:invalidcapability'] = 'There is no capability called "{$a}"';
+$string['error:invalidcontext'] = 'You must select a context instance';
 $string['error:invalidusername'] = 'There is no user with a username of "{$a}"';
 $string['error:noblock'] = 'You must select a block instance.';
 $string['error:nocategory'] = 'You must select a category instance.';
