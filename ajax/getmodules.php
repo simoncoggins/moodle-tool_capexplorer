@@ -38,13 +38,6 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
 
 $modules = get_array_of_activities($courseid);
 
-if (empty($modules)) {
-    $options = array(
-        '0' => get_string('nomodulesfound', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
-
 $options = array();
 foreach ($modules as $module) {
     $key = "{$module->id}_{$module->mod}";

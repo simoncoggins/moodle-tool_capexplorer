@@ -46,13 +46,6 @@ if ($categoryid == -1) {
 
 $courses = get_courses($categoryid, 'c.sortorder ASC', 'c.id,c.fullname');
 
-if (empty($courses)) {
-    $options = array(
-        '0' => get_string('nocoursesfound', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
-
 $options = array();
 foreach ($courses as $course) {
     if ($course->id == SITEID) {

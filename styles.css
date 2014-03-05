@@ -33,3 +33,45 @@
 .option-disabled {
     color: grey;
 }
+
+/* Remove YUI icon and padding */
+.yui3-skin-sam .yui3-treeview-icon {
+    display: none;
+}
+.yui3-skin-sam .yui3-treeview-label {
+    padding-left: 0;
+}
+
+/* Style our own nodeType specific icon */
+.capexplorer-tree-label {
+    background-repeat: no-repeat;
+}
+.dir-ltr .capexplorer-tree-label {
+    padding-left: 20px;
+    background-position: left center;
+}
+.dir-rtl .capexplorer-tree-label {
+    background-position: right center;
+    padding-right: 20px;
+}
+.capexplorer-tree-course {
+    background-image: url([[pix:i/course]]);
+}
+.capexplorer-tree-category {
+    background-image: url([[pix:i/folder]]);
+}
+.capexplorer-tree-user {
+    background-image: url([[pix:i/user]]);
+}
+.capexplorer-tree-users {
+    background-image: url([[pix:i/users]]);
+}
+.capexplorer-tree-module {
+    background-image: url([[pix:i/navigationitem]]);
+}
+.capexplorer-tree-block {
+    background-image: url([[pix:tool_capexplorer|block]]);
+}
+.capexplorer-tree-system {
+    background-image: url([[pix:i/moodle_host]]);
+}

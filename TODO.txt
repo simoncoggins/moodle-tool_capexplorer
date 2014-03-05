@@ -1,21 +1,16 @@
 
 MENU TODO:
-- Make some nodes not selectable
-- Make 'no courses found' not expandable
-- Change icons/styles to match type
-- Improve messages when no items
+- Expand and select menu on page load if $data->contextid set.
+- Make some nodes not selectable - just userdir? or just validate?
+- Add messages when no items or make not expandable?
 - Improve error handling
+- Copy images into capexplorer/pix and edit any we want to change
 - More refactoring to simplify/reduce duplication
 - Move into dialog with link to select?
 - A-Z sub-folders for large numbers
 
 GENERAL TODO:
 
-Expand and select menu on page load if $data->contextid set.
-Figure out why some blocks inside a course only have system as parent context.
-  Need to change getblocks.php to accept a parentcontextid and return only direct child blocks.
-  Need to include blocks folder in other contexts than course (system, frontpage course, category).
-  Might want to selectively show Blocks folder depending on if there are any or not (same for modules folder?).
 Remove 'change' link for user with no access to user policy link.
 Warning if user checks a capability in an invalid context.
 Replace as much of styles.css with existing LESS colours as possible.

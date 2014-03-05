@@ -44,17 +44,21 @@ M.tool_capexplorer.init = function(Y, args) {
         container : '#contexttree',
         nodes : [
             {
-                label: M.util.get_string('systemcontext', 'tool_capexplorer'),
-                data: {nodeType: 'system'}
+                label: M.tool_capexplorer.menu_label_with_icon(
+                    M.util.get_string('systemcontext', 'tool_capexplorer'), 'system'),
+                data: {nodeType: 'system'},
+                canHaveChildren: true
             },
             {
-                label: M.util.get_string('frontpagecourse', 'tool_capexplorer'),
+                label: M.tool_capexplorer.menu_label_with_icon(
+                    M.util.get_string('frontpagecourse', 'tool_capexplorer'), 'course'),
                 // TODO pass in SITEID as an argument.
                 data: {nodeType: 'course', instanceId: 1},
                 canHaveChildren: true
             },
             {
-                label: M.util.get_string('usercontext', 'tool_capexplorer'),
+                label: M.tool_capexplorer.menu_label_with_icon(
+                    M.util.get_string('usercontext', 'tool_capexplorer'), 'users'),
                 data: {nodeType: 'userdir'},
                 canHaveChildren: true
             }
@@ -78,8 +82,6 @@ M.tool_capexplorer.init = function(Y, args) {
         load: function (node, callback) {
             var nodeType = node.data.nodeType;
 
-            // Depending on nodeType we might add nodes directly, or delegate task to
-            // a handler function called via an AJAX request.
             switch (nodeType) {
             case 'userdir':
                 M.tool_capexplorer.menu_load_data(
@@ -90,32 +92,15 @@ M.tool_capexplorer.init = function(Y, args) {
                 );
                 break;
             case 'course':
-                var newnodes =  [
-                    {
-                        label: M.util.get_string('modulecontext', 'tool_capexplorer'),
-                        data: {nodeType: 'moduledir', instanceId: node.data.instanceId},
-                        canHaveChildren: true
-                    },
-                    {
-                        label: M.util.get_string('blockcontext', 'tool_capexplorer'),
-                        data: {nodeType: 'blockdir', instanceId: node.data.instanceId},
-                        canHaveChildren: true
-                    }
-                ];
-                node.append(newnodes);
-                break;
-            case 'moduledir':
                 M.tool_capexplorer.menu_load_data(
                     'getmodules.php',
                     {courseid: node.data.instanceId},
                     M.tool_capexplorer.menu_load_data_module,
                     node
                 );
-                break;
-            case 'blockdir':
                 M.tool_capexplorer.menu_load_data(
                     'getblocks.php',
-                    {courseid: node.data.instanceId},
+                    {contextlevel: 50, instanceid: node.data.instanceId},
                     M.tool_capexplorer.menu_load_data_block,
                     node
                 );
@@ -133,6 +118,20 @@ M.tool_capexplorer.init = function(Y, args) {
                     M.tool_capexplorer.menu_load_data_courses,
                     node
                 );
+                M.tool_capexplorer.menu_load_data(
+                    'getblocks.php',
+                    {contextlevel: 40, instanceid: node.data.instanceId},
+                    M.tool_capexplorer.menu_load_data_block,
+                    node
+                );
+                break;
+            case 'system':
+                M.tool_capexplorer.menu_load_data(
+                    'getblocks.php',
+                    {contextlevel: 10},
+                    M.tool_capexplorer.menu_load_data_block,
+                    node
+                );
                 break;
             }
 
@@ -142,6 +141,16 @@ M.tool_capexplorer.init = function(Y, args) {
     });
 
     tree.render();
+
+    // TODO open tree to selected element (if any)
+    // use this to locate node: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_findNode
+    // then this to select it: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_selectNode
+    // might need to open too.
+}
+
+M.tool_capexplorer.menu_label_with_icon = function(text, iconType) {
+    var iconTypeClass = 'capexplorer-tree-'+iconType;
+    return '<span class="capexplorer-tree-label ' + iconTypeClass+'">' + text + '</span>';
 }
 
 M.tool_capexplorer.menu_load_data_categories = function(node, data) {
@@ -149,7 +158,7 @@ M.tool_capexplorer.menu_load_data_categories = function(node, data) {
     for (var catid in data) {
         if (data.hasOwnProperty(catid)) {
             subcats.push({
-                label: data[catid],
+                label: M.tool_capexplorer.menu_label_with_icon(data[catid], 'category'),
                 data: {nodeType: 'category', instanceId: catid},
                 canHaveChildren: true
             });
@@ -163,7 +172,7 @@ M.tool_capexplorer.menu_load_data_courses = function(node, data) {
     for (var courseid in data) {
         if (data.hasOwnProperty(courseid)) {
             courses.push({
-                label: data[courseid],
+                label: M.tool_capexplorer.menu_label_with_icon(data[courseid], 'course'),
                 data: {nodeType: 'course', instanceId: courseid},
                 canHaveChildren: true
             });
@@ -177,7 +186,7 @@ M.tool_capexplorer.menu_load_data_user = function(node, data) {
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
             users.push({
-                label: data[key]['fullname'],
+                label: M.tool_capexplorer.menu_label_with_icon(data[key]['fullname'], 'user'),
                 data: {nodeType: 'user', instanceId: data[key]['id']}
             });
         }
@@ -190,7 +199,7 @@ M.tool_capexplorer.menu_load_data_module = function(node, data) {
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
             modules.push({
-                label: data[key],
+                label: M.tool_capexplorer.menu_label_with_icon(data[key], 'module'),
                 data: {nodeType: 'module', instanceId: key}
             });
         }
@@ -203,7 +212,7 @@ M.tool_capexplorer.menu_load_data_block = function(node, data) {
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
             blocks.push({
-                label: data[key],
+                label: M.tool_capexplorer.menu_label_with_icon(data[key], 'block'),
                 data: {nodeType: 'block', instanceId: key}
             });
         }
@@ -236,29 +245,29 @@ M.tool_capexplorer.menu_load_data = function(ajaxfile, requestdata, handler, nod
     });
 };
 
-M.tool_capexplorer.menu_set_form_field = function(e) {
-    // TODO something going wrong with blocks and the ajax call.
-    var nodeType = e.node.data.nodeType;
+M.tool_capexplorer.get_context_level_from_node = function(node) {
+    var nodeType = node.data.nodeType;
+    // TODO pass constants in from PHP?
     switch (nodeType) {
     case 'system':
-        var contextLevel = 10;
-        break;
+        return 10;
     case 'user':
-        var contextLevel = 30;
-        break;
+    case 'userdir':
+        return 30;
     case 'category':
-        var contextLevel = 40;
-        break;
+        return 40;
     case 'course':
-        var contextLevel = 50;
-        break;
+        return 50;
     case 'module':
-        var contextLevel = 70;
-        break;
+        return 70;
     case 'block':
-        var contextLevel = 80;
-        break;
+        return 80;
     }
+    return null;
+}
+
+M.tool_capexplorer.menu_set_form_field = function(e) {
+    var contextLevel = M.tool_capexplorer.get_context_level_from_node(e.node);
     var instanceId = (e.node.data.instanceId === undefined) ? 0 : e.node.data.instanceId;
 
     // TODO Pass admin via config.

@@ -28,7 +28,9 @@ require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$courseid = required_param('courseid', PARAM_INT);
+// We are fetching blocks attached to the following contextlevel and instanceid.
+$contextlevel = required_param('contextlevel', PARAM_INT);
+$instanceid   = optional_param('instanceid', 0, PARAM_INT);
 
 require_login();
 
@@ -36,53 +38,25 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-$blockinstances = get_block_instances($courseid);
+$contextinstance = context_helper::get_class_for_level($contextlevel);
+$context = $contextinstance::instance($instanceid);
 
-if (empty($blockinstances)) {
-    $options = array(
-        '0' => get_string('noblocksfound', 'tool_capexplorer')
-    );
-    tool_capexplorer_render_json($options, true);
-}
+$sql = "SELECT
+        bi.id,
+        bi.blockname
+    FROM {block_instances} bi
+    JOIN {block} b ON bi.blockname = b.name
+    WHERE
+    bi.parentcontextid = ?
+";
+$params = array($context->id);
+
+$blockinstances = $DB->get_records_sql($sql, $params);
 
 $options = array();
 foreach ($blockinstances as $blockinstance) {
-    $options[$blockinstance->id] = $blockinstance->blockname;
+    $options[$blockinstance->id] = get_string('pluginname', 'block_' . $blockinstance->blockname);
 }
 
 tool_capexplorer_render_json($options);
 
-/**
- * Return a list of blocks used in a particular course.
- *
- * @param $courseid int ID of the course.
- * @return array Array containing block instance ids/names.
- */
-function get_block_instances($courseid) {
-    global $DB;
-    $context = context_course::instance($courseid);
-
-    // Get blocks in this courses context, and any in parent contexts
-    // if showinsubcontexts is set to 1.
-    $contexttest = 'bi.parentcontextid = :contextid';
-    $parentcontextparams = array();
-    $parentcontextids = $context->get_parent_context_ids();
-    if ($parentcontextids) {
-        list($parentcontexttest, $parentcontextparams) =
-                $DB->get_in_or_equal($parentcontextids, SQL_PARAMS_NAMED, 'parentcontext');
-        $contexttest = "($contexttest OR (bi.showinsubcontexts = 1 AND bi.parentcontextid $parentcontexttest))";
-    }
-
-    $params = array(
-        'contextid' => $context->id,
-    );
-    $sql = "SELECT
-            bi.id,
-            bi.blockname
-        FROM {block_instances} bi
-        JOIN {block} b ON bi.blockname = b.name
-        WHERE
-        $contexttest
-    ";
-    return $DB->get_records_sql($sql, $params + $parentcontextparams);
-}
