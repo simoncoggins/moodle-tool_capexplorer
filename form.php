@@ -72,11 +72,16 @@ class capexplorer_selector_form extends moodleform {
         global $DB;
         $errors = array();
 
-        if (!$DB->record_exists('user', array('username' => $data['username']))) {
+        if (empty($data['username'])) {
+
+            $errors['username'] = get_string('error:missingusername', 'tool_capexplorer');
+        } else if (!$DB->record_exists('user', array('username' => $data['username']))) {
             $errors['username'] = get_string('error:invalidusername', 'tool_capexplorer', $data['username']);
         }
 
-        if (!$DB->record_exists('capabilities', array('name' => $data['capability']))) {
+        if (empty($data['capability'])) {
+            $errors['capability'] = get_string('error:missingcapability', 'tool_capexplorer');
+        } else if (!$DB->record_exists('capabilities', array('name' => $data['capability']))) {
             $errors['capability'] = get_string('error:invalidcapability', 'tool_capexplorer', $data['capability']);
         }
 
