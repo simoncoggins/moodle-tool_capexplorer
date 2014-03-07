@@ -40,7 +40,7 @@ M.tool_capexplorer.init = function(Y, args) {
     // Initialise autocomplete on username and capability fields.
     M.tool_capexplorer.init_autocomplete(Y, args);
 
-    var tree = new Y.TreeView({
+    M.tool_capexplorer.tree = new Y.TreeView({
         container : '#contexttree',
         nodes : [
             {
@@ -70,12 +70,12 @@ M.tool_capexplorer.init = function(Y, args) {
         'getcategories.php',
         {parentid: 0}, // Top level categories.
         M.tool_capexplorer.menu_load_data_categories,
-        tree.rootNode
+        M.tool_capexplorer.tree.rootNode
     );
 
-    tree.on('select', M.tool_capexplorer.menu_set_form_field);
+    M.tool_capexplorer.tree.on('select', M.tool_capexplorer.menu_set_form_field);
 
-    tree.plug(Y.Plugin.Tree.Lazy, {
+    M.tool_capexplorer.tree.plug(Y.Plugin.Tree.Lazy, {
 
         // Custom function that Plugin.Tree.Lazy will call when it needs to
         // load the children for a node.
@@ -140,12 +140,8 @@ M.tool_capexplorer.init = function(Y, args) {
 
     });
 
-    tree.render();
+    M.tool_capexplorer.tree.render();
 
-    // TODO open tree to selected element (if any)
-    // use this to locate node: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_findNode
-    // then this to select it: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_selectNode
-    // might need to open too.
 }
 
 M.tool_capexplorer.menu_label_with_icon = function(text, iconType) {
@@ -282,6 +278,35 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
         data: {contextlevel: contextLevel, instanceid: instanceId}
     });
 }
+
+M.tool_capexplorer.menu_select_node = function(Y, args) {
+
+    // use this to locate node: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_findNode
+    // then this to select it: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_selectNode
+    // TODO this doesn't work because nodes have no children until expanded:
+    var node = M.tool_capexplorer.tree.findNode(
+        M.tool_capexplorer.tree.rootNode,
+        M.tool_capexplorer.find_node_by_info,
+        args
+    );
+
+    // TODO open tree to selected element (if any)
+    // args should be parent context ids
+    // nodetoselect = rootnode
+    // foreach contextid
+    //   nodetoselect = nodetoselect.findNode(uses current contextid)
+    //   TODO might not work because expand is async?
+    //   nodetoselect.expand();
+    // end
+    // nodetoselect.selectNode();
+}
+
+M.tool_capexplorer.find_node_by_info = function(node) {
+    var contextLevel = M.tool_capexplorer.get_context_level_from_node(node);
+    return (contextLevel == this.contextlevel &&
+        node.data.instanceid == this.instanceid);
+}
+
 
 M.tool_capexplorer.init_autocomplete = function(Y, args) {
     Y.one('body').addClass('yui3-skin-sam');

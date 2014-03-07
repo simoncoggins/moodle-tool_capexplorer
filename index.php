@@ -51,6 +51,18 @@ echo $OUTPUT->header();
 // First create the form.
 $mform = new capexplorer_selector_form();
 
+// Re-open selected tree node if data passed to page.
+if ($data = data_submitted()) {
+    if (!empty($data->contextid)) {
+        $contextid =  clean_param($data->contextid, PARAM_INT);
+        $context = context::instance_by_id($contextid);
+        $contextlevel = $context->contextlevel;
+        $instanceid = $context->instanceid;
+        $args = array('contextlevel' => $contextlevel, 'instanceid' => $instanceid);
+        $PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), true);
+    }
+}
+
 if ($data = $mform->get_data()) {
     // Process data if submitted.
     $userid = $DB->get_field('user', 'id', array('username' => $data->username));

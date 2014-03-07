@@ -1,5 +1,7 @@
 
 MENU TODO:
+- Make all ajax calls consistent with id, name, contextid
+- Move all nodes inside system and expand system by default
 - Expand and select menu on page load if $data->contextid set.
 - Make some nodes not selectable - just userdir? or just validate?
 - Add messages when no items or make not expandable?
