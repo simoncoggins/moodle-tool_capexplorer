@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Return a list of users, optionally filtered by search criteria.
+ * Return a node's children as an object that can be used as in the JS
+ * node children property after converting to JSON.
  *
  * @package     tool_capexplorer
  * @copyright   Simon Coggins
@@ -27,7 +28,8 @@ define('AJAX_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
-$search = optional_param('search', '', PARAM_ALPHANUMEXT);
+$nodetype = required_param('nodetype', PARAM_ALPHA);
+$instanceid   = optional_param('instanceid', 0, PARAM_INT);
 
 require_login();
 
@@ -35,29 +37,5 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
-// TODO simplify to use for autocomplete only.
-$sqlfullname = $DB->sql_fullname('u.firstname', 'u.lastname');
-$autocompletefields = $DB->sql_concat_join("', '", array($sqlfullname, 'u.username', 'u.email'));
+echo json_encode(tool_capexplorer_get_child_nodes($nodetype, $instanceid));
 
-if (!empty($search)) {
-    $likesql = ' AND ' . $DB->sql_like($autocompletefields, '?');
-    $params = array("%{$search}%");
-} else {
-    $likesql = '';
-    $params = array();
-}
-
-$sql = "SELECT u.id, u.username, {$autocompletefields} AS autocompletestr,
-    c.id AS contextid, {$sqlfullname} AS name
-    FROM {user} u
-    JOIN {context} c
-    ON u.id = c.instanceid AND contextlevel = " . CONTEXT_USER . "
-    WHERE
-    u.deleted <> 1 {$likesql}
-    ORDER BY {$sqlfullname}";
-
-$users = $DB->get_records_sql($sql, $params);
-
-$OUTPUT->header();
-echo json_encode(array_values($users));
-$OUTPUT->footer();

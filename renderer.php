@@ -437,3 +437,4 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $html;
     }
 }
+

@@ -444,3 +444,192 @@ function tool_capexplorer_has_capability($capability, $context, $userid) {
     // Return result.
     return $overallresult;
 }
+
+// TODO move all below to menulib.php ?
+
+function tool_capexplorer_get_initial_tree($selectedcontextid = null) {
+    return tool_capexplorer_get_system_node();
+    if (is_null($selectedcontextid)) {
+        $selectedcontextid = 1;
+    }
+
+    $context = context::instance_by_id($selectedcontextid);
+    $parentcontexts = $context->get_parent_contexts(true);
+    $contexts = array_reverse($parentcontexts);
+
+    // TODO Write this. Calculate initial open leaves as a JS nodes object.
+}
+
+function tool_capexplorer_get_child_nodes($nodetype, $instanceid = 0) {
+    switch ($nodetype) {
+        case 'root':
+            return tool_capexplorer_get_system_node();
+        case 'userdir':
+            return tool_capexplorer_get_user_nodes();
+        case 'system':
+            $frontpagenode = tool_capexplorer_get_course_nodes(-1);
+            $userdirnode = tool_capexplorer_get_userdir_node();
+            $toplevelcatnodes = tool_capexplorer_get_category_nodes(0);
+            $blocknodes = tool_capexplorer_get_block_nodes($nodetype, $instanceid);
+            return array_merge($frontpagenode, $userdirnode, $toplevelcatnodes, $blocknodes);
+        case 'category':
+            $categorynodes = tool_capexplorer_get_category_nodes($instanceid);
+            $coursenodes = tool_capexplorer_get_course_nodes($instanceid);
+            $blocknodes = tool_capexplorer_get_block_nodes($nodetype, $instanceid);
+            return array_merge($categorynodes, $coursenodes, $blocknodes);
+        case 'course':
+            $modulenodes = tool_capexplorer_get_module_nodes($instanceid);
+            $blocknodes = tool_capexplorer_get_block_nodes($nodetype, $instanceid);
+            return array_merge($modulenodes, $blocknodes);
+    }
+}
+
+function tool_capexplorer_get_user_nodes() {
+    global $DB;
+
+    $sqlfullname = $DB->sql_fullname();
+    $sql = "SELECT u.id, c.id AS contextid, {$sqlfullname} AS name
+        FROM {user} u
+        JOIN {context} c
+        ON u.id = c.instanceid AND contextlevel = " . CONTEXT_USER . "
+        WHERE
+        u.deleted <> 1
+        ORDER BY {$sqlfullname}";
+    if ($users = $DB->get_records_sql($sql, array())) {
+        $nodetypes = array_fill(0, count($users), 'user');
+        return array_map('tool_capexplorer_get_js_tree_node', $users, $nodetypes);
+    } else {
+        return array();
+    }
+
+}
+
+function tool_capexplorer_get_module_nodes($parentcourseid) {
+    global $CFG;
+    require_once($CFG->dirroot . '/course/lib.php');
+    // TODO add contextid.
+    if ($modules = get_array_of_activities($parentcourseid)) {
+        $nodetypes = array_fill(0, count($modules), 'module');
+        return array_map('tool_capexplorer_get_js_tree_node', $modules, $nodetypes);
+    } else {
+        return array();
+    }
+}
+
+function tool_capexplorer_get_course_nodes($parentcategoryid) {
+    if ($parentcategoryid == -1) {
+        return array(tool_capexplorer_get_frontpage_node());
+    }
+
+    // TODO add contextid.
+    if ($courses = get_courses($parentcategoryid, 'c.sortorder ASC',
+        'c.id,c.fullname AS name')) {
+        $nodetypes = array_fill(0, count($courses), 'course');
+        return array_map('tool_capexplorer_get_js_tree_node', $courses, $nodetypes);
+    } else {
+        return array();
+    }
+}
+
+function tool_capexplorer_get_category_nodes($parentcategoryid) {
+    global $DB;
+    // TODO add contextid
+    if ($categories = $DB->get_records_select('course_categories', "parent = ?",
+        array($parentcategoryid), 'name', 'id,name')) {
+        $nodetypes = array_fill(0, count($categories), 'category');
+        return array_map('tool_capexplorer_get_js_tree_node', $categories, $nodetypes);
+    } else {
+        return array();
+    }
+}
+
+function tool_capexplorer_get_block_nodes($parentnodetype, $parentinstanceid = 0) {
+    global $DB;
+    switch ($parentnodetype) {
+    case 'system':
+        $parentcontext = CONTEXT_SYSTEM::instance();
+        break;
+    case 'category':
+        $parentcontext = CONTEXT_COURSECAT::instance($parentinstanceid);
+        break;
+    case 'course':
+        $parentcontext = CONTEXT_COURSE::instance($parentinstanceid);
+        break;
+    default:
+        throw new Exception("Invalid nodetype '{$parentnodetype}' passed to tool_capexplorer_get_block_nodes().");
+    }
+
+    $sql = "SELECT bi.id, c.id AS contextid, bi.blockname AS name
+        FROM {block_instances} bi
+        JOIN {block} b ON bi.blockname = b.name
+        JOIN {context} c ON c.instanceid = bi.id AND c.contextlevel = " . CONTEXT_BLOCK . "
+        WHERE
+        bi.parentcontextid = ?
+    ";
+    $params = array($parentcontext->id);
+
+    if ($blockinstances = $DB->get_records_sql($sql, $params)) {
+
+        // Get block names from lang files and convert to JS nodes.
+        return array_map(function($blockinstance) {
+            $blockinstance->name = get_string('pluginname', 'block_' . $blockinstance->name);
+            return tool_capexplorer_get_js_tree_node($blockinstance, 'block');
+        }, $blockinstances);
+    } else {
+        return array();
+    }
+}
+
+function tool_capexplorer_get_system_node() {
+    $node = new stdClass();
+    $node->name = get_string('systemcontext', 'tool_capexplorer');
+    $node->contextid = 1;
+    return array(tool_capexplorer_get_js_tree_node($node, 'system'));
+}
+
+function tool_capexplorer_get_frontpage_node() {
+    global $DB;
+    // TODO add contextid.
+    $sitename = $DB->get_field('course', 'fullname', array('id' => SITEID));
+    $node = new stdClass();
+    $node->id = SITEID;
+    $node->name = get_string('xfrontpage', 'tool_capexplorer', format_string($sitename));
+    return array(tool_capexplorer_get_js_tree_node($node, 'course'));
+}
+
+function tool_capexplorer_get_userdir_node() {
+    $node = new stdClass();
+    $node->name = get_string('usercontext', 'tool_capexplorer');
+    return array(tool_capexplorer_get_js_tree_node($node, 'userdir'));
+}
+
+/**
+ * Given a PHP node object, return an object that can be converted to a JS
+ * node via JSON encoding.
+ *
+ * @param object $nodeobject A node object with name and optional id and contextid
+ * i                         properties.
+ * @return object An object that matches the JS node syntax when converted to JSON.
+ */
+function tool_capexplorer_get_js_tree_node($nodeobject, $nodetype) {
+
+    // Only certain node types have children.
+    $canhavechildren = in_array($nodetype,
+        array('system', 'userdir', 'category', 'course'));
+
+    $jsnode = new stdClass();
+    $jsnode->label = html_writer::tag('span',
+        format_string($nodeobject->name),
+        array('class' => "capexplorer-tree-label capexplorer-tree-{$nodetype}")
+    );
+    $jsnode->data = new stdClass();
+    $jsnode->data->nodeType = $nodetype;
+    if (isset($nodeobject->id)) {
+        $jsnode->data->instanceId = $nodeobject->id;
+    }
+    if (isset($nodeobject->contextid)) {
+        $jsnode->data->contextId = $nodeobject->contextid;
+    }
+    $jsnode->canHaveChildren = $canhavechildren;
+    return $jsnode;
+}

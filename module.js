@@ -40,38 +40,11 @@ M.tool_capexplorer.init = function(Y, args) {
     // Initialise autocomplete on username and capability fields.
     M.tool_capexplorer.init_autocomplete(Y, args);
 
+    // Load tree with initial data from PHP.
     M.tool_capexplorer.tree = new Y.TreeView({
         container : '#contexttree',
-        nodes : [
-            {
-                label: M.tool_capexplorer.menu_label_with_icon(
-                    M.util.get_string('systemcontext', 'tool_capexplorer'), 'system'),
-                data: {nodeType: 'system'},
-                canHaveChildren: true
-            },
-            {
-                label: M.tool_capexplorer.menu_label_with_icon(
-                    M.util.get_string('frontpagecourse', 'tool_capexplorer'), 'course'),
-                // TODO pass in SITEID as an argument.
-                data: {nodeType: 'course', instanceId: 1},
-                canHaveChildren: true
-            },
-            {
-                label: M.tool_capexplorer.menu_label_with_icon(
-                    M.util.get_string('usercontext', 'tool_capexplorer'), 'users'),
-                data: {nodeType: 'userdir'},
-                canHaveChildren: true
-            }
-        ]
+        nodes : args.initialtree,
     });
-
-    // Add top-level categories to top level of tree.
-    M.tool_capexplorer.menu_load_data(
-        'getcategories.php',
-        {parentid: 0}, // Top level categories.
-        M.tool_capexplorer.menu_load_data_categories,
-        M.tool_capexplorer.tree.rootNode
-    );
 
     M.tool_capexplorer.tree.on('select', M.tool_capexplorer.menu_set_form_field);
 
@@ -81,59 +54,29 @@ M.tool_capexplorer.init = function(Y, args) {
         // load the children for a node.
         load: function (node, callback) {
             var nodeType = node.data.nodeType;
+            var instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0;
+            var requestdata = {instanceid : instanceId, nodetype: nodeType};
 
-            switch (nodeType) {
-            case 'userdir':
-                M.tool_capexplorer.menu_load_data(
-                    'getusers.php',
-                    {},
-                    M.tool_capexplorer.menu_load_data_user,
-                    node
-                );
-                break;
-            case 'course':
-                M.tool_capexplorer.menu_load_data(
-                    'getmodules.php',
-                    {courseid: node.data.instanceId},
-                    M.tool_capexplorer.menu_load_data_module,
-                    node
-                );
-                M.tool_capexplorer.menu_load_data(
-                    'getblocks.php',
-                    {contextlevel: 50, instanceid: node.data.instanceId},
-                    M.tool_capexplorer.menu_load_data_block,
-                    node
-                );
-                break;
-            case 'category':
-                M.tool_capexplorer.menu_load_data(
-                    'getcategories.php',
-                    {parentid: node.data.instanceId},
-                    M.tool_capexplorer.menu_load_data_categories,
-                    node
-                );
-                M.tool_capexplorer.menu_load_data(
-                    'getcourses.php',
-                    {categoryid: node.data.instanceId},
-                    M.tool_capexplorer.menu_load_data_courses,
-                    node
-                );
-                M.tool_capexplorer.menu_load_data(
-                    'getblocks.php',
-                    {contextlevel: 40, instanceid: node.data.instanceId},
-                    M.tool_capexplorer.menu_load_data_block,
-                    node
-                );
-                break;
-            case 'system':
-                M.tool_capexplorer.menu_load_data(
-                    'getblocks.php',
-                    {contextlevel: 10},
-                    M.tool_capexplorer.menu_load_data_block,
-                    node
-                );
-                break;
-            }
+            // TODO Pass admin via config.
+            Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/get_child_nodes.php', {
+                on:   {success:
+                    function(id, r) {
+                        try {
+                            parsedResponse = Y.JSON.parse(r.responseText);
+                        }
+                        catch (e) {
+                            alert("JSON Parse failed!");
+                            return;
+                        }
+                        if (parsedResponse.error !== undefined) {
+                            alert(parsedResponse.error);
+                            return;
+                        }
+                        node.append(parsedResponse);
+                    }
+                },
+                data: requestdata
+            });
 
             callback();
         }
@@ -144,102 +87,6 @@ M.tool_capexplorer.init = function(Y, args) {
 
 }
 
-M.tool_capexplorer.menu_label_with_icon = function(text, iconType) {
-    var iconTypeClass = 'capexplorer-tree-'+iconType;
-    return '<span class="capexplorer-tree-label ' + iconTypeClass+'">' + text + '</span>';
-}
-
-M.tool_capexplorer.menu_load_data_categories = function(node, data) {
-    var subcats =  [];
-    for (var catid in data) {
-        if (data.hasOwnProperty(catid)) {
-            subcats.push({
-                label: M.tool_capexplorer.menu_label_with_icon(data[catid], 'category'),
-                data: {nodeType: 'category', instanceId: catid},
-                canHaveChildren: true
-            });
-        }
-    }
-    node.append(subcats);
-};
-
-M.tool_capexplorer.menu_load_data_courses = function(node, data) {
-    var courses =  [];
-    for (var courseid in data) {
-        if (data.hasOwnProperty(courseid)) {
-            courses.push({
-                label: M.tool_capexplorer.menu_label_with_icon(data[courseid], 'course'),
-                data: {nodeType: 'course', instanceId: courseid},
-                canHaveChildren: true
-            });
-        }
-    }
-    node.append(courses);
-};
-
-M.tool_capexplorer.menu_load_data_user = function(node, data) {
-    var users =  [];
-    for (var key in data) {
-        if (data.hasOwnProperty(key)) {
-            users.push({
-                label: M.tool_capexplorer.menu_label_with_icon(data[key]['fullname'], 'user'),
-                data: {nodeType: 'user', instanceId: data[key]['id']}
-            });
-        }
-    }
-    node.append(users);
-};
-
-M.tool_capexplorer.menu_load_data_module = function(node, data) {
-    var modules =  [];
-    for (var key in data) {
-        if (data.hasOwnProperty(key)) {
-            modules.push({
-                label: M.tool_capexplorer.menu_label_with_icon(data[key], 'module'),
-                data: {nodeType: 'module', instanceId: key}
-            });
-        }
-    }
-    node.append(modules);
-};
-
-M.tool_capexplorer.menu_load_data_block = function(node, data) {
-    var blocks =  [];
-    for (var key in data) {
-        if (data.hasOwnProperty(key)) {
-            blocks.push({
-                label: M.tool_capexplorer.menu_label_with_icon(data[key], 'block'),
-                data: {nodeType: 'block', instanceId: key}
-            });
-        }
-    }
-    node.append(blocks);
-};
-
-// Generic function for loading data via IO request.
-M.tool_capexplorer.menu_load_data = function(ajaxfile, requestdata, handler, node) {
-    // TODO Pass admin via config.
-    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/' + ajaxfile, {
-        on:   {success:
-            function(id, r) {
-                try {
-                    parsedResponse = Y.JSON.parse(r.responseText);
-                }
-                catch (e) {
-                    alert("JSON Parse failed!");
-                    return;
-                }
-                if (parsedResponse.error !== undefined) {
-                    alert(parsedResponse.error);
-                    return;
-                }
-                // Call handler method to add nodes based on data.
-                handler(node, parsedResponse.options);
-            }
-        },
-        data: requestdata
-    });
-};
 
 M.tool_capexplorer.get_context_level_from_node = function(node) {
     var nodeType = node.data.nodeType;
@@ -266,6 +113,7 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
     var contextLevel = M.tool_capexplorer.get_context_level_from_node(e.node);
     var instanceId = (e.node.data.instanceId === undefined) ? 0 : e.node.data.instanceId;
 
+    // TODO include contextid in data so we don't need to do this.
     // TODO Pass admin via config.
     Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getcontextid.php', {
         on:   {success:
@@ -313,13 +161,13 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
 
     Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
         resultFilters: 'phraseMatch',
+        // TODO using 'autocompletestr' here fixes search but displays full string.
         resultTextLocator: 'username',
-        resultListLocator: 'options',
         // TODO Pass admin via config.
         source: M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getusers.php?search={query}',
         resultFormatter: function(query, results) {
             return Y.Array.map(results, function(result) {
-                return Y.Highlight.all(result.raw.data, query);
+                return Y.Highlight.all(result.raw.autocompletestr, query);
             });
         },
     });

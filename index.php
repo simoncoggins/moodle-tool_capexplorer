@@ -38,7 +38,8 @@ $jsmodule = array(
 
 $args = array(
     'admin' => $CFG->admin,
-    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', '')
+    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
+    'initialtree' => tool_capexplorer_get_initial_tree()
 );
 
 $PAGE->requires->strings_for_js(array('systemcontext', 'usercontext', 'modulecontext', 'blockcontext', 'frontpagecourse'), 'tool_capexplorer');
