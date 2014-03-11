@@ -127,37 +127,35 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
     });
 }
 
-// TODO
-// Need this to work recursively.
-// Pass in array of parent contextids
-// if only 1 item in array
-//   select that node
-// else
-//   pop first item off array
-//   find that node in current tree (this level only)
-//   call func again passing shorter array
-// endif
-//   
-M.tool_capexplorer.menu_select_node = function(Y, args) {
+// Recursive function to expand, and then select a node in the tree.
+M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode) {
 
-    // use this to locate node: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_findNode
-    // then this to select it: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_selectNode
-    // TODO this doesn't work because nodes have no children until expanded:
-    var node = M.tool_capexplorer.tree.findNode(
-        M.tool_capexplorer.tree.rootNode,
-        M.tool_capexplorer.find_node_by_info,
-        args
-    );
+    // Start from the top if currentNode not set yet.
+    if (currentNode == undefined) {
+        currentNode = M.tool_capexplorer.tree.rootNode;
+        M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode);
+        return;
+    }
 
-    // TODO open tree to selected element (if any)
-    // args should be parent context ids
-    // nodetoselect = rootnode
-    // foreach contextid
-    //   nodetoselect = nodetoselect.findNode(uses current contextid)
-    //   TODO might not work because expand is async?
-    //   nodetoselect.expand();
-    // end
-    // nodetoselect.selectNode();
+    var currentContextId = parentcontextids.shift();
+
+    currentNode.open();
+
+    // TODO handle userdir node.
+    for (i in currentNode.children) {
+        // We've found the right node.
+        if (currentNode.children[i].data.contextId == currentContextId) {
+            if (parentcontextids.length == 0) {
+                // If we've reached the last node, select it.
+                currentNode.children[i].select();
+            } else {
+                // Otherwise, repeat the process for the child.
+                M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode.children[i]);
+            }
+            // No need to check remaining children.
+            return;
+        }
+    }
 }
 
 M.tool_capexplorer.find_node_by_info = function(node) {

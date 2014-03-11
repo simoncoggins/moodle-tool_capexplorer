@@ -2,8 +2,7 @@
 MENU TODO:
 - Make all ajax calls inclue contextid and update code for setting contextid in form
 - Expand system node by default
-- Write PHP to set expanded menu if $data->contextid set
-- Write JS to select correct node if $data->contextid set
+- Finish JS code to select correct node if $data->contextid set
 - Make some nodes not selectable - just userdir? or just validate?
 - Add messages when no items or make not expandable?
 - Improve error handling

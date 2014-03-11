@@ -57,11 +57,9 @@ if ($data = data_submitted()) {
     if (!empty($data->contextid)) {
         $contextid =  clean_param($data->contextid, PARAM_INT);
         $context = context::instance_by_id($contextid);
-        $contextlevel = $context->contextlevel;
-        $instanceid = $context->instanceid;
-        // TODO pass in parent context array instead. Need to decide best format for
-        // searching in JS.
-        $args = array('contextlevel' => $contextlevel, 'instanceid' => $instanceid);
+        $parentcontextids = $context->get_parent_context_ids(true);
+        // menu_select_node needs an array of contextids, starting at system context.
+        $args = array_reverse($parentcontextids);
         $PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), true);
     }
 }
