@@ -127,6 +127,17 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
     });
 }
 
+// TODO
+// Need this to work recursively.
+// Pass in array of parent contextids
+// if only 1 item in array
+//   select that node
+// else
+//   pop first item off array
+//   find that node in current tree (this level only)
+//   call func again passing shorter array
+// endif
+//   
 M.tool_capexplorer.menu_select_node = function(Y, args) {
 
     // use this to locate node: http://smugmug.github.io/yui-gallery/api/classes/TreeView.html#method_findNode

@@ -445,20 +445,9 @@ function tool_capexplorer_has_capability($capability, $context, $userid) {
     return $overallresult;
 }
 
+
 // TODO move all below to menulib.php ?
 
-function tool_capexplorer_get_initial_tree($selectedcontextid = null) {
-    return tool_capexplorer_get_system_node();
-    if (is_null($selectedcontextid)) {
-        $selectedcontextid = 1;
-    }
-
-    $context = context::instance_by_id($selectedcontextid);
-    $parentcontexts = $context->get_parent_contexts(true);
-    $contexts = array_reverse($parentcontexts);
-
-    // TODO Write this. Calculate initial open leaves as a JS nodes object.
-}
 
 function tool_capexplorer_get_child_nodes($nodetype, $instanceid = 0) {
     switch ($nodetype) {

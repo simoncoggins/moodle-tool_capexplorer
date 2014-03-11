@@ -39,7 +39,7 @@ $jsmodule = array(
 $args = array(
     'admin' => $CFG->admin,
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
-    'initialtree' => tool_capexplorer_get_initial_tree()
+    'initialtree' => tool_capexplorer_get_system_node()
 );
 
 $PAGE->requires->strings_for_js(array('systemcontext', 'usercontext', 'modulecontext', 'blockcontext', 'frontpagecourse'), 'tool_capexplorer');
@@ -59,6 +59,8 @@ if ($data = data_submitted()) {
         $context = context::instance_by_id($contextid);
         $contextlevel = $context->contextlevel;
         $instanceid = $context->instanceid;
+        // TODO pass in parent context array instead. Need to decide best format for
+        // searching in JS.
         $args = array('contextlevel' => $contextlevel, 'instanceid' => $instanceid);
         $PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), true);
     }
