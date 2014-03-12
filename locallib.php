@@ -522,9 +522,13 @@ function tool_capexplorer_get_course_nodes($parentcategoryid) {
 
 function tool_capexplorer_get_category_nodes($parentcategoryid) {
     global $DB;
-    // TODO add contextid
-    if ($categories = $DB->get_records_select('course_categories', "parent = ?",
-        array($parentcategoryid), 'name', 'id,name')) {
+    $sql = "SELECT cc.id,cc.name,ctx.id AS contextid
+        FROM {course_categories} cc
+        JOIN {context} ctx ON ctx.instanceid = cc.id
+            AND ctx.contextlevel = " . CONTEXT_COURSECAT . "
+        WHERE cc.parent = ?
+        ORDER BY cc.name";
+    if ($categories = $DB->get_records_sql($sql, array($parentcategoryid))) {
         $nodetypes = array_fill(0, count($categories), 'category');
         return array_map('tool_capexplorer_get_js_tree_node', $categories, $nodetypes);
     } else {
