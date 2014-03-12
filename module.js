@@ -139,6 +139,9 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
 
     var currentContextId = parentcontextids.shift();
 
+    // TODO The problem is, this is async for Lazy tree, so children don't
+    // exist in time for loop. Probably need to create expanded tree in PHP
+    // and only use recursive function to find selected node.
     currentNode.open();
 
     // TODO handle userdir node.
