@@ -53,6 +53,11 @@ M.tool_capexplorer.init = function(Y, args) {
         // Custom function that Plugin.Tree.Lazy will call when it needs to
         // load the children for a node.
         load: function (node, callback) {
+            if (node.children != undefined && node.children.length != 0) {
+                // Children already expanded.
+                // This prevents duplicate nodes when initial tree is expanded.
+                return;
+            }
             var nodeType = node.data.nodeType;
             var instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0;
             var requestdata = {instanceid : instanceId, nodetype: nodeType};

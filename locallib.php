@@ -448,6 +448,34 @@ function tool_capexplorer_has_capability($capability, $context, $userid) {
 
 // TODO move all below to menulib.php ?
 
+function tool_capexplorer_get_selected_subtree($contextids, $currentnode = null) {
+
+    // Start from the top if currentnode not set yet.
+    if (is_null($currentnode)) {
+        $currentnode = new stdClass();
+        $currentnode->data = new stdClass();
+        $currentnode->data->nodeType = 'root';
+        return tool_capexplorer_get_selected_subtree($contextids, $currentnode);
+    }
+
+    $currentcontextid = array_shift($contextids);
+
+    $nodetype = $currentnode->data->nodeType;
+    $instanceid = isset($currentnode->data->instanceId) ? $currentnode->data->instanceId : 0;
+
+    // TODO will this work with userdir?
+    $nodes = tool_capexplorer_get_child_nodes($nodetype, $instanceid);
+    if (empty($nodes)) {
+        return array();
+    }
+
+    foreach ($nodes as $key => $node) {
+        if (isset($node->data->contextId) && $node->data->contextId == $currentcontextid) {
+            $nodes[$key]->children = tool_capexplorer_get_selected_subtree($contextids, $node);
+        }
+    }
+    return $nodes;
+}
 
 function tool_capexplorer_get_child_nodes($nodetype, $instanceid = 0) {
     switch ($nodetype) {
@@ -507,7 +535,7 @@ function tool_capexplorer_get_module_nodes($parentcourseid) {
 
 function tool_capexplorer_get_course_nodes($parentcategoryid) {
     if ($parentcategoryid == -1) {
-        return array(tool_capexplorer_get_frontpage_node());
+        return tool_capexplorer_get_frontpage_node();
     }
 
     // TODO add contextid.
