@@ -25,27 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Helper function to output a JSON reponse.
- *
- * This function renders the output and exits.
- *
- * @param $options array Array of options to convert to JSON.
- * @param $disabled bool Whether select menu should be disabled (default false).
- */
-function tool_capexplorer_render_json($options, $disabled = false) {
-    global $OUTPUT;
-    $response = array(
-        'options' => $options,
-        'disabled' => (int)$disabled
-    );
-    $OUTPUT->header();
-    echo json_encode($response);
-    $OUTPUT->footer();
-    exit;
-}
-
-
-/**
  * Given a context object, return formatted information about it.
  *
  * @param object $context Context object.
