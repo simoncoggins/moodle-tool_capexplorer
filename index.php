@@ -24,6 +24,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once('form.php');
 require_once('locallib.php');
+require_once('menulib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
 $PAGE->set_context(context_system::instance());
@@ -32,8 +33,11 @@ $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
 $jsmodule = array(
     'name' => 'tool_capexplorer',
-    'fullpath' => '/'.$CFG->admin.'/tool/capexplorer/module.js',
-    'requires' => array('json', 'autocomplete', 'autocomplete-filters', 'autocomplete-highlighters', 'gallery-sm-treeview', 'tree-lazy')
+    'fullpath' => "/{$CFG->admin}/tool/capexplorer/module.js",
+    'requires' => array(
+        'json', 'autocomplete', 'autocomplete-filters',
+        'autocomplete-highlighters', 'gallery-sm-treeview', 'tree-lazy'
+    )
 );
 
 
@@ -55,6 +59,7 @@ if ($data = data_submitted()) {
     }
 }
 
+// TODO sort these defaults.
 // Default tree for first page load.
 if (!isset($initialtree)) {
     $initialtree = tool_capexplorer_get_system_node();

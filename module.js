@@ -95,6 +95,7 @@ M.tool_capexplorer.init = function(Y, args) {
 
 
 M.tool_capexplorer.menu_set_form_field = function(e) {
+    // TODO handle userdir here.
     var contextid = e.node.data.contextId;
     var input = Y.one('input[name=contextid]');
     input.set('value', contextid);
