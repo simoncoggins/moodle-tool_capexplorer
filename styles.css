@@ -34,6 +34,10 @@
     color: grey;
 }
 
+#tree-loading-message {
+    color: grey;
+}
+
 /* Remove YUI icon and padding */
 .yui3-skin-sam .yui3-treeview-icon {
     display: none;

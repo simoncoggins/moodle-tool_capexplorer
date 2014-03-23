@@ -90,6 +90,7 @@ M.tool_capexplorer.init = function(Y, args) {
 
     M.tool_capexplorer.tree.render();
 
+    Y.one('#tree-loading-message').hide();
 }
 
 

@@ -52,7 +52,7 @@ class capexplorer_selector_form extends moodleform {
         // the hidden input tag to prevent validation failing. Real validation of the context tree
         // is done in validation() below with errors applied to the 'contexttree' static element.
         $mform->addElement('static', 'contexttree', get_string('context', 'tool_capexplorer'),
-            '<input type="hidden" name="contexttree" value="1"><div id="contexttree" class="yui3-skin-sam"><div>');
+            '<input type="hidden" name="contexttree" value="1"><div id="contexttree" class="yui3-skin-sam"><span id="tree-loading-message">Loading context tree...</span></div>');
         $mform->addRule('contexttree', get_string('required'), 'required');
 
         $mform->addElement('hidden', 'contextid');
