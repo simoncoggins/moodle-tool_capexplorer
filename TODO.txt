@@ -2,7 +2,6 @@
 MENU TODO:
 - Make some nodes not selectable - just userdir? or just validate?
 - Add messages when no items or make not expandable?
-- Copy images into capexplorer/pix and edit any we want to change
 - More refactoring to simplify/reduce duplication
 
 - Improve error handling
@@ -13,7 +12,6 @@ MENU TODO:
 GENERAL TODO:
 
 autocomplete only taking username into account
-make getusers.php specific to autocomplete
 Remove 'change' link for user with no access to user policy link.
 Warning if user checks a capability in an invalid context.
 Replace as much of styles.css with existing LESS colours as possible.

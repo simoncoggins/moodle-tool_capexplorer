@@ -59,23 +59,23 @@
     padding-right: 20px;
 }
 .capexplorer-tree-course {
-    background-image: url([[pix:i/course]]);
+    background-image: url([[pix:tool_capexplorer|course]]);
 }
 .capexplorer-tree-category {
-    background-image: url([[pix:i/folder]]);
+    background-image: url([[pix:tool_capexplorer|category]]);
 }
 .capexplorer-tree-user {
-    background-image: url([[pix:i/user]]);
+    background-image: url([[pix:tool_capexplorer|user]]);
 }
 .capexplorer-tree-userdir {
-    background-image: url([[pix:i/users]]);
+    background-image: url([[pix:tool_capexplorer|users]]);
 }
 .capexplorer-tree-module {
-    background-image: url([[pix:i/navigationitem]]);
+    background-image: url([[pix:tool_capexplorer|module]]);
 }
 .capexplorer-tree-block {
     background-image: url([[pix:tool_capexplorer|block]]);
 }
 .capexplorer-tree-system {
-    background-image: url([[pix:i/moodle_host]]);
+    background-image: url([[pix:tool_capexplorer|system]]);
 }
