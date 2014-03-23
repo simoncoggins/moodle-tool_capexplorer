@@ -52,11 +52,6 @@ if ($data = data_submitted()) {
         $parentcontextids = $context->get_parent_context_ids(true);
         $contextids = array_reverse($parentcontextids);
         $initialtree = tool_capexplorer_get_selected_subtree($contextids);
-        /*
-        // menu_select_node needs an array of contextids, starting at system context.
-        $args = array_reverse($parentcontextids);
-        $PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), true);
-         */
     }
 }
 

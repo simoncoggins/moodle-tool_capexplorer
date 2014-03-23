@@ -149,7 +149,6 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
     // and only use recursive function to find selected node.
     currentNode.open();
 
-    // TODO handle userdir node.
     for (i in currentNode.children) {
         // We've found the right node.
         if (currentNode.children[i].data.contextId == currentContextId) {
@@ -162,6 +161,14 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
             }
             // No need to check remaining children.
             return;
+        }
+    }
+    // Handle userdir.
+    // If previous loop didn't match anything, open the userdir node.
+    for (i in currentNode.children) {
+        if (currentNode.children[i].data.nodeType == 'userdir') {
+            parentcontextids.unshift(currentContextId);
+            M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode.children[i]);
         }
     }
 }

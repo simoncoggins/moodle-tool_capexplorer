@@ -474,6 +474,11 @@ function tool_capexplorer_get_selected_subtree($contextids, $currentnode = null)
             $nodes[$key]->children = tool_capexplorer_get_selected_subtree($contextids, $node);
         }
     }
+    foreach ($nodes as $key => $node) {
+        if ($node->data->nodeType == 'userdir') {
+            $nodes[$key]->children = tool_capexplorer_get_user_nodes();
+        }
+    }
     return $nodes;
 }
 
