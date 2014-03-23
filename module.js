@@ -121,6 +121,10 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
         // We've found the right node.
         if (currentNode.children[i].data.contextId == currentContextId) {
             if (parentcontextids.length == 0) {
+                // Always open the system node.
+                if (currentNode.children[i].data.nodeType == 'system') {
+                    currentNode.children[i].open();
+                }
                 // If we've reached the last node, select it.
                 currentNode.children[i].select();
             } else {
