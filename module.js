@@ -93,44 +93,12 @@ M.tool_capexplorer.init = function(Y, args) {
 }
 
 
-M.tool_capexplorer.get_context_level_from_node = function(node) {
-    var nodeType = node.data.nodeType;
-    // TODO pass constants in from PHP?
-    switch (nodeType) {
-    case 'system':
-        return 10;
-    case 'user':
-    case 'userdir':
-        return 30;
-    case 'category':
-        return 40;
-    case 'course':
-        return 50;
-    case 'module':
-        return 70;
-    case 'block':
-        return 80;
-    }
-    return null;
-}
-
 M.tool_capexplorer.menu_set_form_field = function(e) {
-    var contextLevel = M.tool_capexplorer.get_context_level_from_node(e.node);
-    var instanceId = (e.node.data.instanceId === undefined) ? 0 : e.node.data.instanceId;
-
-    // TODO include contextid in data so we don't need to do this.
-    // TODO Pass admin via config.
-    Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getcontextid.php', {
-        on:   {success:
-            function(id, r) {
-                var contextid = r.responseText;
-                var input = Y.one('input[name=contextid]');
-                input.set('value', contextid);
-            }
-        },
-        data: {contextlevel: contextLevel, instanceid: instanceId}
-    });
+    var contextid = e.node.data.contextId;
+    var input = Y.one('input[name=contextid]');
+    input.set('value', contextid);
 }
+
 
 // Recursive function to expand, and then select a node in the tree.
 M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode) {
@@ -144,8 +112,8 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
 
     var currentContextId = parentcontextids.shift();
 
-    // TODO The problem is, this is async for Lazy tree, so children don't
-    // exist in time for loop. Probably need to create expanded tree in PHP
+    // The problem is, open() is async for Lazy tree, so children don't
+    // exist in time for loop below. Therefore we need to create expanded tree in PHP
     // and only use recursive function to find selected node.
     currentNode.open();
 
@@ -171,12 +139,6 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
             M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode.children[i]);
         }
     }
-}
-
-M.tool_capexplorer.find_node_by_info = function(node) {
-    var contextLevel = M.tool_capexplorer.get_context_level_from_node(node);
-    return (contextLevel == this.contextlevel &&
-        node.data.instanceid == this.instanceid);
 }
 
 
