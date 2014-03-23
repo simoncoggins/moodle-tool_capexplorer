@@ -69,7 +69,6 @@ $args = array(
     'initialtree' => $initialtree
 );
 
-$PAGE->requires->strings_for_js(array('systemcontext', 'usercontext', 'modulecontext', 'blockcontext', 'frontpagecourse'), 'tool_capexplorer');
 $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
 $args = $contextids;
 $PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), false, $jsmodule);
