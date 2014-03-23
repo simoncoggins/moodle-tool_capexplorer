@@ -527,12 +527,25 @@ function tool_capexplorer_get_user_nodes() {
 }
 
 function tool_capexplorer_get_module_nodes($parentcourseid) {
-    global $CFG;
+    global $CFG, $DB;
     require_once($CFG->dirroot . '/course/lib.php');
-    // TODO add contextid.
     if ($modules = get_array_of_activities($parentcourseid)) {
+        $cmids = array_map(function($item) {
+            return $item->cm;
+        }, $modules);
+        $sql = "SELECT cm.instance, ctx.id AS contextid
+            FROM {course_modules} cm
+            JOIN {context} ctx ON cm.instance = ctx.instanceid
+            AND ctx.contextlevel = " . CONTEXT_MODULE;
+        $contextmap = $DB->get_records_sql_menu($sql);
+
+        $moduleswithcontext = array_map(function($item) use ($contextmap) {
+            $item->contextid = $contextmap[$item->cm];
+            return $item;
+        }, $modules);
+
         $nodetypes = array_fill(0, count($modules), 'module');
-        return array_map('tool_capexplorer_get_js_tree_node', $modules, $nodetypes);
+        return array_map('tool_capexplorer_get_js_tree_node', $moduleswithcontext, $nodetypes);
     } else {
         return array();
     }
@@ -543,9 +556,8 @@ function tool_capexplorer_get_course_nodes($parentcategoryid) {
         return tool_capexplorer_get_frontpage_node();
     }
 
-    // TODO add contextid.
     if ($courses = get_courses($parentcategoryid, 'c.sortorder ASC',
-        'c.id,c.fullname AS name')) {
+        'c.id,c.fullname AS name, ctx.id AS contextid')) {
         $nodetypes = array_fill(0, count($courses), 'course');
         return array_map('tool_capexplorer_get_js_tree_node', $courses, $nodetypes);
     } else {
@@ -615,11 +627,13 @@ function tool_capexplorer_get_system_node() {
 
 function tool_capexplorer_get_frontpage_node() {
     global $DB;
-    // TODO add contextid.
-    $sitename = $DB->get_field('course', 'fullname', array('id' => SITEID));
-    $node = new stdClass();
-    $node->id = SITEID;
-    $node->name = get_string('xfrontpage', 'tool_capexplorer', format_string($sitename));
+    $sql = "SELECT c.id, c.fullname AS name, ctx.id AS contextid
+        FROM {course} c
+        JOIN {context} ctx ON c.id = ctx.instanceid
+        AND ctx.contextlevel = " . CONTEXT_COURSE . "
+        WHERE c.id = ?";
+    $node = $DB->get_record_sql($sql, array(SITEID));
+    $node->name = get_string('xfrontpage', 'tool_capexplorer', $node->name);
     return array(tool_capexplorer_get_js_tree_node($node, 'course'));
 }
 
