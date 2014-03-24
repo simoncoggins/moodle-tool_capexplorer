@@ -27,12 +27,24 @@ $string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href
 $string['autoassign'] = 'Auto assign';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
+$string['capability_help'] = '<p>Select a capability to check.</p><p>This field uses autocomplete so start typing the name of a capability then select from the options that appear.</p>';
 $string['capabilityplaceholder'] = 'Enter a capability';
 $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';
 $string['capgranted'] = 'True (Granted)';
 $string['change'] = 'Change';
 $string['context'] = 'Context';
+$string['context_help'] = '<p>You must provide a <em>context instance</em> to check a capability against. The tree shown displays the hierarchy of all the context instances on your site.</p>
+<p>Expand nodes by clicking the arrow to see more specific child contexts. Select an instance by clicking the name.</p>
+<p>The icons represent the <em>context level</em> of each instance:</p>
+<p>
+<div class="capexplorer-tree-label capexplorer-tree-system">System (Site) context</div>
+<div class="capexplorer-tree-label capexplorer-tree-user">User context</div>
+<div class="capexplorer-tree-label capexplorer-tree-category">Category context</div>
+<div class="capexplorer-tree-label capexplorer-tree-course">Course context</div>
+<div class="capexplorer-tree-label capexplorer-tree-module">Module context</div>
+<div class="capexplorer-tree-label capexplorer-tree-block">Block context</div>
+</p>';
 $string['contextaggrrules'] = 'Context aggregation rules';
 $string['contextaggrrules_help'] = '<p>To determine the role total for a particular role, aggregate the permissions at each context using the rules below:</p>
 <ol>
@@ -108,6 +120,7 @@ $string['user'] = 'User';
 $string['usercontext'] = 'User context';
 $string['userisadmin'] = 'Note: "{$a->user}" is a <a href="{$a->url}">site administrator</a>, and as such they are automatically granted all capabilities. The results below show how their access would be calculated if they weren\'t an admin.';
 $string['username'] = 'Username';
+$string['username_help'] = '<p>Select a user to check.</p><p>This field uses autocomplete so start typing a username, email address or user\'s name and select from the options that appear.</p>';
 $string['usernameplaceholder'] = 'Enter name, username or email';
 $string['viaassignment'] = 'Via <a href="{$a}">role assignment</a>';
 $string['viaoverride'] = 'Via <a href="{$a}">role override</a>';

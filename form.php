@@ -41,12 +41,14 @@ class capexplorer_selector_form extends moodleform {
             '"');
         $mform->setType('username', PARAM_TEXT);
         $mform->addRule('username', get_string('required'), 'required');
+        $mform->addHelpButton('username', 'username', 'tool_capexplorer');
 
         $mform->addElement('text', 'capability', get_string('capability', 'tool_capexplorer'),
             'maxlength="254" size="75" placeholder="' . get_string('capabilityplaceholder', 'tool_capexplorer') .
             '"');
         $mform->setType('capability', PARAM_TEXT);
         $mform->addRule('capability', get_string('required'), 'required');
+        $mform->addHelpButton('capability', 'capability', 'tool_capexplorer');
 
         // Slight hack here: we want the 'contexttree' static element to be "required" so we need
         // the hidden input tag to prevent validation failing. Real validation of the context tree
@@ -54,6 +56,7 @@ class capexplorer_selector_form extends moodleform {
         $mform->addElement('static', 'contexttree', get_string('context', 'tool_capexplorer'),
             '<input type="hidden" name="contexttree" value="1"><div id="contexttree" class="yui3-skin-sam"><span id="tree-loading-message">Loading context tree...</span></div>');
         $mform->addRule('contexttree', get_string('required'), 'required');
+        $mform->addHelpButton('contexttree', 'context', 'tool_capexplorer');
 
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
