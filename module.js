@@ -95,7 +95,14 @@ M.tool_capexplorer.init = function(Y, args) {
 
 
 M.tool_capexplorer.menu_set_form_field = function(e) {
-    // TODO handle userdir here.
+    // 'users' node is not a context, so instead of selecting
+    // it when clicked, open/close it.
+    if (e.node.data.nodeType == 'userdir') {
+        e.preventDefault();
+        e.node.toggleOpen();
+        return;
+    }
+    // Otherwise, select the node and store the context id.
     var contextid = e.node.data.contextId;
     var input = Y.one('input[name=contextid]');
     input.set('value', contextid);
