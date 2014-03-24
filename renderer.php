@@ -191,6 +191,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     public function print_role_assignment_table($contexts, $roles, $manualassignments, $autoassignments) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $systemcontext = context_system::instance();
+        $hassiteconfig = has_capability('moodle/site:config', $systemcontext);
 
         $html = '';
         $table = new html_table();
@@ -272,9 +274,17 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                     if (isset($autoassignments[$contextid][$roleid])) {
                         $text = get_string($autoassignments[$contextid][$roleid], 'admin');
                         $cell2->text = $this->output->container($text);
-                        $url = new moodle_url('/admin/settings.php', array('section' => 'userpolicies'));
-                        $link = html_writer::link($url, get_string('change', 'tool_capexplorer'));
-                        $cell2->text .= html_writer::tag('small', $link);
+                        if (!$hassiteconfig) {
+                            $error = 'nopermtoautoassign';
+                        } else {
+                            $error = '';
+                        }
+                        if (empty($error)) {
+                            $url = new moodle_url('/admin/settings.php', array('section' => 'userpolicies'));
+                            $cell2->text .= $this->print_change_link($url);
+                        } else {
+                            $cell2->text .= $this->print_message_with_help($error);
+                        }
                     }
                     $row[] = $cell2;
                 }
@@ -375,7 +385,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
         if ($overallresult != $result) {
             // TODO Define bug URL.
-            $bugurl = new moodle_url('/');
+            $bugurl = new moodle_url('');
             $cacheurl = new moodle_url('/admin/purgecaches.php');
             $a = new stdClass();
             $a->cacheurl = $cacheurl->out();
