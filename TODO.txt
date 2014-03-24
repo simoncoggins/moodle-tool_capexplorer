@@ -11,7 +11,7 @@ MENU TODO:
 GENERAL TODO:
 
 autocomplete only taking username into account
-Warning if user checks a capability in an invalid context.
+Improve messages when user checks a capability in an invalid context.
 Replace as much of styles.css with existing LESS colours as possible.
 Fix unit tests - instead of random, have some predefined data and expected results.
 

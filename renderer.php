@@ -373,14 +373,18 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      * Display warning messages if:
      * 1/ The result from this tool does not match the result from has_capability().
      * 2/ The user being tested is an admin (so is automatically granted all capabilities).
+     * 3/ The capability being checked can't be assigned in the context provided.
      *
      * @param bool $overallresult The result calculated by this tool.
      * @param bool $result The result calculated by has_capability().
      * @param object $user User object for the user being tested.
+     * @param string $capability The capability being checked.
+     * @param object $context The context being checked.
      *
      * @return string HTML to display any warning messages.
      */
-    public function print_warning_messages($overallresult, $result, $user) {
+    public function print_warning_messages($overallresult, $result, $user, $capability,
+        $context) {
         $html = '';
 
         if ($overallresult != $result) {
@@ -399,6 +403,19 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $a->url = $url->out();
             $a->user = fullname($user);
             $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $a), 'notifyproblem');
+        }
+
+        $contextcaps = $context->get_capabilities();
+        // See if capability being checked is one of them.
+        $result = array_filter($contextcaps,
+            function($contextcap) use ($capability) {
+                return ($contextcap->name == $capability);
+            }
+        );
+        if (empty($result)) {
+            $a = new stdClass();
+            $a->capability = $capability;
+            $html .= $this->output->container(get_string('capabilitycontextmismatch', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
         return $html;

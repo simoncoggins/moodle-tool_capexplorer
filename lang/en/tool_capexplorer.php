@@ -28,6 +28,8 @@ $string['autoassign'] = 'Auto assign';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
 $string['capability_help'] = '<p>Select a capability to check.</p><p>This field uses autocomplete so start typing the name of a capability then select from the options that appear.</p>';
+// TODO read get_capabilities() code and improve description.
+$string['capabilitycontextmismatch'] = 'Note: The capability selected would not normally be assigned in the selected context.';
 $string['capabilityplaceholder'] = 'Enter a capability';
 $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';

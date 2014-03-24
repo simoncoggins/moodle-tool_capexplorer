@@ -115,7 +115,7 @@ $roletotals = tool_capexplorer_merge_permissions_across_contexts(
 );
 $overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
 
-echo $output->print_warning_messages($overallresult, $result, $user);
+echo $output->print_warning_messages($overallresult, $result, $user, $capability, $context);
 
 echo $output->heading_with_help(get_string('contextlineage', 'tool_capexplorer'), 'contextlineage', 'tool_capexplorer');
 echo $output->container(get_string('contextlineagesummary', 'tool_capexplorer'));
