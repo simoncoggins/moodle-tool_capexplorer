@@ -1,8 +1,4 @@
 
-.hidden-field {
-    display: none;
-}
-
 .perm-allow {
     color: green;
 }
@@ -32,6 +28,11 @@
 
 .option-disabled {
     color: grey;
+}
+
+/* Increase width of autocomplete form fields slightly */
+#id_username, #id_capability {
+    width: 400px;
 }
 
 #tree-loading-message {
@@ -80,6 +81,3 @@
     background-image: url([[pix:tool_capexplorer|system]]);
 }
 
-#id_username, #id_capability {
-    width: 400px;
-}
