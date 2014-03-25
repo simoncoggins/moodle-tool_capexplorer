@@ -63,7 +63,7 @@ M.tool_capexplorer.init = function(Y, args) {
             var requestdata = {instanceid : instanceId, nodetype: nodeType};
 
             // TODO Pass admin via config.
-            Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/get_child_nodes.php', {
+            Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getchildnodes.php', {
                 on:   {success:
                     function(id, r) {
                         try {

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Return a list of users, optionally filtered by search criteria.
+ * Return a list of users, filtered by search criteria.
  *
  * @package     tool_capexplorer
  * @copyright   Simon Coggins
@@ -38,14 +38,14 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
 $sqlfullname = $DB->sql_fullname('u.firstname', 'u.lastname');
 $autocompletefields = $DB->sql_concat_join("', '", array($sqlfullname, 'u.username', 'u.email'));
 
-$sql = "SELECT u.id, u.username, {$autocompletefields} AS autocompletestr,
-    {$sqlfullname} AS name
+$sql = "SELECT u.id, u.username, {$autocompletefields} AS autocompletestr
     FROM {user} u
     WHERE
     u.deleted <> 1 AND "  . $DB->sql_like($autocompletefields, '?') . "
     ORDER BY {$sqlfullname}";
+$params = array('%' . $DB->sql_like_escape($search) . '%');
 
-$users = $DB->get_records_sql($sql, array("%{$search}%"));
+$users = $DB->get_records_sql($sql, $params);
 
 $OUTPUT->header();
 echo json_encode(array_values($users));

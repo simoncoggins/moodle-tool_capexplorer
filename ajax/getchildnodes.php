@@ -38,5 +38,7 @@ if (!has_capability('tool/capexplorer:view', context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
+$OUTPUT->header();
 echo json_encode(tool_capexplorer_get_child_nodes($nodetype, $instanceid));
+$OUTPUT->footer();
 
