@@ -62,8 +62,8 @@ M.tool_capexplorer.init = function(Y, args) {
             var instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0;
             var requestdata = {instanceid : instanceId, nodetype: nodeType};
 
-            // TODO Pass admin via config.
-            Y.io(M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getchildnodes.php', {
+            Y.io(M.cfg.wwwroot + '/' + args['admin'] +
+                '/tool/capexplorer/ajax/getchildnodes.php', {
                 on:   {success:
                     function(id, r) {
                         try {
@@ -158,19 +158,27 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
 
 
 M.tool_capexplorer.init_autocomplete = function(Y, args) {
+    var usernameInput = Y.one('#id_username');
     Y.one('body').addClass('yui3-skin-sam');
 
-    Y.one('#id_username').plug(Y.Plugin.AutoComplete, {
+    usernameInput.plug(Y.Plugin.AutoComplete, {
         resultFilters: 'phraseMatch',
-        // TODO using 'autocompletestr' here fixes search but displays full string.
-        resultTextLocator: 'username',
-        // TODO Pass admin via config.
-        source: M.cfg.wwwroot + '/admin/tool/capexplorer/ajax/getusers.php?search={query}',
+        resultTextLocator: 'autocompletestr',
+        source: M.cfg.wwwroot + '/' + args['admin'] +
+            '/tool/capexplorer/ajax/getusers.php?search={query}',
         resultFormatter: function(query, results) {
             return Y.Array.map(results, function(result) {
                 return Y.Highlight.all(result.raw.autocompletestr, query);
             });
         },
+        on: {
+            // Override default action to fill just the username (rather than
+            // full 'autocompletestr'.
+            select: function(e) {
+                e.preventDefault();
+                usernameInput.set('value', e.result.raw.username);
+            }
+        }
     });
 
     Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
