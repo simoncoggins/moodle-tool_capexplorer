@@ -35,6 +35,11 @@
     width: 400px;
 }
 
+/* Set colour of autocomplete items so they don't go red if element validation failed. */
+.yui3-aclist-item {
+    color: black;
+}
+
 #tree-loading-message {
     color: grey;
 }
