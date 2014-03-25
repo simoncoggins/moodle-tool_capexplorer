@@ -74,12 +74,11 @@ if (!isset($contextids)) {
 $args = array(
     'admin' => $CFG->admin,
     'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
-    'initialtree' => $initialtree
+    'initialtree' => $initialtree,
+    'contextids' => $contextids
 );
 
 $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
-$args = $contextids;
-$PAGE->requires->js_init_call('M.tool_capexplorer.menu_select_node', array($args), false, $jsmodule);
 
 if ($data = $mform->get_data()) {
     // Process data if submitted.

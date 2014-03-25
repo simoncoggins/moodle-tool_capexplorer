@@ -91,6 +91,8 @@ M.tool_capexplorer.init = function(Y, args) {
     M.tool_capexplorer.tree.render();
 
     Y.one('#tree-loading-message').hide();
+
+    M.tool_capexplorer.menu_select_node(Y, args['contextids']);
 }
 
 
