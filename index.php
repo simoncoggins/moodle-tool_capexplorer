@@ -45,6 +45,9 @@ admin_externalpage_setup('toolcapexplorer');
 
 echo $OUTPUT->header();
 
+echo $OUTPUT->heading(get_string('pluginname', 'tool_capexplorer'));
+echo $OUTPUT->container(get_string('capexplorersummary', 'tool_capexplorer'));
+
 // First create the form.
 $mform = new capexplorer_selector_form();
 

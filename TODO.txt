@@ -15,5 +15,6 @@ Improve messages when user checks a capability in an invalid context.
 Replace as much of styles.css with existing LESS colours as possible.
 Fix unit tests - instead of random, have some predefined data and expected results.
 
+Remove hover styles from userdir node?
 More unit tests for functions in locallib.php (e.g. add automatic assignments to tests).
 

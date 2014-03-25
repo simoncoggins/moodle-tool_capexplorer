@@ -79,3 +79,7 @@
 .capexplorer-tree-system {
     background-image: url([[pix:tool_capexplorer|system]]);
 }
+
+#id_username, #id_capability {
+    width: 400px;
+}
