@@ -24,23 +24,31 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Get a section of the context tree with the expanded nodes determined by
+ * a set of context ids.
+ *
+ * This will call itself recursively, gradually shortening the $contextids
+ * array until each level has been expanded.
+ *
+ * @param array $contextids Array of context IDs representing the 'open' nodes of the tree.
+ * @param object $parentnode The node who's children should be calculated, or null for the whole tree.
+ * @return array Array of nodes, potentially with one node at each level having its children expanded.
+ */
+function tool_capexplorer_get_selected_subtree($contextids, $parentnode = null) {
 
-// TODO PHPDocs.
-
-function tool_capexplorer_get_selected_subtree($contextids, $currentnode = null) {
-
-    // Start from the top if currentnode not set yet.
-    if (is_null($currentnode)) {
-        $currentnode = new stdClass();
-        $currentnode->data = new stdClass();
-        $currentnode->data->nodeType = 'root';
-        return tool_capexplorer_get_selected_subtree($contextids, $currentnode);
+    // Start from the top if parentnode not set yet.
+    if (is_null($parentnode)) {
+        $parentnode = new stdClass();
+        $parentnode->data = new stdClass();
+        $parentnode->data->nodeType = 'root';
+        return tool_capexplorer_get_selected_subtree($contextids, $parentnode);
     }
 
     $currentcontextid = array_shift($contextids);
 
-    $nodetype = $currentnode->data->nodeType;
-    $instanceid = isset($currentnode->data->instanceId) ? $currentnode->data->instanceId : 0;
+    $nodetype = $parentnode->data->nodeType;
+    $instanceid = isset($parentnode->data->instanceId) ? $parentnode->data->instanceId : 0;
 
     $nodes = tool_capexplorer_get_child_nodes($nodetype, $instanceid);
     if (empty($nodes)) {
@@ -60,6 +68,15 @@ function tool_capexplorer_get_selected_subtree($contextids, $currentnode = null)
     return $nodes;
 }
 
+/**
+ * Get the child nodes of a particular node.
+ *
+ * The node is uniquely specified by nodetype and instanceid (not used in all cases).
+ *
+ * @param string $nodetype A string representing the type of node, e.g. 'course'.
+ * @param int $instanceid The ID of the node.
+ * @return array An array of child nodes.
+ */
 function tool_capexplorer_get_child_nodes($nodetype, $instanceid = 0) {
     switch ($nodetype) {
         case 'root':
@@ -84,6 +101,11 @@ function tool_capexplorer_get_child_nodes($nodetype, $instanceid = 0) {
     }
 }
 
+/**
+ * Get data for user nodes and return in node format used by JS.
+ *
+ * @return array Array of user node objects to include in context tree.
+ */
 function tool_capexplorer_get_user_nodes() {
     global $DB;
 
@@ -104,6 +126,12 @@ function tool_capexplorer_get_user_nodes() {
 
 }
 
+/**
+ * Get data for module nodes and return in node format used by JS.
+ *
+ * @param int $parentcourseid Return modules that belong to this course.
+ * @return array Array of module node objects to include in context tree.
+ */
 function tool_capexplorer_get_module_nodes($parentcourseid) {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/course/lib.php');
@@ -129,6 +157,12 @@ function tool_capexplorer_get_module_nodes($parentcourseid) {
     }
 }
 
+/**
+ * Get data for course nodes and return in node format used by JS.
+ *
+ * @param int $parentcategoryid Return courses that belong to this category.
+ * @return array Array of course node objects to include in context tree.
+ */
 function tool_capexplorer_get_course_nodes($parentcategoryid) {
     if ($parentcategoryid == -1) {
         return tool_capexplorer_get_frontpage_node();
@@ -143,6 +177,12 @@ function tool_capexplorer_get_course_nodes($parentcategoryid) {
     }
 }
 
+/**
+ * Get data for category nodes and return in node format used by JS.
+ *
+ * @param int $parentcategoryid Return categories that are children of this category.
+ * @return array Array of category node objects to include in context tree.
+ */
 function tool_capexplorer_get_category_nodes($parentcategoryid) {
     global $DB;
     $sql = "SELECT cc.id,cc.name,ctx.id AS contextid
@@ -159,6 +199,16 @@ function tool_capexplorer_get_category_nodes($parentcategoryid) {
     }
 }
 
+/**
+ * Get data for block nodes and return in node format used by JS.
+ *
+ * This function is a bit more complex as blocks can be children of several
+ * different context levels.
+ *
+ * @param string $parentnodetype The node type of the parent node.
+ * @param int $parentinstanceid The instanceid of the parent node.
+ * @return array Array of block node objects to include in context tree.
+ */
 function tool_capexplorer_get_block_nodes($parentnodetype, $parentinstanceid = 0) {
     global $DB;
     switch ($parentnodetype) {
@@ -196,6 +246,11 @@ function tool_capexplorer_get_block_nodes($parentnodetype, $parentinstanceid = 0
     }
 }
 
+/**
+ * Get the system node and return in node format used by JS.
+ *
+ * @return array Array containing just the system node.
+ */
 function tool_capexplorer_get_system_node() {
     $node = new stdClass();
     $node->name = get_string('systemcontext', 'tool_capexplorer');
@@ -203,6 +258,14 @@ function tool_capexplorer_get_system_node() {
     return array(tool_capexplorer_get_js_tree_node($node, 'system'));
 }
 
+/**
+ * Get the front page node and return in node format used by JS.
+ *
+ * This is handled separately from get_course_node() because a slightly
+ * different lang string is used when rendering the node.
+ *
+ * @return array Array containing just the front page node.
+ */
 function tool_capexplorer_get_frontpage_node() {
     global $DB;
     $sql = "SELECT c.id, c.fullname AS name, ctx.id AS contextid
@@ -215,6 +278,15 @@ function tool_capexplorer_get_frontpage_node() {
     return array(tool_capexplorer_get_js_tree_node($node, 'course'));
 }
 
+/**
+ * Get the 'userdir' node and return in node format used by JS.
+ *
+ * This is used as a container for the user nodes, to avoid all site
+ * users appearing as direct children of the system node (there could
+ * be a lot).
+ *
+ * @return array Array containing just the userdir node.
+ */
 function tool_capexplorer_get_userdir_node() {
     $node = new stdClass();
     $node->name = get_string('usercontext', 'tool_capexplorer');
@@ -224,6 +296,9 @@ function tool_capexplorer_get_userdir_node() {
 /**
  * Given a PHP node object, return an object that can be converted to a JS
  * node via JSON encoding.
+ *
+ * This is used to decorate the PHP objects with some common properties
+ * needed by the JS.
  *
  * @param object $nodeobject A node object with name and optional id and contextid
  * i                         properties.
