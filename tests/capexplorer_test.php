@@ -16,6 +16,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
+
 /**
  * Automated unit testing.
  *
@@ -23,9 +26,252 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class tool_generator_capexplorer_testcase extends advanced_testcase {
+
+    public function test_get_context_info() {
+        $systemcontext = context_system::instance();
+        $result = tool_capexplorer_get_context_info($systemcontext);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertObjectHasAttribute('contextlevel', $result);
+        $this->assertObjectHasAttribute('instance', $result);
+    }
+
+    public function test_get_parent_context_info() {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $usercontextinfo = tool_capexplorer_get_context_info($usercontext);
+        $systemcontext = context_system::instance();
+        $systemcontextinfo = tool_capexplorer_get_context_info($systemcontext);
+
+        $parentinfo = tool_capexplorer_get_parent_context_info($usercontext);
+        // Should contain system and user context info.
+        $this->assertCount(2, $parentinfo);
+        // The first item in the array should be the system context info.
+        $firstitem = array_shift($parentinfo);
+        $this->assertEquals($systemcontextinfo, $firstitem);
+        // The second item in the array should be the user context info.
+        $seconditem = array_shift($parentinfo);
+        $this->assertEquals($usercontextinfo, $seconditem);
+    }
+
+    public function test_get_role_assignment_info() {
+        $this->resetAfterTest();
+
+        // Create a user and some contexts.
+        $systemcontext = context_system::instance();
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $cat = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($cat->id);
+        $course = $this->getDataGenerator()->create_course(array('category' => $cat->id));
+        $coursecontext = context_course::instance($course->id);
+        $contexts = array($systemcontext, $usercontext, $categorycontext, $coursecontext);
+
+        // Create some roles.
+        $role1 = create_role('Role 1', 'role1', 'Role 1 description');
+        $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        $role3 = create_role('Role 3', 'role3', 'Role 3 description');
+        $role4 = create_role('Role 4', 'role4', 'Role 4 description');
+        $role5 = create_role('Role 5', 'role5', 'Role 5 description');
+
+        // Assign the roles to the test user in various contexts.
+        $this->getDataGenerator()->role_assign($role1, $user->id, $systemcontext->id);
+        $this->getDataGenerator()->role_assign($role2, $user->id, $systemcontext->id);
+        $this->getDataGenerator()->role_assign($role2, $user->id, $usercontext->id);
+        $this->getDataGenerator()->role_assign($role3, $user->id, $categorycontext->id);
+        $this->getDataGenerator()->role_assign($role4, $user->id, $coursecontext->id);
+        $this->getDataGenerator()->role_assign($role5, $user->id, $coursecontext->id);
+
+        $result = tool_capexplorer_get_role_assignment_info($contexts, $user->id);
+
+        $expectedresult = array(
+            $systemcontext->id => array(
+                $role1 => true,
+                $role2 => true,
+            ),
+            $usercontext->id => array(
+                $role2 => true
+            ),
+            $categorycontext->id => array(
+                $role3 => true
+            ),
+            $coursecontext->id => array(
+                $role4 => true,
+                $role5 => true
+            )
+        );
+        $this->assertEquals($expectedresult, $result);
+    }
+
+    public function test_get_auto_role_assignment_info() {
+        global $USER;
+        $this->resetAfterTest();
+        $systemcontext = context_system::instance();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $role1 = create_role('Role 1', 'role1', 'Role 1 description');
+        $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        set_config('defaultuserroleid', $role1);
+        set_config('guestroleid', $role2);
+
+        $result = tool_capexplorer_get_auto_role_assignment_info($user->id);
+
+        $expectedresult = array(
+            $systemcontext->id => array(
+                $role1 => 'defaultuserroleid'
+            )
+        );
+        $this->assertEquals($expectedresult, $result);
+
+        $this->setGuestUser();
+
+        $result = tool_capexplorer_get_auto_role_assignment_info($USER->id);
+
+        $expectedresult = array(
+            $systemcontext->id => array(
+                $role2 => 'guestroleid'
+            )
+        );
+        $this->assertEquals($expectedresult, $result);
+
+    }
+
+
+    public function test_role_is_auto_assigned() {
+        $this->resetAfterTest();
+
+        $role1 = create_role('Role 1', 'role1', 'Role 1 description');
+        $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        $role3 = create_role('Role 3', 'role3', 'Role 3 description');
+        set_config('defaultuserroleid', $role1);
+        set_config('guestroleid', $role2);
+
+        $this->assertTrue(tool_capexplorer_role_is_auto_assigned($role1));
+        $this->assertTrue(tool_capexplorer_role_is_auto_assigned($role2));
+        $this->assertFalse(tool_capexplorer_role_is_auto_assigned($role3));
+    }
+
+    public function test_get_assigned_roles() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Create a user and some contexts.
+        $systemcontext = context_system::instance();
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $cat = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($cat->id);
+        $course = $this->getDataGenerator()->create_course(array('category' => $cat->id));
+        $coursecontext = context_course::instance($course->id);
+        $contexts = array($systemcontext, $usercontext, $categorycontext, $coursecontext);
+        $this->setUser($user);
+
+        // Create some roles.
+        $role1 = create_role('Role 1', 'role1', 'Role 1 description');
+        $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        $role3 = create_role('Role 3', 'role3', 'Role 3 description');
+        $unassigned = create_role('Unassigned Role', 'unassignedrole', 'Unassigned role description');
+
+        // Assign the roles to the test user in various contexts.
+        $this->getDataGenerator()->role_assign($role1, $user->id, $systemcontext->id);
+        $this->getDataGenerator()->role_assign($role2, $user->id, $systemcontext->id);
+        $this->getDataGenerator()->role_assign($role2, $user->id, $usercontext->id);
+        $this->getDataGenerator()->role_assign($role3, $user->id, $categorycontext->id);
+        $this->getDataGenerator()->role_assign($role2, $user->id, $coursecontext->id);
+        $this->getDataGenerator()->role_assign($role3, $user->id, $coursecontext->id);
+
+        $manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $user->id);
+
+        // Set a default role.
+        $defaultrole = create_role('Default Role', 'defaultrole', 'Default Role description');
+        set_config('defaultuserroleid', $defaultrole);
+
+        $autoassignments = tool_capexplorer_get_auto_role_assignment_info($user->id);
+
+        $result = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
+        $assignedroleids = array_keys($result);
+
+        // Assigned roles should be in the results.
+        $this->assertContains($role1, $assignedroleids);
+        $this->assertContains($role2, $assignedroleids);
+        $this->assertContains($role3, $assignedroleids);
+        $this->assertContains($defaultrole, $assignedroleids);
+        // Roles that haven't been assigned shouldn't be in the results.
+        $this->assertNotContains($unassigned, $assignedroleids);
+
+        // The elements should contain a role database object.
+        $role1object = $DB->get_record('role', array('id'=>$role1), '*', MUST_EXIST);
+        $this->assertEquals($role1object, $result[$role1]);
+    }
+
+    public function test_get_role_override_info() {
+        // TODO
+    }
+
+    public function permissions_data() {
+        return array(
+            // Prohibit should always win.
+            array(CAP_PROHIBIT, CAP_INHERIT, CAP_PROHIBIT),
+            array(CAP_PROHIBIT, CAP_ALLOW, CAP_PROHIBIT),
+            array(CAP_PREVENT, CAP_PROHIBIT, CAP_PROHIBIT),
+            // Other permission should win if one is inherited.
+            array(CAP_PREVENT, CAP_INHERIT, CAP_PREVENT),
+            array(CAP_ALLOW, CAP_INHERIT, CAP_ALLOW),
+            array(CAP_INHERIT, CAP_ALLOW, CAP_ALLOW),
+            array(CAP_INHERIT, CAP_PREVENT, CAP_PREVENT),
+            // If both inherited, return inherit.
+            array(CAP_INHERIT, CAP_INHERIT, CAP_INHERIT),
+            // Otherwise use the most specific.
+            array(CAP_PREVENT, CAP_ALLOW, CAP_ALLOW),
+            array(CAP_ALLOW, CAP_PREVENT, CAP_PREVENT),
+        );
+    }
+
     /**
+     * @dataProvider permissions_data
+     */
+    public function test_merge_permissions($p1, $p2, $expectedresult) {
+        $this->assertEquals($expectedresult,
+            tool_capexplorer_merge_permissions($p1, $p2));
+    }
+
+    public function permissions_across_roles_data() {
+        return array(
+            // Any prohibit results in false.
+            array(array(CAP_PROHIBIT, CAP_ALLOW, CAP_ALLOW), false),
+            array(array(CAP_ALLOW, CAP_INHERIT, CAP_PROHIBIT), false),
+            array(array(CAP_INHERIT, CAP_INHERIT, CAP_PROHIBIT), false),
+            array(array(CAP_PROHIBIT, CAP_INHERIT, CAP_PROHIBIT), false),
+            // Any one allow without prohibit results in true.
+            array(array(CAP_ALLOW, CAP_INHERIT, CAP_INHERIT), true),
+            array(array(CAP_INHERIT, CAP_INHERIT, CAP_ALLOW), true),
+            array(array(CAP_ALLOW, CAP_ALLOW, CAP_ALLOW), true),
+            array(array(CAP_PREVENT, CAP_ALLOW, CAP_INHERIT), true),
+            array(array(CAP_PREVENT, CAP_ALLOW, CAP_PREVENT), true),
+            array(array(CAP_INHERIT, CAP_INHERIT, CAP_ALLOW), true),
+            // None set or prevent only results in false.
+            array(array(CAP_INHERIT, CAP_INHERIT, CAP_INHERIT), false),
+            array(array(CAP_PREVENT, CAP_INHERIT, CAP_INHERIT), false),
+            array(array(CAP_PREVENT, CAP_PREVENT, CAP_INHERIT), false),
+        );
+    }
+
+    /**
+     * @dataProvider permissions_across_roles_data
+     */
+    public function test_merge_permissions_across_roles($roletotals, $expectedresult) {
+        $this->assertEquals($expectedresult,
+            tool_capexplorer_merge_permissions_across_roles($roletotals));
+    }
+
+    /**
+     * TODO reenable this test but in a less random fashion.
+     *
      * Tests that capexplorer gives the same results as the native {@link has_capability()}.
      */
+    /*
     public function test_tool_capexplorer_has_capability() {
         global $DB;
 
@@ -135,6 +381,7 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
             }
         }
     }
+     */
 
     /**
      * Return a random permission with a fixed probability.
@@ -145,6 +392,7 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
      *
      * @return int|null Permission constant, e.g. CAP_* or null.
      */
+    /*
     public function get_random_permission_value($systemcontext = true) {
 
         // Assignment is more likely in the system context than for overrides.
@@ -179,4 +427,5 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
 
         return null;
     }
+     */
 }

@@ -97,31 +97,6 @@ function tool_capexplorer_get_parent_context_info($context) {
 
 
 /**
- * @param array $roles Array of role objects keyed by roleid.
- * @param string $capability A capability to check against.
- * @return array Array of roleid/permission pairs for the specified capability.
- */
-function tool_capexplorer_get_system_role_permissions($roles, $capability) {
-    global $DB;
-
-    $systemcontext = context_system::instance();
-    $systemcontextid = $systemcontext->id;
-    $roleids = array_keys($roles);
-
-    list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids);
-
-    // Get the system level role permissions.
-    $rolepermissions = $DB->get_records_select_menu('role_capabilities',
-        "roleid {$rolesql} AND contextid = ? AND capability = ?",
-        array_merge($roleparams, array($systemcontextid, $capability)),
-        '', 'roleid, permission'
-    );
-
-    return $rolepermissions;
-}
-
-
-/**
  * Given a set of contexts, determine if the specified user is assigned to
  * any roles in those contexts.
  *
@@ -186,62 +161,6 @@ function tool_capexplorer_merge_permissions_across_contexts($contextids, $roleid
         }
     }
     return $roletotals;
-}
-
-
-/**
- * Given a pair of permissions, combine them using the appropriate rules, returning
- * a single permission.
- *
- * @param int $permission1 The first (least specific) permission constant (CAP_*).
- * @param int $permission2 The second (more specific) permission constant (CAP_*).
- * @return int The calculated combined permission.
- */
-function tool_capexplorer_merge_permissions($permission1, $permission2) {
-
-    // Prohibit always wins.
-    if ($permission1 == CAP_PROHIBIT || $permission2 == CAP_PROHIBIT) {
-        return CAP_PROHIBIT;
-    }
-    // If one permission not set, return the other.
-    // This will return not set if neither is set which is correct.
-    if ($permission2 == CAP_INHERIT) {
-        return $permission1;
-    }
-    if ($permission1 == CAP_INHERIT) {
-        return $permission2;
-    }
-    // Otherwise return the most specific one.
-    return $permission2;
-}
-
-
-/**
- * Given an array of role total permissions, as returned by
- * {@link tool_capexplorer_merge_permissions_across_contexts} determine if
- * the user should be granted the capability or not. It is assumed that the
- * user is assigned to all roles provided in the specified context or above.
- *
- * Note only PROHIBIT and ALLOW are of any consequence when aggregating here,
- * PREVENT is only useful for nullifying a less specific ALLOW within a role.
- * Only one ALLOW is required but all roles must be checked for PROHIBITS.
- *
- * @param array $roletotals Array keyed on roleid with role total permission as value.
- * @return bool True if the user should be granted the capability based on the totals.
- */
-function tool_capexplorer_merge_permissions_across_roles($roletotals) {
-    $status = false;
-    foreach ($roletotals as $roleid => $permission) {
-        switch ($permission) {
-        case CAP_PROHIBIT:
-            // Any prohibit prevents access.
-            return false;
-        case CAP_ALLOW:
-            // Any allow gives access (as long as there isn't a PROHIBIT).
-            $status = true;
-        }
-    }
-    return $status;
 }
 
 
@@ -382,6 +301,63 @@ function tool_capexplorer_get_role_override_info($contextids, $roleids, $capabil
 
     return $out;
 }
+
+
+/**
+ * Given a pair of permissions, combine them using the appropriate rules, returning
+ * a single permission.
+ *
+ * @param int $permission1 The first (least specific) permission constant (CAP_*).
+ * @param int $permission2 The second (more specific) permission constant (CAP_*).
+ * @return int The calculated combined permission.
+ */
+function tool_capexplorer_merge_permissions($permission1, $permission2) {
+
+    // Prohibit always wins.
+    if ($permission1 == CAP_PROHIBIT || $permission2 == CAP_PROHIBIT) {
+        return CAP_PROHIBIT;
+    }
+    // If one permission not set, return the other.
+    // This will return not set if neither is set which is correct.
+    if ($permission2 == CAP_INHERIT) {
+        return $permission1;
+    }
+    if ($permission1 == CAP_INHERIT) {
+        return $permission2;
+    }
+    // Otherwise return the most specific one.
+    return $permission2;
+}
+
+
+/**
+ * Given an array of role total permissions, as returned by
+ * {@link tool_capexplorer_merge_permissions_across_contexts} determine if
+ * the user should be granted the capability or not. It is assumed that the
+ * user is assigned to all roles provided in the specified context or above.
+ *
+ * Note only PROHIBIT and ALLOW are of any consequence when aggregating here,
+ * PREVENT is only useful for nullifying a less specific ALLOW within a role.
+ * Only one ALLOW is required but all roles must be checked for PROHIBITS.
+ *
+ * @param array $roletotals Array keyed on roleid with role total permission as value.
+ * @return bool True if the user should be granted the capability based on the totals.
+ */
+function tool_capexplorer_merge_permissions_across_roles($roletotals) {
+    $status = false;
+    foreach ($roletotals as $roleid => $permission) {
+        switch ($permission) {
+        case CAP_PROHIBIT:
+            // Any prohibit prevents access.
+            return false;
+        case CAP_ALLOW:
+            // Any allow gives access (as long as there isn't a PROHIBIT).
+            $status = true;
+        }
+    }
+    return $status;
+}
+
 
 /**
  * Local implementation of {@link has_capability()} using the logic implemented
