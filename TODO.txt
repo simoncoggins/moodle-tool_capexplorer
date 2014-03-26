@@ -16,5 +16,4 @@ Fix unit tests - instead of random, have some predefined data and expected resul
 Put results on a separate page (with initial results block)?
 
 Remove hover styles from userdir node?
-More unit tests for functions in locallib.php (e.g. add automatic assignments to tests).
 

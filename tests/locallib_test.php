@@ -20,7 +20,7 @@ global $CFG;
 require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
 
 /**
- * Automated unit testing.
+ * Automated unit testing of locallib.php functions.
  *
  * @package tool_capexplorer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,10 +46,10 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
         $parentinfo = tool_capexplorer_get_parent_context_info($usercontext);
         // Should contain system and user context info.
         $this->assertCount(2, $parentinfo);
-        // The first item in the array should be the system context info.
+        // The first item should be the system context info.
         $firstitem = array_shift($parentinfo);
         $this->assertEquals($systemcontextinfo, $firstitem);
-        // The second item in the array should be the user context info.
+        // The second item should be the user context info.
         $seconditem = array_shift($parentinfo);
         $this->assertEquals($usercontextinfo, $seconditem);
     }
@@ -73,6 +73,7 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
         $role3 = create_role('Role 3', 'role3', 'Role 3 description');
         $role4 = create_role('Role 4', 'role4', 'Role 4 description');
         $role5 = create_role('Role 5', 'role5', 'Role 5 description');
+        $unassigned = create_role('Unassigned Role', 'unassignedrole', 'Unassigned role description');
 
         // Assign the roles to the test user in various contexts.
         $this->getDataGenerator()->role_assign($role1, $user->id, $systemcontext->id);
@@ -113,6 +114,7 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
 
         $role1 = create_role('Role 1', 'role1', 'Role 1 description');
         $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        $unassigned = create_role('Unassigned Role', 'unassignedrole', 'Unassigned role description');
         set_config('defaultuserroleid', $role1);
         set_config('guestroleid', $role2);
 
@@ -137,7 +139,6 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
         $this->assertEquals($expectedresult, $result);
 
     }
-
 
     public function test_role_is_auto_assigned() {
         $this->resetAfterTest();
@@ -207,7 +208,71 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
     }
 
     public function test_get_role_override_info() {
-        // TODO
+        $this->resetAfterTest();
+
+        // Create a user and some contexts.
+        $systemcontext = context_system::instance();
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $cat = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($cat->id);
+        $course = $this->getDataGenerator()->create_course(array('category' => $cat->id));
+        $coursecontext = context_course::instance($course->id);
+        $contextids = array($systemcontext->id, $usercontext->id,
+            $categorycontext->id, $coursecontext->id);
+
+        $this->setUser($user);
+
+        // Create some roles.
+        $role1 = create_role('Role 1', 'role1', 'Role 1 description');
+        $role2 = create_role('Role 2', 'role2', 'Role 2 description');
+        $role3 = create_role('Role 3', 'role3', 'Role 3 description');
+        $roleids = array($role1, $role2, $role3);
+
+        // Test with 'moodle/site:config' as it isn't set in any role by default.
+        $capability = 'moodle/site:config';
+
+        // Assign permissions to our capability in some roles/contexts.
+        // System context.
+        assign_capability($capability, CAP_ALLOW, $role1, $systemcontext);
+        assign_capability($capability, CAP_PROHIBIT, $role3, $systemcontext);
+        // User context.
+        assign_capability($capability, CAP_PREVENT, $role1, $usercontext);
+        assign_capability($capability, CAP_INHERIT, $role2, $usercontext);
+        assign_capability($capability, CAP_ALLOW, $role3, $usercontext);
+        // Category context.
+        assign_capability($capability, CAP_PREVENT, $role2, $categorycontext);
+        // Course context.
+        assign_capability($capability, CAP_INHERIT, $role1, $coursecontext);
+        assign_capability($capability, CAP_ALLOW, $role2, $coursecontext);
+        assign_capability($capability, CAP_PROHIBIT, $role3, $coursecontext);
+
+        $result = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
+
+        $expectedresult = array(
+            $systemcontext->id => array(
+                $role1 => CAP_ALLOW,
+                $role2 => null,
+                $role3 => CAP_PROHIBIT,
+            ),
+            $usercontext->id => array(
+                $role1 => CAP_PREVENT,
+                $role2 => CAP_INHERIT,
+                $role3 => CAP_ALLOW,
+            ),
+            $categorycontext->id => array(
+                $role1 => null,
+                $role2 => CAP_PREVENT,
+                $role3 => null,
+            ),
+            $coursecontext->id => array(
+                $role1 => CAP_INHERIT,
+                $role2 => CAP_ALLOW,
+                $role3 => CAP_PROHIBIT,
+            ),
+        );
+
+        $this->assertEquals($expectedresult, $result);
     }
 
     public function permissions_data() {
