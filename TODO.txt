@@ -12,8 +12,11 @@ GENERAL TODO:
 
 AJAX on user is case sensitive?
 Improve messages when user checks a capability in an invalid context.
-Fix unit tests - instead of random, have some predefined data and expected results.
+Fix last unit tests - instead of random, have some predefined data and expected results.
+Add unit tests for menulib.php
+Remove manually assigned column for auto assigned role if no manual assignments?
 Put results on a separate page (with initial results block)?
 
+Add behat tests?
 Remove hover styles from userdir node?
 

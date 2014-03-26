@@ -334,6 +334,19 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
     /**
      * TODO reenable this test but in a less random fashion.
      *
+     * Setup some specific data to allow us to test the following:
+     *
+     * - Not assigned any roles include autos
+     * - Assigned 1 role with each permission and no overrides
+     * - Assigned 1 role with different permissions with overrides
+     * - Assigned 1 role below context being tested (fails)
+     * - Assigned 1 role elsewhere in context tree to area being tested (fails)
+     * - Prohibited due to default/guest role despite allow elsewhere
+     * - Allowed due to default/guest role
+     * - Assigned 2 roles with conflicting results
+     *
+     * Need to check in all contexts including block/module and multiple subcats.
+     *
      * Tests that capexplorer gives the same results as the native {@link has_capability()}.
      */
     /*
