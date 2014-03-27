@@ -332,178 +332,231 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
     }
 
     /**
-     * TODO reenable this test but in a less random fashion.
+     * Tests that capexplorer calculates capability checks correctly.
      *
-     * Setup some specific data to allow us to test the following:
-     *
-     * - Not assigned any roles include autos
-     * - Assigned 1 role with each permission and no overrides
-     * - Assigned 1 role with different permissions with overrides
-     * - Assigned 1 role below context being tested (fails)
-     * - Assigned 1 role elsewhere in context tree to area being tested (fails)
-     * - Prohibited due to default/guest role despite allow elsewhere
-     * - Allowed due to default/guest role
-     * - Assigned 2 roles with conflicting results
-     *
-     * Need to check in all contexts including block/module and multiple subcats.
-     *
-     * Tests that capexplorer gives the same results as the native {@link has_capability()}.
+     * @group wip
      */
-    /*
     public function test_tool_capexplorer_has_capability() {
         global $DB;
-
         $this->resetAfterTest();
-        $this->setAdminUser();
-        $catids = $DB->get_fieldset_select('course_categories', 'id', '');
 
-        // Create category contexts to test:
-        $contextstotest = array();
-        foreach (range(1, 10) as $i) {
-            if (rand(1, 100) <= 15) {
-                // New top level category.
-                $parent = 0;
-            } else {
-                // Child of existing category.
-                $parent = $catids[array_rand($catids)];
-            }
-            $cat = $this->getDataGenerator()->create_category(array('parent' => $parent));
-            // Add new category to list of existing categories.
-            $catids[] = $cat->id;
-
-            // Track as a context to test.
-            $contextstotest[] = context_coursecat::instance($cat->id);
-        }
-
-        // Create course and module contexts to test.
-        foreach (range(1, 10) as $i) {
-            $course = $this->getDataGenerator()->create_course(array('category' => $catids[array_rand($catids)]));
-            $contextstotest[] = context_course::instance($course->id);
-
-            foreach (range(1, 10 as $j) {
-                $module = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
-                $contextstotest[] = context_module::instance($module->id);
-            }
-        }
-
-        // Create users and user contexts to test.
-        $userstotest = array();
-        foreach (range(1, 10) as $i) {
-            $user = $this->getDataGenerator()->create_user();
-            $contextstotest[] = context_user::instance($user->id);
-            $userstotest[] = $user;
-        }
-        // TODO Always test admin and guest users.
-
-        // Create roles.
-        $rolestotest = array();
-        foreach (range(1, 10) as $i) {
-            $rolestotest[] = create_role("Role {$i}", "role{$i}", "Role {$i} description");
-        }
-
-        // Always test the system context.
+        // Create a user and some contexts.
         $systemcontext = context_system::instance();
-        $contextstotest[] = $systemcontext;
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $cat = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($cat->id);
+        $subcat = $this->getDataGenerator()->create_category(array('parent' => $cat->id));
+        $subcatcontext = context_coursecat::instance($subcat->id);
+        $course = $this->getDataGenerator()->create_course(array('category' => $subcat->id));
+        $coursecontext = context_course::instance($course->id);
+        $module = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
+        $modulecontext = context_module::instance($module->id);
+        $block = $this->getDataGenerator()->create_block('online_users', array('parentcontextid' => $coursecontext->id));
+        $blockcontext = context_block::instance($block->id);
+        $frontpagecoursecontext = context_course::instance(SITEID);
 
-        $allcaps = $DB->get_records_menu('capabilities', array(), 'id, name');
-        // Assign system permissions and overrides.
-        foreach ($contextstotest as $ctxid) {
-            $issystemcontext = ($ctxid == $systemcontext->id);
-            $context = context::instance_by_id($ctxid);
-            foreach ($rolestotest as $roleid) {
-                foreach ($allcaps as $cap) {
-                    $perm = $this->get_random_permission_value($issystemcontext);
-                    if (!is_null($perm)) {
-                        assign_capability($cap, $perm, $roleid, $context);
-                    }
-                }
+        $this->setUser($user);
+
+        // Test with 'moodle/site:config' as it isn't set in any role by default.
+        $capability = 'moodle/site:config';
+
+        // Create a bunch of test roles for assigning.
+        $roles = array();
+
+        // Loop through different combinations of permission settings.
+        $systemlevelperms = $overrideperms = array(
+            'prohibit' => CAP_PROHIBIT,
+            'prevent' => CAP_PREVENT,
+            'allow' => CAP_ALLOW,
+            'inherit' => CAP_INHERIT,
+            'notset' => null
+        );
+        foreach ($systemlevelperms as $systempermstr => $systemperm) {
+            $roles[$systempermstr] = array();
+            foreach ($overrideperms as $overridepermstr => $overrideperm) {
+                $role = create_role(
+                    "system {$systempermstr}, override {$overridepermstr}",
+                    "{$systempermstr}system{$overridepermstr}override",
+                    "Role with '{$systempermstr}' at system level and '{$overridepermstr}' overriding at course level."
+                );
+                assign_capability($capability, $systemperm, $role, $systemcontext);
+                assign_capability($capability, $overrideperm, $role, $coursecontext);
+                $roles[$systempermstr][$overridepermstr] = $role;
             }
         }
-
-        // Assigning roles.
-        foreach ($userstotest as $user) {
-            foreach ($rolestotest as $roleid) {
-                foreach ($contextstotest as $context) {
-                    // Only assign in 1/4 of contexts.
-                    if (rand(1, 100) >= 75) {
-                        $this->getDataGenerator()->role_assign($roleid, $user->id, $context->id);
-                    }
-                }
-            }
-        }
-
         // Ensure caches are reset.
         reload_all_capabilities();
 
-        // Actual tests.
-        foreach ($userstotest as $user) {
-            // TODO Could do this but still need to ignore admin rights.
-            // Run test as a user.
-            //$this->setUser($user);
-            foreach ($rolestotest as $roleid) {
-                foreach ($contextstotest as $context) {
-                    // Only test in 1/4 of contexts.
-                    if (rand(1, 100) >= 75) {
-                        // Test 10 caps for every user/role/context combination.
-                        shuffle($allcaps);
-                        $capstotest = array_slice($allcaps, 0, 10);
-                        foreach ($capstotest as $cap) {
-                            $hc = has_capability($cap, $context, $user->id, true);
-                            $cehc = tool_capexplorer_has_capability($cap, $context, $user->id);
-                            $this->assertEquals($hc, $cehc
-                                "Mismatch when checking capability '{$cap}' in context '{$context->id}' for user '{$user->id}'."
-                            );
-                        }
-                    }
-                }
+        // No default role.
+        set_config('defaultuserroleid', null);
+
+        // With no roles assigned, should not have permission.
+        $this->assertFalse(tool_capexplorer_has_capability($capability, $systemcontext, $user->id));
+
+        // Now test assigning a single role at a time with different permissions and overrides.
+        // First check capability in block context (below override).
+        $expectedresults = array(
+            'prohibit' => array (
+                'prohibit' => false,
+                'prevent'  => false,
+                'allow'    => false,
+                'inherit'  => false,
+                'notset'   => false,
+            ),
+            'prevent' => array (
+                'prohibit' => false,
+                'prevent'  => false,
+                'allow'    => true,
+                'inherit'  => false,
+                'notset'   => false,
+            ),
+            'allow' => array (
+                'prohibit' => false,
+                'prevent'  => false,
+                'allow'    => true,
+                'inherit'  => true,
+                'notset'   => true,
+            ),
+            'inherit' => array (
+                'prohibit' => false,
+                'prevent'  => false,
+                'allow'    => true,
+                'inherit'  => false,
+                'notset'   => false,
+            ),
+            'notset' => array (
+                'prohibit' => false,
+                'prevent'  => false,
+                'allow'    => true,
+                'inherit'  => false,
+                'notset'   => false,
+            ),
+        );
+        foreach ($systemlevelperms as $systempermstr => $systemperm) {
+            foreach ($overrideperms as $overridepermstr => $overrideperm) {
+                $this->getDataGenerator()->role_assign(
+                    $roles[$systempermstr][$overridepermstr],
+                    $user->id,
+                    $systemcontext->id);
+                $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
+                    tool_capexplorer_has_capability($capability, $blockcontext, $user->id),
+                    "Capability check failed with system permission '{$systempermstr}' and course override '{$overridepermstr}' in block context");
+                role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
             }
         }
-    }
-     */
 
-    /**
-     * Return a random permission with a fixed probability.
-     *
-     * Used to populate role permissions and overrides. Each individual
-     * permission is weighted to ensure a reasonable distribution of
-     * data to test.
-     *
-     * @return int|null Permission constant, e.g. CAP_* or null.
-     */
+        // Now repeat the test for the 'allow' override only, but check capability at
+        // the category level - override should not be applied.
+        $expectedresults = array(
+            'prohibit' => array('allow' => false),
+            'prevent'  => array('allow' => false),
+            'allow'    => array('allow' => true),
+            'inherit'  => array('allow' => false),
+            'notset'   => array('allow' => false),
+        );
+        $overridepermstr = 'allow';
+        $overrideperm = CAP_ALLOW;
+        foreach ($systemlevelperms as $systempermstr => $systemperm) {
+            $this->getDataGenerator()->role_assign(
+                $roles[$systempermstr][$overridepermstr],
+                $user->id,
+                $systemcontext->id);
+            $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
+                tool_capexplorer_has_capability($capability, $categorycontext, $user->id),
+                "Capability check failed with system permission '{$systempermstr}' and course override '{$overridepermstr}' in category context");
+            role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
+        }
+
+        // Make sure scope is limited within a subtree.
+        // Assign allowed role in one part of tree and check in another part.
+        // Assign in course inside category.
+        $this->getDataGenerator()->role_assign(
+            $roles['allow']['notset'],
+            $user->id,
+            $coursecontext->id);
+        // Check in front page course.
+        $this->assertFalse(tool_capexplorer_has_capability($capability,
+            $frontpagecoursecontext, $user->id));
+        role_unassign($roles['allow']['notset'], $user->id, $coursecontext->id);
+
+        // Test default role applies correctly.
+        // First check that prohibit in a default role removes access.
+
+        // Allow in system first.
+        $this->getDataGenerator()->role_assign(
+            $roles['allow']['notset'],
+            $user->id,
+            $systemcontext->id);
+
+        // Should have access.
+        $this->assertTrue(tool_capexplorer_has_capability($capability,
+            $systemcontext, $user->id));
+
+        // Prohibit via default role.
+        set_config('defaultuserroleid', $roles['prohibit']['notset']);
+
+        // Shouldn't have access once default role added.
+        $this->assertFalse(tool_capexplorer_has_capability($capability,
+            $systemcontext, $user->id));
+
+        role_unassign($roles['allow']['notset'], $user->id, $systemcontext->id);
+
+        // With no roles assigned I shouldn't have access.
+        // Shouldn't have access once default role added.
+        $this->assertFalse(tool_capexplorer_has_capability($capability,
+            $blockcontext, $user->id));
+
+        // Allow via default role.
+        set_config('defaultuserroleid', $roles['allow']['notset']);
+
+        // We should now have access.
+        $this->assertTrue(tool_capexplorer_has_capability($capability,
+            $blockcontext, $user->id));
+
+        set_config('defaultuserroleid', null);
+
+        // Check behaviour with multiple conflicting roles.
+        // First role just straight prevent at system level.
+        $this->getDataGenerator()->role_assign(
+            $roles['prevent']['notset'],
+            $user->id,
+            $systemcontext->id);
+        // Shouldn't have access.
+        $this->assertFalse(tool_capexplorer_has_capability($capability,
+            $modulecontext, $user->id));
+        // Second role defined as prevent but with an allow override.
+        // Assigned at course level.
+        $this->getDataGenerator()->role_assign(
+            $roles['prevent']['allow'],
+            $user->id,
+            $coursecontext->id);
+        // Should have overridden other role due to allow.
+        $this->assertTrue(tool_capexplorer_has_capability($capability,
+            $modulecontext, $user->id));
+        // Add a prohibit with attempt to override with allow (should not work).
+        $this->getDataGenerator()->role_assign(
+            $roles['prohibit']['allow'],
+            $user->id,
+            $categorycontext->id);
+        // Prohibit in any role should always prevent access.
+        $this->assertFalse(tool_capexplorer_has_capability($capability,
+            $modulecontext, $user->id));
+
+        role_unassign($roles['prevent']['notset'], $user->id, $systemcontext->id);
+        role_unassign($roles['prevent']['allow'], $user->id, $coursecontext->id);
+        role_unassign($roles['prohibit']['allow'], $user->id, $categorycontext->id);
+
     /*
-    public function get_random_permission_value($systemcontext = true) {
-
-        // Assignment is more likely in the system context than for overrides.
-        if ($systemcontext) {
-            $probmap = array(
-                5 => CAP_PROHIBIT,
-                20 => CAP_PREVENT,
-                50 => CAP_ALLOW,
-                // CAP_INHERIT and null both mean not set, but include both separately
-                // so we test both cases work as expected.
-                75 => CAP_INHERIT,
-                100 => null
-            );
-        } else {
-            $probmap = array(
-                5 => CAP_PROHIBIT,
-                15 => CAP_PREVENT,
-                30 => CAP_ALLOW,
-                // CAP_INHERIT and null both mean not set, but include both separately
-                // so we test both cases work as expected.
-                65 => CAP_INHERIT,
-                100 => null
-            );
-        }
-
-        $rand = rand(1, 100);
-        foreach ($probmap as $chance => $value) {
-            if ($rand <= $chance) {
-                return $value;
-            }
-        }
-
-        return null;
-    }
+     * TODO
+     *
+     * Setup some specific data to allow us to test the following:
+     *
+     * - override applied at low context, role assigned at higher context, checked
+     *   at lower context.
+     *
+     * Need to check in all contexts including block/module and multiple subcats.
      */
+    }
+
 }
