@@ -162,23 +162,20 @@ M.tool_capexplorer.init_autocomplete = function(Y, args) {
     Y.one('body').addClass('yui3-skin-sam');
 
     usernameInput.plug(Y.Plugin.AutoComplete, {
-        resultFilters: 'phraseMatch',
-        resultTextLocator: 'autocompletestr',
         source: M.cfg.wwwroot + '/' + args['admin'] +
             '/tool/capexplorer/ajax/getusers.php?search={query}',
+        resultTextLocator: 'username',
+        resultFilters: function (query, results) {
+            query = query.toLowerCase();
+            return Y.Array.filter(results, function (result) {
+                return result.raw.autocompletestr.toLowerCase().indexOf(query) !== -1;
+            });
+        },
         resultFormatter: function(query, results) {
             return Y.Array.map(results, function(result) {
                 return Y.Highlight.all(result.raw.autocompletestr, query);
             });
         },
-        on: {
-            // Override default action to fill just the username (rather than
-            // full 'autocompletestr'.
-            select: function(e) {
-                e.preventDefault();
-                usernameInput.set('value', e.result.raw.username);
-            }
-        }
     });
 
     Y.one('#id_capability').plug(Y.Plugin.AutoComplete, {
