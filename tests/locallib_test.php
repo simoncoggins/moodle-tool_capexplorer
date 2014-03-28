@@ -331,11 +331,6 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
             tool_capexplorer_merge_permissions_across_roles($roletotals));
     }
 
-    /**
-     * Tests that capexplorer calculates capability checks correctly.
-     *
-     * @group wip
-     */
     public function test_tool_capexplorer_has_capability() {
         global $DB;
         $this->resetAfterTest();
@@ -441,7 +436,8 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
                     $systemcontext->id);
                 $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
                     tool_capexplorer_has_capability($capability, $blockcontext, $user->id),
-                    "Capability check failed with system permission '{$systempermstr}' and course override '{$overridepermstr}' in block context");
+                    "Capability check failed with system permission '{$systempermstr}' and " .
+                    "course override '{$overridepermstr}' in block context");
                 role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
             }
         }
@@ -464,7 +460,8 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
                 $systemcontext->id);
             $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
                 tool_capexplorer_has_capability($capability, $categorycontext, $user->id),
-                "Capability check failed with system permission '{$systempermstr}' and course override '{$overridepermstr}' in category context");
+                "Capability check failed with system permission '{$systempermstr}' and " .
+                "course override '{$overridepermstr}' in category context");
             role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
         }
 
@@ -547,16 +544,20 @@ class tool_generator_capexplorer_testcase extends advanced_testcase {
         role_unassign($roles['prevent']['allow'], $user->id, $coursecontext->id);
         role_unassign($roles['prohibit']['allow'], $user->id, $categorycontext->id);
 
-    /*
-     * TODO
-     *
-     * Setup some specific data to allow us to test the following:
-     *
-     * - override applied at low context, role assigned at higher context, checked
-     *   at lower context.
-     *
-     * Need to check in all contexts including block/module and multiple subcats.
-     */
+        // Check that overrides apply even when assigned below the override (e.g.
+        // an override is applied to the role, not the assignment).
+        //
+        // system <- define prevent
+        // course <- override with allow
+        // block <- assign and check
+        $this->getDataGenerator()->role_assign(
+            $roles['prevent']['allow'],
+            $user->id,
+            $blockcontext->id);
+        $this->assertTrue(tool_capexplorer_has_capability($capability,
+            $blockcontext, $user->id));
+        role_unassign($roles['prevent']['allow'], $user->id, $blockcontext->id);
+
     }
 
 }
