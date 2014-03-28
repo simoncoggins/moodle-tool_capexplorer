@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability Explorer context tree menu functions.
+ * Capability Explorer context tree functions.
  *
  * @package     tool_capexplorer
  * @copyright   Simon Coggins

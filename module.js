@@ -46,7 +46,7 @@ M.tool_capexplorer.init = function(Y, args) {
         nodes : args.initialtree,
     });
 
-    M.tool_capexplorer.tree.on('select', M.tool_capexplorer.menu_set_form_field);
+    M.tool_capexplorer.tree.on('select', M.tool_capexplorer.tree_set_form_field);
 
     M.tool_capexplorer.tree.plug(Y.Plugin.Tree.Lazy, {
 
@@ -92,11 +92,11 @@ M.tool_capexplorer.init = function(Y, args) {
 
     Y.one('#tree-loading-message').hide();
 
-    M.tool_capexplorer.menu_select_node(Y, args['contextids']);
+    M.tool_capexplorer.tree_select_node(Y, args['contextids']);
 }
 
 
-M.tool_capexplorer.menu_set_form_field = function(e) {
+M.tool_capexplorer.tree_set_form_field = function(e) {
     // 'users' node is not a context, so instead of selecting
     // it when clicked, open/close it.
     if (e.node.data.nodeType == 'userdir') {
@@ -112,12 +112,12 @@ M.tool_capexplorer.menu_set_form_field = function(e) {
 
 
 // Recursive function to expand, and then select a node in the tree.
-M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode) {
+M.tool_capexplorer.tree_select_node = function(Y, parentcontextids, currentNode) {
 
     // Start from the top if currentNode not set yet.
     if (currentNode == undefined) {
         currentNode = M.tool_capexplorer.tree.rootNode;
-        M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode);
+        M.tool_capexplorer.tree_select_node(Y, parentcontextids, currentNode);
         return;
     }
 
@@ -140,7 +140,7 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
                 currentNode.children[i].select();
             } else {
                 // Otherwise, repeat the process for the child.
-                M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode.children[i]);
+                M.tool_capexplorer.tree_select_node(Y, parentcontextids, currentNode.children[i]);
             }
             // No need to check remaining children.
             return;
@@ -151,7 +151,7 @@ M.tool_capexplorer.menu_select_node = function(Y, parentcontextids, currentNode)
     for (i in currentNode.children) {
         if (currentNode.children[i].data.nodeType == 'userdir') {
             parentcontextids.unshift(currentContextId);
-            M.tool_capexplorer.menu_select_node(Y, parentcontextids, currentNode.children[i]);
+            M.tool_capexplorer.tree_select_node(Y, parentcontextids, currentNode.children[i]);
         }
     }
 }

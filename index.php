@@ -24,7 +24,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once('form.php');
 require_once('locallib.php');
-require_once('menulib.php');
+require_once('treelib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
 $PAGE->set_context(context_system::instance());

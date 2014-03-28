@@ -27,7 +27,7 @@ define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
-require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/menulib.php");
+require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/treelib.php");
 
 $nodetype = required_param('nodetype', PARAM_ALPHA);
 $instanceid   = optional_param('instanceid', 0, PARAM_INT);
