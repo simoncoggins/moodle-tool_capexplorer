@@ -41,7 +41,7 @@ $autocompletefields = $DB->sql_concat_join("', '", array($sqlfullname, 'u.userna
 $sql = "SELECT u.id, u.username, {$autocompletefields} AS autocompletestr
     FROM {user} u
     WHERE
-    u.deleted <> 1 AND "  . $DB->sql_like($autocompletefields, '?') . "
+    u.deleted <> 1 AND "  . $DB->sql_like($autocompletefields, '?', false) . "
     ORDER BY {$sqlfullname}";
 $params = array('%' . $DB->sql_like_escape($search) . '%');
 

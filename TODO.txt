@@ -10,7 +10,6 @@ MENU TODO:
 
 GENERAL TODO:
 
-AJAX on user is case sensitive?
 Improve messages when user checks a capability in an invalid context.
 Add unit tests for menulib.php
 Remove manually assigned column for auto assigned role if no manual assignments?
