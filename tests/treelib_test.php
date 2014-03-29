@@ -27,6 +27,17 @@ require_once($CFG->dirroot . '/admin/tool/capexplorer/treelib.php');
  */
 class tool_capexplorer_treelib_testcase extends advanced_testcase {
 
+    /**
+     * Helper method to check some common properties of a node.
+     */
+    protected function check_node_structure($item, $nodetype) {
+        $this->assertObjectHasAttribute('label', $item);
+        $this->assertObjectHasAttribute('data', $item);
+        $this->assertObjectHasAttribute('nodeType', $item->data);
+        $this->assertEquals($nodetype, $item->data->nodeType);
+        $this->assertObjectHasAttribute('canHaveChildren', $item);
+    }
+
     public function test_get_user_nodes() {
         $this->resetAfterTest();
 
@@ -48,9 +59,33 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         // Should ignore deleted users.
         $this->assertCount(5, $result);
 
+        // Check structure of first item.
+        $item = current($result);
+        $this->check_node_structure($item, 'user');
     }
 
     public function test_get_module_nodes() {
+        $this->resetAfterTest();
+
+        // Create some modules to be found.
+        $cat = $this->getDataGenerator()->create_category();
+        $subcat = $this->getDataGenerator()->create_category(array('parent' => $cat->id));
+        $course = $this->getDataGenerator()->create_course(array('category' => $subcat->id));
+
+        $module = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
+        $module2 = $this->getDataGenerator()->create_module('wiki', array('course' => $course->id));
+
+        // Create second course with a module that shouldn't be found.
+        $course2 = $this->getDataGenerator()->create_course(array('category' => $subcat->id));
+        $module3 = $this->getDataGenerator()->create_module('forum', array('course' => $course2->id));
+
+        $result = tool_capexplorer_get_module_nodes($course->id);
+        // Should find the two modules in specified course, but not others.
+        $this->assertCount(2, $result);
+
+        // Check structure of first item.
+        $item = current($result);
+        $this->check_node_structure($item, 'module');
     }
 
     public function test_get_course_nodes() {

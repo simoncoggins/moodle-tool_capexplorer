@@ -139,11 +139,13 @@ function tool_capexplorer_get_module_nodes($parentcourseid) {
         $cmids = array_map(function($item) {
             return $item->cm;
         }, $modules);
-        $sql = "SELECT cm.instance, ctx.id AS contextid
+        list($insql, $inparams) = $DB->get_in_or_equal($cmids);
+        $sql = "SELECT cm.id, ctx.id AS contextid
             FROM {course_modules} cm
-            JOIN {context} ctx ON cm.instance = ctx.instanceid
-            AND ctx.contextlevel = " . CONTEXT_MODULE;
-        $contextmap = $DB->get_records_sql_menu($sql);
+            LEFT JOIN {context} ctx ON cm.id = ctx.instanceid
+            AND ctx.contextlevel = " . CONTEXT_MODULE . "
+            WHERE cm.id {$insql}";
+        $contextmap = $DB->get_records_sql_menu($sql, $inparams);
 
         $moduleswithcontext = array_map(function($item) use ($contextmap) {
             $item->contextid = $contextmap[$item->cm];
