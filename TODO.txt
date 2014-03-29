@@ -1,5 +1,6 @@
 
 MENU TODO:
+- Fix tree defaults
 - More refactoring to simplify/reduce duplication
 
 - Add messages when no items or make not expandable?
@@ -10,6 +11,8 @@ MENU TODO:
 
 GENERAL TODO:
 
+Add README.txt
+Move directory structure to suit plugin.
 Improve messages when user checks a capability in an invalid context.
 Add unit tests for treelib.php
 Remove manually assigned column for auto assigned role if no manual assignments?

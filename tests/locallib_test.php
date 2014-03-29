@@ -25,7 +25,7 @@ require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
  * @package tool_capexplorer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tool_generator_capexplorer_testcase extends advanced_testcase {
+class tool_capexplorer_locallib_testcase extends advanced_testcase {
 
     public function test_get_context_info() {
         $systemcontext = context_system::instance();
