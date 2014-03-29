@@ -388,12 +388,10 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $html = '';
 
         if ($overallresult != $result) {
-            // TODO Define bug URL.
-            $bugurl = new moodle_url('');
             $cacheurl = new moodle_url('/admin/purgecaches.php');
             $a = new stdClass();
             $a->cacheurl = $cacheurl->out();
-            $a->bugurl = $bugurl->out();
+            $a->bugurl = 'https://tracker.moodle.org/browse/CONTRIB';
             $html .= $this->container(get_string('resultdiffersfromaccesslib', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
