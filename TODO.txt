@@ -1,23 +1,17 @@
 
-MENU TODO:
+- Put results on a separate page (with initial results block)?
 - Fix tree defaults
-- More refactoring to simplify/reduce duplication
+- Remove manually assigned column for auto assigned role if no manual assignments?
+- Add unit tests for treelib.php
+- Improve messages when user checks a capability in an invalid context.
+- Move directory structure to suit plugin.
+- Push to github
 
+- Add behat tests?
+- Remove hover styles from userdir node?
 - Add messages when no items or make not expandable?
 - Improve error handling
 - Preload icons?
 - Move into dialog with link to select?
 - A-Z sub-folders for large numbers
-
-GENERAL TODO:
-
-Add README.txt
-Move directory structure to suit plugin.
-Improve messages when user checks a capability in an invalid context.
-Add unit tests for treelib.php
-Remove manually assigned column for auto assigned role if no manual assignments?
-Put results on a separate page (with initial results block)?
-
-Add behat tests?
-Remove hover styles from userdir node?
 
