@@ -51,6 +51,10 @@ echo $OUTPUT->container(get_string('capexplorersummary', 'tool_capexplorer'));
 // First create the form.
 $mform = new capexplorer_selector_form();
 
+// Default tree for first page load.
+$initialtree = tool_capexplorer_get_system_node();
+$contextids = array();
+
 // Re-open selected tree node if data passed to page.
 if ($data = data_submitted()) {
     if (!empty($data->contextid)) {
@@ -60,15 +64,6 @@ if ($data = data_submitted()) {
         $contextids = array_reverse($parentcontextids);
         $initialtree = tool_capexplorer_get_selected_subtree($contextids);
     }
-}
-
-// TODO sort these defaults.
-// Default tree for first page load.
-if (!isset($initialtree)) {
-    $initialtree = tool_capexplorer_get_system_node();
-}
-if (!isset($contextids)) {
-    $contextids = array(1);
 }
 
 $args = array(

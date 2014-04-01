@@ -146,11 +146,15 @@ M.tool_capexplorer.tree_select_node = function(Y, parentcontextids, currentNode)
             return;
         }
     }
-    // Handle userdir.
-    // If previous loop didn't match anything, open the userdir node.
+    // If previous loop didn't match anything do some further checks.
     for (i in currentNode.children) {
+        // Handle userdir.
         if (currentNode.children[i].data.nodeType == 'userdir') {
             parentcontextids.unshift(currentContextId);
+            M.tool_capexplorer.tree_select_node(Y, parentcontextids, currentNode.children[i]);
+        }
+        // Ensure system node is opened.
+        if (currentNode.children[i].data.nodeType == 'system') {
             M.tool_capexplorer.tree_select_node(Y, parentcontextids, currentNode.children[i]);
         }
     }

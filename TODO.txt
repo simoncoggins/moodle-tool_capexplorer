@@ -1,6 +1,5 @@
 
 - Put results on a separate page (with initial results block)?
-- Fix tree defaults
 - Remove manually assigned column for auto assigned role if no manual assignments?
 - Add unit tests for treelib.php
 - Improve messages when user checks a capability in an invalid context.

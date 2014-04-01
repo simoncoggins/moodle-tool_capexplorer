@@ -45,6 +45,10 @@ function tool_capexplorer_get_selected_subtree($contextids, $parentnode = null) 
         return tool_capexplorer_get_selected_subtree($contextids, $parentnode);
     }
 
+    if (empty($contextids)) {
+        return array();
+    }
+
     $currentcontextid = array_shift($contextids);
 
     $nodetype = $parentnode->data->nodeType;
