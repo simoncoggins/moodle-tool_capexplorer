@@ -31,22 +31,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('pluginname', 'tool_capexplorer'));
 $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
-$jsmodule = array(
-    'name' => 'tool_capexplorer',
-    'fullpath' => "/{$CFG->admin}/tool/capexplorer/module.js",
-    'requires' => array(
-        'json', 'autocomplete', 'autocomplete-filters',
-        'autocomplete-highlighters', 'gallery-sm-treeview', 'tree-lazy'
-    )
-);
-
-
 admin_externalpage_setup('toolcapexplorer');
-
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('pluginname', 'tool_capexplorer'));
-echo $OUTPUT->container(get_string('capexplorersummary', 'tool_capexplorer'));
 
 // First create the form.
 $mform = new capexplorer_selector_form();
@@ -66,14 +51,7 @@ if ($data = data_submitted()) {
     }
 }
 
-$args = array(
-    'admin' => $CFG->admin,
-    'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
-    'initialtree' => $initialtree,
-    'contextids' => $contextids
-);
-
-$PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
+echo $OUTPUT->header();
 
 if ($data = $mform->get_data()) {
     // Process data if submitted.
@@ -82,14 +60,34 @@ if ($data = $mform->get_data()) {
     $context = context::instance_by_id($data->contextid);
 } else {
     // No data yet, just display the form.
+
+    // Load JS for autocomplete and context tree.
+    $jsmodule = array(
+        'name' => 'tool_capexplorer',
+        'fullpath' => "/{$CFG->admin}/tool/capexplorer/module.js",
+        'requires' => array(
+            'json', 'autocomplete', 'autocomplete-filters',
+            'autocomplete-highlighters', 'gallery-sm-treeview', 'tree-lazy'
+        )
+    );
+
+    $args = array(
+        'admin' => $CFG->admin,
+        'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
+        'initialtree' => $initialtree,
+        'contextids' => $contextids
+    );
+
+    $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
+
+    echo $OUTPUT->heading(get_string('pluginname', 'tool_capexplorer'));
+    echo $OUTPUT->container(get_string('capexplorersummary', 'tool_capexplorer'));
     echo $mform->display();
     echo $OUTPUT->footer();
     exit;
 }
 
-echo $mform->display();
-
-$output = $PAGE->get_renderer('tool_capexplorer');
+// Display results.
 
 $result = has_capability($capability, $context, $userid, false);
 $user = $DB->get_record('user', array('id' => $userid));
@@ -112,17 +110,23 @@ $roletotals = tool_capexplorer_merge_permissions_across_contexts(
 );
 $overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
 
-echo $output->print_warning_messages($overallresult, $result, $user, $capability, $context);
+$output = $PAGE->get_renderer('tool_capexplorer');
 
-echo $output->heading_with_help(get_string('contextlineage', 'tool_capexplorer'), 'contextlineage', 'tool_capexplorer');
-echo $output->container(get_string('contextlineagesummary', 'tool_capexplorer'));
+echo $output->print_back_link();
+echo $output->heading(get_string('capexplorerresult', 'tool_capexplorer'));
+echo $output->print_warning_messages($overallresult, $result, $user, $capability, $context);
+echo $output->print_results_table($user, $capability, $context, $overallresult);
+
+echo $output->heading(get_string('detailedbreakdown', 'tool_capexplorer'));
+echo $output->heading_with_help(get_string('step1', 'tool_capexplorer'), 'parentcontexts', 'tool_capexplorer', '', '', 3);
+echo $output->container(get_string('parentcontextssummary', 'tool_capexplorer'));
 echo $output->print_parent_context_table($parentcontextinfo);
 
-echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
+echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)), 3);
 echo $output->container(get_string('roleassignmentsummary', 'tool_capexplorer'));
 echo $output->print_role_assignment_table($contexts, $assignedroles, $manualassignments, $autoassignments);
 
-echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
+echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability), 3);
 $contextaggrhelpicon = $output->help_icon('contextaggrrules', 'tool_capexplorer');
 echo $output->container(get_string('rolepermissionsummary', 'tool_capexplorer', $contextaggrhelpicon));
 echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability);

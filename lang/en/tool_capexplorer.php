@@ -33,6 +33,7 @@ $string['capabilitycontextmismatch'] = 'Note: The capability selected would not 
 $string['capabilityplaceholder'] = 'Enter a capability';
 $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';
+$string['capexplorerresult'] = 'Overall result';
 $string['capexplorersummary'] = '<p>Capability Explorer is a tool to help explain how Moodle\'s capability system works. Submit the form below to get an explanation of how the capability check is calculated.</p>';
 $string['capgranted'] = 'True (Granted)';
 $string['change'] = 'Change';
@@ -55,13 +56,11 @@ $string['contextaggrrules_help'] = '<p>To determine the role total for a particu
     <li>If all contexts have the permission "Not set", the role total is "Not set".</li>
     <li>Otherwise, the role total is the same as the most specific permission that is set (i.e. the allow or prevent that\'s closest to the bottom of the context lineage).</li>
 </ol>';
+$string['contextinfo'] = '{$a->contextstring} ({$a->contextlevel} context)';
 $string['contextlevel'] = 'Context level';
-$string['contextlineage'] = 'Context lineage';
-// TODO write this help:
-$string['contextlineage_help'] = 'Context lineage help';
-$string['contextlineagesummary'] = '<p>Determine all context levels between the system level and the context being checked.</p>';
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
+$string['detailedbreakdown'] = 'Detailed breakdown';
 $string['error:invalidcapability'] = 'There is no capability called "{$a}"';
 $string['error:invalidcontext'] = 'You must select a context instance';
 $string['error:invalidusername'] = 'There is no user with a username of "{$a}"';
@@ -72,6 +71,7 @@ $string['error:nocategory'] = 'You must select a category instance.';
 $string['error:nocourse'] = 'You must select a course instance.';
 $string['error:nomodule'] = 'You must select a module instance.';
 $string['error:nouser'] = 'You must select a user instance.';
+$string['exploreanother'] = '&laquo; Explore another capability';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
 $string['frontpagecourse'] = 'Front Page Course';
 $string['instancename'] = 'Instance Name';
@@ -95,6 +95,10 @@ $string['notassignable'] = 'Not assignable';
 $string['notassignable_help'] = '<p>Each role defines the context levels where the role can be assigned.</p><p>This can be customised by changing the "Context types where this role may be assigned" setting in the role definition:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define Roles &gt; [Role name] &gt; Edit</em>.</p>';
 $string['notassigned'] = 'Not Assigned';
 $string['overallresult'] = 'Overall result';
+$string['parentcontexts'] = 'Parent contexts';
+// TODO: Improve text below.
+$string['parentcontexts_help'] = '<p>Because of the hierarchical nature of the permissions system, assignments at any parent context can impact a capability check in a child context. Therefore the first step is to determine all the contexts between the system level and the context being checked.</p>';
+$string['parentcontextssummary'] = '<p>Determine all context levels between the system level and the context being checked.</p>';
 $string['permission'] = 'Permission';
 $string['permissionallow'] = 'Allow';
 $string['permissioninherit'] = 'Inherit';
@@ -103,6 +107,7 @@ $string['permissionprevent'] = 'Prevent';
 $string['permissionprohibit'] = 'Prohibit';
 $string['permissionunknown'] = 'Unknown';
 $string['pluginname'] = 'Capability Explorer';
+$string['result'] = 'Result';
 $string['resultdiffersfromaccesslib'] = '<p>The result calculated by this tool does not match the result from core code!</p><p>You could try <a href="{$a->cacheurl}">clearing your cache</a> but if that doesn\'t help this is probably a bug in Capability Explorer. Please <a href="{$a->bugurl}">let us know about it</a> and if you can include a screenshot of this page to help us track down the problem.</p>';
 $string['role'] = 'Role';
 $string['roleaggrrules'] = 'Role aggregation rules';
@@ -119,6 +124,8 @@ $string['rolepermissionsummary'] = '<p>For each assigned role, list the permissi
 $string['roletotal'] = 'Role total';
 $string['roletotals'] = 'Role totals';
 $string['set'] = 'Set';
+$string['step1'] = 'Step 1: Determine parent contexts';
+$string['step2'] = 'Step 2: List role assignments';
 $string['systemcontext'] = 'System (Site) context';
 $string['user'] = 'User';
 $string['usercontext'] = 'User context';

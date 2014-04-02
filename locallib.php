@@ -54,7 +54,7 @@ function tool_capexplorer_get_context_info($context) {
         case CONTEXT_COURSE:
             $coursename = format_string($DB->get_field('course', 'fullname',
                 array('id' => $context->instanceid)));
-            if ($context->instanceid == 1) {
+            if ($context->instanceid == SITEID) {
                 $item->instance = get_string('xfrontpage', 'tool_capexplorer', $coursename);
             } else {
                 $item->instance = $coursename;

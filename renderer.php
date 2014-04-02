@@ -368,6 +368,18 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $text;
     }
 
+    /**
+     * Display a link back to the form.
+     */
+    public function print_back_link() {
+
+        return $this->container(
+            html_writer::link(
+                new moodle_url('/admin/tool/capexplorer/'),
+                get_string('exploreanother', 'tool_capexplorer')
+            )
+        );
+    }
 
     /**
      * Display warning messages if:
@@ -416,6 +428,67 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $html .= $this->output->container(get_string('capabilitycontextmismatch', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
+        return $html;
+    }
+
+    public function print_human_readable_context_info($context) {
+
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            return get_string('systemcontext', 'tool_capexplorer');
+        }
+
+        $contextinfo = tool_capexplorer_get_context_info($context);
+
+        $a = new stdClass();
+        $a->contextstring = isset($contextinfo->url) ?
+            html_writer::link($contextinfo->url, $contextinfo->instance) :
+            $contextinfo->instance;
+        $a->contextlevel = $contextinfo->contextlevel;
+        return get_string('contextinfo', 'tool_capexplorer', $a);
+
+    }
+
+    public function print_results_table($user, $capability, $context, $result) {
+        $html = '';
+        $table = new html_table();
+        $table->data = array();
+
+        $cell = new html_table_cell();
+        $cell->text = get_string('user', 'tool_capexplorer');
+        $cell->header = true;
+        $cell2 = new html_table_cell();
+        $cell2->text = html_writer::link(
+            new moodle_url('/user/profile.php', array('id' => $user->id)),
+            fullname($user)
+        );
+        $userrow = array($cell, $cell2);
+        $table->data[] = new html_table_row($userrow);
+
+        $cell = new html_table_cell();
+        $cell->text = get_string('capability', 'tool_capexplorer');
+        $cell->header = true;
+        $cell2 = new html_table_cell();
+        $cell2->text = $capability;
+        $capabilityrow = array($cell, $cell2);
+        $table->data[] = new html_table_row($capabilityrow);
+
+        $cell = new html_table_cell();
+        $cell->text = get_string('context', 'tool_capexplorer');
+        $cell->header = true;
+        $cell2 = new html_table_cell();
+        $cell2->text = $this->print_human_readable_context_info($context);
+        $contextrow = array($cell, $cell2);
+        $table->data[] = new html_table_row($contextrow);
+
+        $cell = new html_table_cell();
+        $cell->text = get_string('result', 'tool_capexplorer');
+        $cell->header = true;
+        $cell2 = new html_table_cell();
+        $cell2->text = $this->print_boolean_permission_value($result);
+        $resultrow = array($cell, $cell2);
+        $table->data[] = new html_table_row($resultrow);
+
+        $html .= html_writer::table($table);
         return $html;
     }
 
