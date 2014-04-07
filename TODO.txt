@@ -1,7 +1,6 @@
 
 - Put results on a separate page (with initial results block)?
 - Remove manually assigned column for auto assigned role if no manual assignments?
-- Add unit tests for treelib.php
 - Improve messages when user checks a capability in an invalid context.
 - Move directory structure to suit plugin.
 - Push to github
