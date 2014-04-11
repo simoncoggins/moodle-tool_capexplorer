@@ -1,5 +1,5 @@
 
-.perm-allow {
+.perm-allow, .roleassigned {
     color: green;
 }
 

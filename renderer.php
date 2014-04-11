@@ -246,10 +246,12 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                     && $manualassignments[$contextid][$roleid] != CAP_INHERIT) {
 
                     $textkey = 'assigned';
+                    $class = 'roleassigned';
                 } else {
                     $textkey = 'notassigned';
+                    $class = '';
                 }
-                $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'));
+                $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'), $class);
 
                 if (!array_key_exists($roleid, $assignableroles)) {
                     $error = 'notassignable';
@@ -273,7 +275,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                     $cell2 = new html_table_cell();
                     if (isset($autoassignments[$contextid][$roleid])) {
                         $text = get_string($autoassignments[$contextid][$roleid], 'admin');
-                        $cell2->text = $this->output->container($text);
+                        $cell2->text = $this->output->container($text, 'roleassigned');
                         if (!$hassiteconfig) {
                             $error = 'nopermtoautoassign';
                         } else {
