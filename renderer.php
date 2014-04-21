@@ -68,10 +68,11 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      * @param array $roles An array of role objects.
      * @param string $capability A capability to display results for.
      * @param bool $includetotals If true include a row of role totals.
+     * @param bool $includechangelinks If true include links to change the settings.
      *
      * @return string HTML to display the table.
      */
-    public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true) {
+    public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true, $includechangelinks = true) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
         $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
@@ -148,10 +149,12 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
                     }
                 }
 
-                if (empty($error)) {
-                    $cell .= $this->print_change_link($url);
-                } else {
-                    $cell .= $this->print_message_with_help($error);
+                if ($includechangelinks) {
+                    if (empty($error)) {
+                        $cell .= $this->print_change_link($url);
+                    } else {
+                        $cell .= $this->print_message_with_help($error);
+                    }
                 }
 
                 $row[] = $cell;
@@ -208,23 +211,29 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $assignrow = array('', '');
 
         foreach ($roles as $role) {
+            $autoassigned = tool_capexplorer_role_is_auto_assigned($role->id);
+            $manualassigned = tool_capexplorer_role_is_manually_assigned($role->id, $manualassignments);
+
             $rolecell = new html_table_cell();
             $rolecell->text = role_get_name($role);
             $rolecell->header = true;
-            if (tool_capexplorer_role_is_auto_assigned($role->id)) {
+            if ($autoassigned && $manualassigned) {
                 $rolecell->colspan = 2;
             }
             $rolerow[] = $rolecell;
 
-            $assigncell = new html_table_cell();
-            $assigncell->header = true;
-            $assigncell->text = get_string('manualassign', 'tool_capexplorer');
-            $assignrow[] = $assigncell;
-            if (tool_capexplorer_role_is_auto_assigned($role->id)) {
-                // Add the 2nd row cell for auto assignments.
+            if ($manualassigned) {
+                $assigncell = new html_table_cell();
+                $assigncell->header = true;
+                $assigncell->text = get_string('manualassign', 'tool_capexplorer');
+                $assigncell->text .= $this->help_icon('manualassignment', 'tool_capexplorer');
+                $assignrow[] = $assigncell;
+            }
+            if ($autoassigned) {
                 $assigncell2 = new html_table_cell();
                 $assigncell2->header = true;
                 $assigncell2->text = get_string('autoassign', 'tool_capexplorer');
+                $assigncell2->text .= $this->help_icon('autoassignment', 'tool_capexplorer');
                 $assignrow[] = $assigncell2;
             }
         }
@@ -240,38 +249,43 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $row = array($contextinfo->contextlevel, $instance);
             foreach ($roles as $role) {
                 $roleid = $role->id;
-                $cell = new html_table_cell();
+                $autoassigned = tool_capexplorer_role_is_auto_assigned($roleid);
+                $manualassigned = tool_capexplorer_role_is_manually_assigned($roleid, $manualassignments);
 
-                if (isset($manualassignments[$contextid][$roleid])
-                    && $manualassignments[$contextid][$roleid] != CAP_INHERIT) {
+                if ($manualassigned) {
+                    $cell = new html_table_cell();
 
-                    $textkey = 'assigned';
-                    $class = 'roleassigned';
-                } else {
-                    $textkey = 'notassigned';
-                    $class = '';
+                    if (isset($manualassignments[$contextid][$roleid])
+                        && $manualassignments[$contextid][$roleid] != CAP_INHERIT) {
+
+                        $textkey = 'assigned';
+                        $class = 'roleassigned';
+                    } else {
+                        $textkey = 'notassigned';
+                        $class = '';
+                    }
+                    $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'), $class);
+
+                    if (!array_key_exists($roleid, $assignableroles)) {
+                        $error = 'notassignable';
+                    } else if (!user_can_assign($context, $roleid)) {
+                        $error = 'nopermtoassign';
+                    } else {
+                        $error = '';
+                    }
+
+                    if (empty($error)) {
+                        $url = new moodle_url('/admin/roles/assign.php',
+                            array('contextid' => $contextid, 'roleid' => $roleid));
+                        $cell->text .= $this->print_change_link($url);
+                    } else {
+                        $cell->text .= $this->print_message_with_help($error);
+                    }
+
+                    $row[] = $cell;
                 }
-                $cell->text = $this->output->container(get_string($textkey, 'tool_capexplorer'), $class);
 
-                if (!array_key_exists($roleid, $assignableroles)) {
-                    $error = 'notassignable';
-                } else if (!user_can_assign($context, $roleid)) {
-                    $error = 'nopermtoassign';
-                } else {
-                    $error = '';
-                }
-
-                if (empty($error)) {
-                    $url = new moodle_url('/admin/roles/assign.php',
-                        array('contextid' => $contextid, 'roleid' => $roleid));
-                    $cell->text .= $this->print_change_link($url);
-                } else {
-                    $cell->text .= $this->print_message_with_help($error);
-                }
-
-                $row[] = $cell;
-
-                if (tool_capexplorer_role_is_auto_assigned($role->id)) {
+                if ($autoassigned) {
                     $cell2 = new html_table_cell();
                     if (isset($autoassignments[$contextid][$roleid])) {
                         $text = get_string($autoassignments[$contextid][$roleid], 'admin');

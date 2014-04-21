@@ -24,7 +24,10 @@
 
 $string['assigned'] = 'Assigned';
 $string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
-$string['autoassign'] = 'Auto assign';
+$string['autoassign'] = 'Automatically assigned';
+$string['autoassignment'] = 'Automatic assignment';
+// TODO
+$string['autoassignment_help'] = 'Some roles can be automatically assigned to users in the system context.';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
 $string['capability_help'] = '<p>Select a capability to check.</p><p>This field uses autocomplete so start typing the name of a capability then select from the options that appear.</p>';
@@ -37,6 +40,7 @@ $string['capexplorerresult'] = 'Overall result';
 $string['capexplorersummary'] = '<p>Capability Explorer is a tool to help explain how Moodle\'s capability system works. Submit the form below to get an explanation of how the capability check is calculated.</p>';
 $string['capgranted'] = 'True (Granted)';
 $string['change'] = 'Change';
+$string['combineusingcontextaggregation'] = '<p>Combine the individual permissions using context aggregation rules{$a} to get a set of role totals.</p>';
 $string['context'] = 'Context';
 $string['context_help'] = '<p>You must provide a <em>context instance</em> to check a capability against. The tree shown displays the hierarchy of all the context instances on your site.</p>
 <p>Expand nodes by clicking the arrow to see more specific child contexts. Select an instance by clicking the name.</p>
@@ -60,7 +64,6 @@ $string['contextinfo'] = '{$a->contextstring} ({$a->contextlevel} context)';
 $string['contextlevel'] = 'Context level';
 $string['coursecatcontext'] = 'Course category context';
 $string['coursecontext'] = 'Course context';
-$string['detailedbreakdown'] = 'Detailed breakdown';
 $string['error:invalidcapability'] = 'There is no capability called "{$a}"';
 $string['error:invalidcontext'] = 'You must select a context instance';
 $string['error:invalidusername'] = 'There is no user with a username of "{$a}"';
@@ -76,7 +79,10 @@ $string['finalresultsummary'] = '<p>Finally, combine the role totals using the r
 $string['frontpagecourse'] = 'Front Page Course';
 $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
-$string['manualassign'] = 'Manual assign';
+$string['manualassign'] = 'Manually assigned';
+$string['manualassignment'] = 'Manual assignment';
+// TODO
+$string['manualassignment_help'] = 'Help with Manual assignment';
 $string['modulecontext'] = 'Module (Activity) context';
 $string['nocatfrontpage'] = 'No category (Front page course)';
 $string['none'] = 'None';
@@ -117,15 +123,18 @@ $string['roleaggrrules_help'] = '<p>To determine the overall result, aggregate t
     <li>Otherwise, if any one role total is "Allow" the overall result is "Granted".</li>
     <li>If none of the role totals are "Allow", the overall result is "Denied".</li>
 </ol>';
-$string['roleassignmentsforuserx'] = 'Role assignments for user "{$a}"';
-$string['roleassignmentsummary'] = '<p>Determine which roles are assigned to the user in any of the parent contexts. Roles can either be assigned manually via role assignments or automatically based on system configuration. Only roles assigned in one of the parent contexts contribute to the final result.</p>';
+$string['roleassignmentsforuserx'] = 'Below are all roles that have assignments for "{$a}" in any of the contexts listed above:';
+$string['roleassignmentsummary'] = '<p>Determine which roles are assigned to the user in any of the parent contexts. Only roles assigned in one of the parent contexts contribute to the final result.</p>';
 $string['rolepermissionsandoverridesforcapx'] = 'All role permissions and overrides for capability "{$a}"';
-$string['rolepermissionsummary'] = '<p>For each assigned role, list the permission from the role definition for the system context. Also list any role overrides in any other contexts in the context lineage.</p><p>Combine the individual permissions using context aggregation rules{$a} to get a set of role totals.</p>';
+$string['rolepermissionsummary'] = '<p>For each assigned role, list the permission from the role definition for the system context. Also list any role overrides in any of the parent contexts.</p>';
 $string['roletotal'] = 'Role total';
 $string['roletotals'] = 'Role totals';
 $string['set'] = 'Set';
-$string['step1'] = 'Step 1: Determine parent contexts';
-$string['step2'] = 'Step 2: List role assignments';
+$string['step1'] = 'Step 1: Parent contexts';
+$string['step2'] = 'Step 2: Role assignments';
+$string['step3'] = 'Step 3: Role permissions and overrides';
+$string['step4'] = 'Step 4: Aggregate across contexts';
+$string['step5'] = 'Step 5: Aggregate across roles';
 $string['systemcontext'] = 'System (Site) context';
 $string['user'] = 'User';
 $string['usercontext'] = 'User context';

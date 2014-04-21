@@ -117,20 +117,26 @@ echo $output->heading(get_string('capexplorerresult', 'tool_capexplorer'));
 echo $output->print_warning_messages($overallresult, $result, $user, $capability, $context);
 echo $output->print_results_table($user, $capability, $context, $overallresult);
 
-echo $output->heading(get_string('detailedbreakdown', 'tool_capexplorer'));
 echo $output->heading_with_help(get_string('step1', 'tool_capexplorer'), 'parentcontexts', 'tool_capexplorer', '', '', 3);
 echo $output->container(get_string('parentcontextssummary', 'tool_capexplorer'));
 echo $output->print_parent_context_table($parentcontextinfo);
 
-echo $output->heading(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)), 3);
+echo $output->heading(get_string('step2', 'tool_capexplorer'), 3);
 echo $output->container(get_string('roleassignmentsummary', 'tool_capexplorer'));
+echo $output->container(get_string('roleassignmentsforuserx', 'tool_capexplorer', fullname($user)));
 echo $output->print_role_assignment_table($contexts, $assignedroles, $manualassignments, $autoassignments);
 
-echo $output->heading(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability), 3);
-$contextaggrhelpicon = $output->help_icon('contextaggrrules', 'tool_capexplorer');
-echo $output->container(get_string('rolepermissionsummary', 'tool_capexplorer', $contextaggrhelpicon));
-echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability);
+echo $output->heading(get_string('step3', 'tool_capexplorer'), 3);
+echo $output->container(get_string('rolepermissionsummary', 'tool_capexplorer'));
+echo $output->container(get_string('rolepermissionsandoverridesforcapx', 'tool_capexplorer', $capability));
+echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability, false);
 
+echo $output->heading(get_string('step4', 'tool_capexplorer'), 3);
+$contextaggrhelpicon = $output->help_icon('contextaggrrules', 'tool_capexplorer');
+echo $output->container(get_string('combineusingcontextaggregation', 'tool_capexplorer', $contextaggrhelpicon));
+echo $output->print_role_permission_and_overrides_table($contexts, $assignedroles, $capability, true, false);
+
+echo $output->heading(get_string('step5', 'tool_capexplorer'), 3);
 $roleaggrhelpicon = $output->help_icon('roleaggrrules', 'tool_capexplorer');
 echo $output->container(get_string('finalresultsummary', 'tool_capexplorer', $roleaggrhelpicon));
 echo $output->print_role_totals_table($roletotals, $overallresult);
