@@ -14,17 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Automated unit testing of locallib.php functions.
+ *
+ * @package     tool_capexplorer
+ * @copyright   Simon Coggins
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
 
-/**
- * Automated unit testing of locallib.php functions.
- *
- * @package tool_capexplorer
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class tool_capexplorer_locallib_testcase extends advanced_testcase {
 
     public function test_get_context_info() {
