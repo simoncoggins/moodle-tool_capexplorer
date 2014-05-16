@@ -1,6 +1,8 @@
 
 - Move directory structure to suit plugin.
+- Ensure valid: http://docs.moodle.org/dev/Guidelines_for_contributed_code and http://docs.moodle.org/dev/Plugin_validation
 - Push to github
+- Submit: https://moodle.org/plugins/registerplugin.php
 
 - Add behat tests?
 - Remove hover styles from userdir node?

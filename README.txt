@@ -9,7 +9,8 @@ Minimum requirements
 ====================
 
 Currently, due to the YUI treeview dependency, this plugin requires
-Moodle 2.7+.
+Moodle 2.7+. It should be possible to backport to any 2.x version by manually
+including the treeview library.
 
 Installation
 ============
