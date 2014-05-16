@@ -26,13 +26,10 @@ $string['assigned'] = 'Assigned';
 $string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
 $string['autoassign'] = 'Automatically assigned';
 $string['autoassignment'] = 'Automatic assignment';
-// TODO
-$string['autoassignment_help'] = 'Some roles can be automatically assigned to users in the system context.';
+$string['autoassignment_help'] = 'Some roles can be automatically assigned to users in the system context. The roles can be set from Site Administration > Users > Permissions > User Policies';
 $string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
 $string['capability_help'] = '<p>Select a capability to check.</p><p>This field uses autocomplete so start typing the name of a capability then select from the options that appear.</p>';
-// TODO read get_capabilities() code and improve description.
-$string['capabilitycontextmismatch'] = 'Note: The capability selected would not normally be assigned in the selected context.';
 $string['capabilityplaceholder'] = 'Enter a capability';
 $string['capdenied'] = 'False (Denied)';
 $string['capexplorer:view'] = 'View Capability Explorer';
@@ -58,7 +55,7 @@ $string['contextaggrrules_help'] = '<p>To determine the role total for a particu
 <ol>
     <li>If "Prohibit" appears in any context, the role total is "Prohibit".</li>
     <li>If all contexts have the permission "Not set", the role total is "Not set".</li>
-    <li>Otherwise, the role total is the same as the most specific permission that is set (i.e. the allow or prevent that\'s closest to the bottom of the context lineage).</li>
+    <li>Otherwise, the role total is the same as the most specific permission that is set (i.e. the allow or prevent that\'s closest to the context in which the capability is being checked).</li>
 </ol>';
 $string['contextinfo'] = '{$a->contextstring} ({$a->contextlevel} context)';
 $string['contextlevel'] = 'Context level';
@@ -68,12 +65,7 @@ $string['error:invalidcapability'] = 'There is no capability called "{$a}"';
 $string['error:invalidcontext'] = 'You must select a context instance';
 $string['error:invalidusername'] = 'There is no user with a username of "{$a}"';
 $string['error:missingcapability'] = 'You must enter a capability';
-$string['error:missingusername'] = 'You must enter a username.';
-$string['error:noblock'] = 'You must select a block instance.';
-$string['error:nocategory'] = 'You must select a category instance.';
-$string['error:nocourse'] = 'You must select a course instance.';
-$string['error:nomodule'] = 'You must select a module instance.';
-$string['error:nouser'] = 'You must select a user instance.';
+$string['error:missingusername'] = 'You must enter a username';
 $string['exploreanother'] = '&laquo; Explore another capability';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
 $string['frontpagecourse'] = 'Front Page Course';
@@ -81,8 +73,7 @@ $string['instancename'] = 'Instance Name';
 $string['instances'] = 'Instance';
 $string['manualassign'] = 'Manually assigned';
 $string['manualassignment'] = 'Manual assignment';
-// TODO
-$string['manualassignment_help'] = 'Help with Manual assignment';
+$string['manualassignment_help'] = 'Roles assigned directly to a specific user, for example via \'Assign system roles\', or via course enrolments.';
 $string['modulecontext'] = 'Module (Activity) context';
 $string['nocatfrontpage'] = 'No category (Front page course)';
 $string['none'] = 'None';
@@ -95,14 +86,12 @@ $string['nopermtodefinerole_help'] = 'The ablity to define role permissions requ
 $string['nopermtooverride'] = 'No permission';
 $string['nopermtooverride_help'] = 'Not all users have permission to override roles. The ability to override roles is dependent on your own roles and can be controlled here:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define roles &gt; Allow role overrides</em></p><p>In addition the user must have the capability "moodle/role:override" or "moodle/role:safeoverride" in the context where the override is taking place.</p><p>Site administrators can override all roles.</p>';
 $string['notoverridable'] = 'Not overridable';
-// TODO read get_capabilities() code and improve description.
 $string['notoverridable_help'] = '<p>Each capability defines a context level which is the lowest level the context will be checked in. Below this level the capability is not available to override since the override will not have any effect.</p><p>This prevents capabilities that are clearly not applicable at more specific contexts from cluttering up the override page.</p><p>In this case the capability being checked has specified a higher context level so it is not possible to override this capability at this level.</p>';
 $string['notassignable'] = 'Not assignable';
 $string['notassignable_help'] = '<p>Each role defines the context levels where the role can be assigned.</p><p>This can be customised by changing the "Context types where this role may be assigned" setting in the role definition:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define Roles &gt; [Role name] &gt; Edit</em>.</p>';
 $string['notassigned'] = 'Not Assigned';
 $string['overallresult'] = 'Overall result';
 $string['parentcontexts'] = 'Parent contexts';
-// TODO: Improve text below.
 $string['parentcontexts_help'] = '<p>Because of the hierarchical nature of the permissions system, assignments at any parent context can impact a capability check in a child context. Therefore the first step is to determine all the contexts between the system level and the context being checked.</p>';
 $string['parentcontextssummary'] = '<p>Determine all context levels between the system level and the context being checked.</p>';
 $string['permission'] = 'Permission';
@@ -123,9 +112,9 @@ $string['roleaggrrules_help'] = '<p>To determine the overall result, aggregate t
     <li>Otherwise, if any one role total is "Allow" the overall result is "Granted".</li>
     <li>If none of the role totals are "Allow", the overall result is "Denied".</li>
 </ol>';
-$string['roleassignmentsforuserx'] = 'Below are all roles that have assignments for "{$a}" in any of the contexts listed above:';
+$string['roleassignmentsforuserx'] = '<p>Below are all roles that have assignments for "{$a}" in any of the contexts listed above:</p>';
 $string['roleassignmentsummary'] = '<p>Determine which roles are assigned to the user in any of the parent contexts. Only roles assigned in one of the parent contexts contribute to the final result.</p>';
-$string['rolepermissionsandoverridesforcapx'] = 'All role permissions and overrides for capability "{$a}"';
+$string['rolepermissionsandoverridesforcapx'] = '<p>All role permissions and overrides for capability "{$a}"</p>';
 $string['rolepermissionsummary'] = '<p>For each assigned role, list the permission from the role definition for the system context. Also list any role overrides in any of the parent contexts.</p>';
 $string['roletotal'] = 'Role total';
 $string['roletotals'] = 'Role totals';
@@ -138,7 +127,7 @@ $string['step5'] = 'Step 5: Aggregate across roles';
 $string['systemcontext'] = 'System (Site) context';
 $string['user'] = 'User';
 $string['usercontext'] = 'User context';
-$string['userisadmin'] = 'Note: "{$a->user}" is a <a href="{$a->url}">site administrator</a>, and as such they are automatically granted all capabilities. The results below show how their access would be calculated if they weren\'t an admin.';
+$string['userisadmin'] = '<p>Note: "{$a->user}" is a <a href="{$a->url}">site administrator</a>, and as such they are automatically granted all capabilities. The results below show how their access would be calculated without site administrator privileges.</p>';
 $string['username'] = 'Username';
 $string['username_help'] = '<p>Select a user to check.</p><p>This field uses autocomplete so start typing a username, email address or user\'s name and select from the options that appear.</p>';
 $string['usernameplaceholder'] = 'Enter name, username or email';

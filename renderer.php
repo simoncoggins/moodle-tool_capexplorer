@@ -431,19 +431,6 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
-        $contextcaps = $context->get_capabilities();
-        // See if capability being checked is one of them.
-        $result = array_filter($contextcaps,
-            function($contextcap) use ($capability) {
-                return ($contextcap->name == $capability);
-            }
-        );
-        if (empty($result)) {
-            $a = new stdClass();
-            $a->capability = $capability;
-            $html .= $this->output->container(get_string('capabilitycontextmismatch', 'tool_capexplorer', $a), 'notifyproblem');
-        }
-
         return $html;
     }
 
