@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2013100100;
-$plugin->requires  = 2010112400; // Moodle 2.0.
+$plugin->requires  = 2014051200; // Moodle 2.7.
 $plugin->cron      = 0;
 $plugin->component = 'tool_capexplorer';
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->maturity  = MATURITY_STABLE;
