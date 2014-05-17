@@ -1,6 +1,5 @@
 
 - Re-test everything on stable 2.7
-- Change @copyright to @author
 - Run unit tests
 - Fix expand arrows in menu.
 - Check lang strings are all used/none missing.

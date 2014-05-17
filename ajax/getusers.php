@@ -18,7 +18,7 @@
  * Return a list of users, filtered by search criteria.
  *
  * @package     tool_capexplorer
- * @copyright   Simon Coggins
+ * @author      Simon Coggins
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,7 +18,7 @@
  * Capability Explorer
  *
  * @package   tool_capexplorer
- * @copyright Simon Coggins
+ * @author    Simon Coggins
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
