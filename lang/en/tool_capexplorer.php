@@ -22,17 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['assigned'] = 'Assigned';
-$string['assignoverridelinks'] = '<a href="{$a->assignurl}">Assign</a> | <a href="{$a->overrideurl}">Override</a>';
 $string['autoassign'] = 'Automatically assigned';
 $string['autoassignment'] = 'Automatic assignment';
 $string['autoassignment_help'] = 'Some roles can be automatically assigned to users in the system context. The roles can be set from Site Administration > Users > Permissions > User Policies';
-$string['blockcontext'] = 'Block context';
 $string['capability'] = 'Capability';
 $string['capability_help'] = '<p>Select a capability to check.</p><p>This field uses autocomplete so start typing the name of a capability then select from the options that appear.</p>';
 $string['capabilityplaceholder'] = 'Enter a capability';
 $string['capdenied'] = 'False (Denied)';
-$string['capexplorer:view'] = 'View Capability Explorer';
+$string['capexplorer:view'] = 'View capability explorer';
 $string['capexplorerresult'] = 'Overall result';
 $string['capexplorersummary'] = '<p>Capability Explorer is a tool to help explain how Moodle\'s capability system works. Submit the form below to get an explanation of how the capability check is calculated.</p>';
 $string['capgranted'] = 'True (Granted)';
@@ -59,8 +56,6 @@ $string['contextaggrrules_help'] = '<p>To determine the role total for a particu
 </ol>';
 $string['contextinfo'] = '{$a->contextstring} ({$a->contextlevel} context)';
 $string['contextlevel'] = 'Context level';
-$string['coursecatcontext'] = 'Course category context';
-$string['coursecontext'] = 'Course context';
 $string['error:invalidcapability'] = 'There is no capability called "{$a}"';
 $string['error:invalidcontext'] = 'You must select a context instance';
 $string['error:invalidusername'] = 'There is no user with a username of "{$a}"';
@@ -68,14 +63,10 @@ $string['error:missingcapability'] = 'You must enter a capability';
 $string['error:missingusername'] = 'You must enter a username';
 $string['exploreanother'] = '&laquo; Explore another capability';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
-$string['frontpagecourse'] = 'Front Page Course';
 $string['instancename'] = 'Instance Name';
-$string['instances'] = 'Instance';
 $string['manualassign'] = 'Manually assigned';
 $string['manualassignment'] = 'Manual assignment';
 $string['manualassignment_help'] = 'Roles assigned directly to a specific user, for example via \'Assign system roles\', or via course enrolments.';
-$string['modulecontext'] = 'Module (Activity) context';
-$string['nocatfrontpage'] = 'No category (Front page course)';
 $string['none'] = 'None';
 $string['nopermtoassign'] = 'No permission';
 $string['nopermtoassign_help'] = '<p>Not all users have permission to assign roles to other users. The ability to assign roles is dependent on your own roles and can be controlled here:</p><p><em>Site admin &gt; Users &gt; Permissions &gt; Define roles &gt; Allow role assignments</em></p><p>In addition the user must have the capability "moodle/role:assign" in the context where the role assignment is taking place.</p><p>Site administrators can assign all roles.</p>';
@@ -101,7 +92,7 @@ $string['permissionnotset'] = 'Not set';
 $string['permissionprevent'] = 'Prevent';
 $string['permissionprohibit'] = 'Prohibit';
 $string['permissionunknown'] = 'Unknown';
-$string['pluginname'] = 'Capability Explorer';
+$string['pluginname'] = 'Capability explorer';
 $string['result'] = 'Result';
 $string['resultdiffersfromaccesslib'] = '<p>The result calculated by this tool does not match the result from core code!</p><p>You could try <a href="{$a->cacheurl}">clearing your cache</a> but if that doesn\'t help this is probably a bug in Capability Explorer. Please <a href="{$a->bugurl}">let us know about it</a> and if you can include a screenshot of this page to help us track down the problem.</p>';
 $string['role'] = 'Role';
@@ -118,7 +109,6 @@ $string['rolepermissionsandoverridesforcapx'] = '<p>All role permissions and ove
 $string['rolepermissionsummary'] = '<p>For each assigned role, list the permission from the role definition for the system context. Also list any role overrides in any of the parent contexts.</p>';
 $string['roletotal'] = 'Role total';
 $string['roletotals'] = 'Role totals';
-$string['set'] = 'Set';
 $string['step1'] = 'Step 1: Parent contexts';
 $string['step2'] = 'Step 2: Role assignments';
 $string['step3'] = 'Step 3: Role permissions and overrides';
@@ -131,7 +121,5 @@ $string['userisadmin'] = '<p>Note: "{$a->user}" is a <a href="{$a->url}">site ad
 $string['username'] = 'Username';
 $string['username_help'] = '<p>Select a user to check.</p><p>This field uses autocomplete so start typing a username, email address or user\'s name and select from the options that appear.</p>';
 $string['usernameplaceholder'] = 'Enter name, username or email';
-$string['viaassignment'] = 'Via <a href="{$a}">role assignment</a>';
-$string['viaoverride'] = 'Via <a href="{$a}">role override</a>';
 $string['xfrontpage'] = '{$a} (Front page)';
 
