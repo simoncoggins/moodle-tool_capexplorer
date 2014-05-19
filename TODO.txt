@@ -2,9 +2,7 @@
 - Re-test everything on stable 2.7
 - Run unit tests
 - Fix expand arrows in menu.
-- Fix first commit.
 - Ensure valid: http://docs.moodle.org/dev/Guidelines_for_contributed_code and http://docs.moodle.org/dev/Plugin_validation
-- Push to github
 - Submit: https://moodle.org/plugins/registerplugin.php
 
 - Add behat tests?
