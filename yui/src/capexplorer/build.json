@@ -1,0 +1,11 @@
+{
+    "name": "moodle-tool_capexplorer-capexplorer",
+    "builds": {
+        "moodle-tool_capexplorer-capexplorer": {
+            "jsfiles": [
+                "tool_capexplorer.js"
+                ]
+        }
+    }
+}
+

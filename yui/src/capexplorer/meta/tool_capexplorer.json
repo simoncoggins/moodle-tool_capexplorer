@@ -1,0 +1,13 @@
+{
+    "moodle-tool_capexplorer-capexplorer": {
+        "requires": [
+            "json",
+            "autocomplete",
+            "autocomplete-filters",
+            "autocomplete-highlighters",
+            "gallery-sm-treeview",
+            "tree-lazy"
+        ]
+    }
+}
+

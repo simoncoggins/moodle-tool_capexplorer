@@ -62,23 +62,13 @@ if ($data = $mform->get_data()) {
     // No data yet, just display the form.
 
     // Load JS for autocomplete and context tree.
-    $jsmodule = array(
-        'name' => 'tool_capexplorer',
-        'fullpath' => "/{$CFG->admin}/tool/capexplorer/module.js",
-        'requires' => array(
-            'json', 'autocomplete', 'autocomplete-filters',
-            'autocomplete-highlighters', 'gallery-sm-treeview', 'tree-lazy'
-        )
-    );
-
     $args = array(
         'admin' => $CFG->admin,
         'capabilities' => $DB->get_fieldset_select('capabilities', 'name', ''),
         'initialtree' => $initialtree,
         'contextids' => $contextids
     );
-
-    $PAGE->requires->js_init_call('M.tool_capexplorer.init', array($args), false, $jsmodule);
+    $PAGE->requires->yui_module('moodle-tool_capexplorer-capexplorer', 'M.tool_capexplorer.capexplorer.init', array($args));
 
     echo $OUTPUT->heading(get_string('pluginname', 'tool_capexplorer'));
     echo $OUTPUT->container(get_string('capexplorersummary', 'tool_capexplorer'));
