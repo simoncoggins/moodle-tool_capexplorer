@@ -25,10 +25,10 @@
 M.tool_capexplorer = M.tool_capexplorer || {};
 
 M.tool_capexplorer.capexplorer = {
-        /**
-         * Initialize JS support for the form on index.php
-         */
-        init: function(args) {
+    /**
+     * Initialize JS support for the form on index.php
+     */
+    init: function(args) {
         var parsedResponse, nodeType;
 
         // Initialise autocomplete on username and capability fields.
