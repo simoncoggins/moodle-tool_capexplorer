@@ -64,6 +64,7 @@ $string['error:missingcapability'] = 'You must enter a capability';
 $string['error:missingusername'] = 'You must enter a username';
 $string['exploreanother'] = '&laquo; Explore another capability';
 $string['finalresultsummary'] = '<p>Finally, combine the role totals using the role aggregation rules{$a} to get the overall result.</p>';
+$string['guestaccessblocked'] = '<p>Note: As an additional safety measure Moodle prevents unprivileged users from being granted "risky" capabilities. "{$a->capability}" is deemed risky because it could be used to edit or remove data, modify site configuration, or add potentially malicious scripts into site pages. The results below show how their access would be calculated if the capability wasn\'t considered risky.</p>';
 $string['instancename'] = 'Instance Name';
 $string['manualassign'] = 'Manually assigned';
 $string['manualassignment'] = 'Manual assignment';

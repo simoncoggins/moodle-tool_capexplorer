@@ -415,7 +415,9 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $context) {
         $html = '';
 
-        if ($overallresult != $result) {
+        $guestaccessblocked = tool_capexplorer_is_guest_access_blocked($capability, $user->id);
+
+        if (!$guestaccessblocked && $overallresult != $result) {
             $cacheurl = new moodle_url('/admin/purgecaches.php');
             $a = new stdClass();
             $a->cacheurl = $cacheurl->out();
@@ -429,6 +431,13 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $a->url = $url->out();
             $a->user = fullname($user);
             $html .= $this->output->container(get_string('userisadmin', 'tool_capexplorer', $a), 'notifyproblem');
+        }
+
+        if ($guestaccessblocked) {
+            $a = new stdClass();
+            $a->capability = $capability;
+            $a->user = fullname($user);
+            $html .= $this->output->container(get_string('guestaccessblocked', 'tool_capexplorer', $a), 'notifyproblem');
         }
 
         return $html;

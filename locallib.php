@@ -418,4 +418,27 @@ function tool_capexplorer_has_capability($capability, $context, $userid) {
     return $overallresult;
 }
 
+/**
+ * Test to see if has_capability() will short-circuit the normal process
+ * and deny access to the user. This function returns true if that will occur
+ * for this combination of user/capability, false otherwise.
+ *
+ * This will occur if the user is guest/not logged in AND the capability
+ * is "risky". "Risky" means a 'write' capability or one with a risk of XSS,
+ * dataloss or site config.
+ *
+ * @param string $capability The capability being checked.
+ * @param int $userid The ID of the user being checked.
+ *
+ * @return bool True if the user is guest and the capability is "risky".
+ */
+function tool_capexplorer_is_guest_access_blocked($capability, $userid) {
+    $capinfo = get_capability_info($capability);
+    if (($capinfo->captype === 'write') or ($capinfo->riskbitmask & (RISK_XSS | RISK_CONFIG | RISK_DATALOSS))) {
+        if (isguestuser($userid) or $userid == 0) {
+            return true;
+        }
+    }
+    return false;
+}
 

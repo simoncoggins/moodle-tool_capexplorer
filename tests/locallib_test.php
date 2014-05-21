@@ -559,7 +559,28 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         $this->assertTrue(tool_capexplorer_has_capability($capability,
             $blockcontext, $user->id));
         role_unassign($roles['prevent']['allow'], $user->id, $blockcontext->id);
-
     }
 
+    public function test_tool_capexplorer_is_guest_access_blocked() {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $writecapability = 'moodle/site:config';
+        $readcapability = 'moodle/course:view';
+        $riskcapability = 'report/security:view';
+        // Real user shouldn't be overridden for any capability type.
+        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+            $writecapability, $user->id));
+        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+            $readcapability, $user->id));
+        // Guest user shouldn't be overridden for read capability.
+        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+            $readcapability, 1));
+        // Guest user should be overridden for write capability.
+        $this->assertTrue(tool_capexplorer_is_guest_access_blocked(
+            $writecapability, 1));
+        // Guest user should be overridden for a read capability that
+        // has config risk.
+        $this->assertTrue(tool_capexplorer_is_guest_access_blocked(
+            $riskcapability, 1));
+    }
 }
