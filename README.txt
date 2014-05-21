@@ -2,15 +2,15 @@ Capability Explorer
 ===================
 
 Capability Explorer is a tool to help explain how Moodle's capability system
-works. The user selects a user, capability and context and they receive an
+works. Select a user, capability and context and you'll get a detailed
 explanation of how that capability check is calculated by the system.
 
 Minimum requirements
 ====================
 
 Currently, due to the YUI treeview dependency, this plugin requires
-Moodle 2.7+. It should be possible to backport to any 2.x version by manually
-including the treeview library.
+Moodle 2.7+. It should be possible to backport to any 2.x version by including
+the treeview library in the module.
 
 Installation
 ============
@@ -22,6 +22,10 @@ install.
 You can then access the tool via:
 
 Site Administration > Users > Permissions > Capability Explorer
+
+For full documentation and screenshots, see:
+
+http://docs.moodle.org/27/en/Capability_explorer
 
 Bug reports
 ===========
