@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['assigned'] = 'Assigned';
 $string['autoassign'] = 'Automatically assigned';
 $string['autoassignment'] = 'Automatic assignment';
 $string['autoassignment_help'] = 'Some roles can be automatically assigned to users in the system context. The roles can be set from Site Administration > Users > Permissions > User Policies';
