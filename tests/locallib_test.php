@@ -348,7 +348,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course(array('category' => $subcat->id));
         $coursecontext = context_course::instance($course->id);
         $module = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
-        $modulecontext = context_module::instance($module->id);
+        $modulecontext = context_module::instance($module->cmid);
         $block = $this->getDataGenerator()->create_block('online_users', array('parentcontextid' => $coursecontext->id));
         $blockcontext = context_block::instance($block->id);
         $frontpagecoursecontext = context_course::instance(SITEID);
