@@ -12,6 +12,8 @@ Currently, due to the YUI treeview dependency, this plugin requires
 Moodle 2.7+. It should be possible to backport to any 2.x version by including
 the treeview library in the module.
 
+Note: This plugin does not current support sites that use MNet.
+
 Installation
 ============
 
