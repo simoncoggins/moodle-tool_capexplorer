@@ -29,4 +29,4 @@ $plugin->requires  = 2014051200; // Moodle 2.7.
 $plugin->cron      = 0;
 $plugin->component = 'tool_capexplorer';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0';
+$plugin->release   = 'v1.0.0';
