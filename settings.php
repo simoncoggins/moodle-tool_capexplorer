@@ -29,7 +29,7 @@ if ($hassiteconfig or has_capability('tool/capexplorer:view', context_system::in
     $ADMIN->add('roles', new admin_externalpage(
         'toolcapexplorer',
         get_string('pluginname', 'tool_capexplorer'),
-        "/{$CFG->admin}/tool/capexplorer/index.php",
+        "{$CFG->wwwroot}/{$CFG->admin}/tool/capexplorer/index.php",
         'tool/capexplorer:view'
     ));
 }
