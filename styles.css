@@ -1,47 +1,49 @@
 
-.perm-allow, .roleassigned {
+.path-tool-admin-capexplorer .perm-allow,
+.path-tool-admin-capexplorer .roleassigned {
     color: green;
 }
 
-.perm-prevent {
+.path-tool-admin-capexplorer .perm-prevent {
     color: red;
 }
 
-.perm-prohibit {
+.path-tool-admin-capexplorer .perm-prohibit {
     color: red;
     font-weight: bold;
 }
 
-.perm-notset {
+.path-tool-admin-capexplorer .perm-notset {
     color: gray;
 }
 
-.capgranted {
+.path-tool-admin-capexplorer .capgranted {
     color: green;
     font-weight: bold;
 }
 
-.capdenied {
+..path-tool-admin-capexplorer capdenied {
     color: red;
     font-weight: bold;
 }
 
-.option-disabled {
+.path-tool-admin-capexplorer .option-disabled {
     color: grey;
 }
 
 /* Increase width of autocomplete form fields slightly */
-#id_username, #id_capability {
+.path-tool-admin-capexplorer #id_username,
+.path-tool-admin-capexplorer #id_capability {
     width: 400px;
+}
+
+.path-tool-admin-capexplorer #tree-loading-message {
+    color: grey;
 }
 
 /* Set colour of autocomplete items so they don't go red if element validation failed. */
 .yui3-aclist-item {
     color: black;
-}
-
-#tree-loading-message {
-    color: grey;
 }
 
 /* Remove YUI icon and padding */
