@@ -1,0 +1,16 @@
+Changelog
+=========
+
+v1.0.1
+------
+
+* Made CSS selectors specific to plugin
+* Provided full site path for admin page URL
+* Change format for plugin release string
+* Fixed bug in unit test
+
+v1.0.0
+------
+
+Initial release of Capability explorer.
+
