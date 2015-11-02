@@ -22,7 +22,7 @@
     font-weight: bold;
 }
 
-..path-tool-admin-capexplorer capdenied {
+.path-tool-admin-capexplorer .capdenied {
     color: red;
     font-weight: bold;
 }
