@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.0.2
+------
+
+* Fixed bug with CSS selectors causing missing colours in results
+* Tested for release on Moodle 2.9
+* Tested for release on Moodle 3.0
+
 v1.0.1
 ------
 
