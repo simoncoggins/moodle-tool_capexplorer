@@ -1,43 +1,43 @@
 
-.path-tool-admin-capexplorer .perm-allow,
-.path-tool-admin-capexplorer .roleassigned {
+.path-admin-tool-capexplorer .perm-allow,
+.path-admin-tool-capexplorer .roleassigned {
     color: green;
 }
 
-.path-tool-admin-capexplorer .perm-prevent {
+.path-admin-tool-capexplorer .perm-prevent {
     color: red;
 }
 
-.path-tool-admin-capexplorer .perm-prohibit {
+.path-admin-tool-capexplorer .perm-prohibit {
     color: red;
     font-weight: bold;
 }
 
-.path-tool-admin-capexplorer .perm-notset {
+.path-admin-tool-capexplorer .perm-notset {
     color: gray;
 }
 
-.path-tool-admin-capexplorer .capgranted {
+.path-admin-tool-capexplorer .capgranted {
     color: green;
     font-weight: bold;
 }
 
-.path-tool-admin-capexplorer .capdenied {
+.path-admin-tool-capexplorer .capdenied {
     color: red;
     font-weight: bold;
 }
 
-.path-tool-admin-capexplorer .option-disabled {
+.path-admin-tool-capexplorer .option-disabled {
     color: grey;
 }
 
 /* Increase width of autocomplete form fields slightly */
-.path-tool-admin-capexplorer #id_username,
-.path-tool-admin-capexplorer #id_capability {
+.path-admin-tool-capexplorer #id_username,
+.path-admin-tool-capexplorer #id_capability {
     width: 400px;
 }
 
-.path-tool-admin-capexplorer #tree-loading-message {
+.path-admin-tool-capexplorer #tree-loading-message {
     color: grey;
 }
 
