@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
 
+/**
+ * Unit tests for capexplorer.
+ *
+ * @group tool_capexplorer
+ */
 class tool_capexplorer_locallib_testcase extends advanced_testcase {
 
     public function test_get_context_info() {

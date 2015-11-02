@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/capexplorer/treelib.php');
 
+/**
+ * Unit tests for capexplorer treeview.
+ *
+ * @group tool_capexplorer
+ */
 class tool_capexplorer_treelib_testcase extends advanced_testcase {
 
     /**
