@@ -27,7 +27,7 @@ Site Administration > Users > Permissions > Capability Explorer
 
 For full documentation and screenshots, see:
 
-http://docs.moodle.org/27/en/Capability_explorer
+http://docs.moodle.org/en/Capability_explorer
 
 Bug reports
 ===========
