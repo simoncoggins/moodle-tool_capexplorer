@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.3
+------
+
+* New release to bump plugin version number to trigger automatic updates
+
 v1.0.2
 ------
 
