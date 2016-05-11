@@ -55,7 +55,7 @@ M.tool_capexplorer.capexplorer = {
                 }
                 nodeType = node.data.nodeType,
                     instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0,
-                    requestdata = {instanceid : instanceId, nodetype: nodeType};
+                    requestdata = {instanceid : instanceId, nodetype: nodeType, sesskey: M.cfg.sesskey};
 
                 Y.io(M.cfg.wwwroot + '/' + args.admin +
                     '/tool/capexplorer/ajax/getchildnodes.php', {
@@ -160,7 +160,7 @@ M.tool_capexplorer.capexplorer = {
 
         usernameInput.plug(Y.Plugin.AutoComplete, {
             source: M.cfg.wwwroot + '/' + args.admin +
-                '/tool/capexplorer/ajax/getusers.php?search={query}',
+                '/tool/capexplorer/ajax/getusers.php?search={query}&sesskey='+M.cfg.sesskey,
             resultTextLocator: 'username',
             resultFilters: function (query, results) {
                 query = query.toLowerCase();

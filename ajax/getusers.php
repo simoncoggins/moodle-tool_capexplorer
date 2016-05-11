@@ -28,11 +28,13 @@ require(dirname(__FILE__) . '/../../../../config.php');
 
 $search = required_param('search', PARAM_TEXT);
 
-require_login();
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_url('/admin/tool/capexplorer/ajax/getusers.php');
 
-if (!has_capability('tool/capexplorer:view', context_system::instance())) {
-    print_error('nopermissiontoshow', 'error');
-}
+require_login();
+require_sesskey();
+
+require_capability('tool/capexplorer:view', context_system::instance());
 
 $sqlfullname = $DB->sql_fullname('u.firstname', 'u.lastname');
 $autocompletefields = $DB->sql_concat_join("', '", array($sqlfullname, 'u.username', 'u.email'));

@@ -30,7 +30,7 @@ M.tool_capexplorer.capexplorer = {
     /**
      * Initialize JS support for the form on index.php
      */
-        init: function(args) {
+    init: function(args) {
         var parsedResponse, nodeType;
 
         // Initialise autocomplete on username and capability fields.
@@ -57,7 +57,7 @@ M.tool_capexplorer.capexplorer = {
                 }
                 nodeType = node.data.nodeType,
                     instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0,
-                    requestdata = {instanceid : instanceId, nodetype: nodeType};
+                    requestdata = {instanceid : instanceId, nodetype: nodeType, sesskey: M.cfg.sesskey};
 
                 Y.io(M.cfg.wwwroot + '/' + args.admin +
                     '/tool/capexplorer/ajax/getchildnodes.php', {
@@ -162,7 +162,7 @@ M.tool_capexplorer.capexplorer = {
 
         usernameInput.plug(Y.Plugin.AutoComplete, {
             source: M.cfg.wwwroot + '/' + args.admin +
-                '/tool/capexplorer/ajax/getusers.php?search={query}',
+                '/tool/capexplorer/ajax/getusers.php?search={query}&sesskey='+M.cfg.sesskey,
             resultTextLocator: 'username',
             resultFilters: function (query, results) {
                 query = query.toLowerCase();

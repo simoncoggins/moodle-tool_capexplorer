@@ -32,11 +32,13 @@ require(dirname(__FILE__) . '/../../../../config.php');
 $nodetype = required_param('nodetype', PARAM_ALPHA);
 $instanceid   = optional_param('instanceid', 0, PARAM_INT);
 
-require_login();
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_url('/admin/tool/capexplorer/ajax/getchildnodes.php');
 
-if (!has_capability('tool/capexplorer:view', \context_system::instance())) {
-    print_error('nopermissiontoshow', 'error');
-}
+require_login();
+require_sesskey();
+
+require_capability('tool/capexplorer:view', \context_system::instance());
 
 $OUTPUT->header();
 echo json_encode(tree::get_child_nodes($nodetype, $instanceid));
