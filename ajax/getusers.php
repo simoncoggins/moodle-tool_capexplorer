@@ -25,7 +25,6 @@
 define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
 
 $search = required_param('search', PARAM_TEXT);
 

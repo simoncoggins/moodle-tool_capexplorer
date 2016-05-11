@@ -75,10 +75,10 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
     public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true, $includechangelinks = true) {
         $roleids = array_keys($roles);
         $contextids = array_map(function($context) {return $context->id;}, $contexts);
-        $overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
+        $overridedata = \tool_capexplorer\capexplorer::get_role_override_info($contextids, $roleids, $capability);
 
         if ($includetotals) {
-            $roletotals = tool_capexplorer_merge_permissions_across_contexts(
+            $roletotals = \tool_capexplorer\capexplorer::merge_permissions_across_contexts(
                 $contextids,
                 $roleids,
                 $overridedata
@@ -107,7 +107,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         foreach ($contexts as $context) {
             $contextid = $context->id;
             $issystemcontext = ($contextid == $systemcontextid);
-            $contextinfo = tool_capexplorer_get_context_info($context);
+            $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
             $instance = isset($contextinfo->url) ?
                 html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
@@ -186,8 +186,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      *
      * @param array $contexts An array of context objects.
      * @param array $roles An array of role objects.
-     * @param array $manualassignments 2D array as output by {@link tool_capexplorer_get_role_assignment_info()}
-     * @param array $autoassignments 2D array as output by {@link tool_capexplorer_get_auto_role_assignment_info()}
+     * @param array $manualassignments 2D array as output by {@link \tool_capexplorer\capexplorer::get_role_assignment_info()}
+     * @param array $autoassignments 2D array as output by {@link \tool_capexplorer\capexplorer::get_auto_role_assignment_info()}
      *
      * @return string HTML to display the table.
      */
@@ -211,8 +211,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $assignrow = array('', '');
 
         foreach ($roles as $role) {
-            $autoassigned = tool_capexplorer_role_is_auto_assigned($role->id);
-            $manualassigned = tool_capexplorer_role_is_manually_assigned($role->id, $manualassignments);
+            $autoassigned = \tool_capexplorer\capexplorer::role_is_auto_assigned($role->id);
+            $manualassigned = \tool_capexplorer\capexplorer::role_is_manually_assigned($role->id, $manualassignments);
 
             $rolecell = new html_table_cell();
             $rolecell->text = role_get_name($role);
@@ -242,15 +242,15 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
         foreach ($contexts as $context) {
             $contextid = $context->id;
-            $contextinfo = tool_capexplorer_get_context_info($context);
+            $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
             $assignableroles = get_assignable_roles($context);
             $instance = isset($contextinfo->url) ?
                 html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
             foreach ($roles as $role) {
                 $roleid = $role->id;
-                $autoassigned = tool_capexplorer_role_is_auto_assigned($roleid);
-                $manualassigned = tool_capexplorer_role_is_manually_assigned($roleid, $manualassignments);
+                $autoassigned = \tool_capexplorer\capexplorer::role_is_auto_assigned($roleid);
+                $manualassigned = \tool_capexplorer\capexplorer::role_is_manually_assigned($roleid, $manualassignments);
 
                 if ($manualassigned) {
                     $cell = new html_table_cell();
@@ -415,7 +415,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $context) {
         $html = '';
 
-        $guestaccessblocked = tool_capexplorer_is_guest_access_blocked($capability, $user->id);
+        $guestaccessblocked = \tool_capexplorer\capexplorer::is_guest_access_blocked($capability, $user->id);
 
         if (!$guestaccessblocked && $overallresult != $result) {
             $cacheurl = new moodle_url('/admin/purgecaches.php');
@@ -449,7 +449,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             return get_string('systemcontext', 'tool_capexplorer');
         }
 
-        $contextinfo = tool_capexplorer_get_context_info($context);
+        $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
 
         $a = new stdClass();
         $a->contextstring = isset($contextinfo->url) ?

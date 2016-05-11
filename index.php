@@ -24,7 +24,6 @@ namespace tool_capexplorer;
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
-require_once('locallib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
 $PAGE->set_context(\context_system::instance());
@@ -81,24 +80,24 @@ if ($data = $mform->get_data()) {
 
 $result = has_capability($capability, $context, $userid, false);
 $user = $DB->get_record('user', array('id' => $userid));
-$parentcontextinfo = tool_capexplorer_get_parent_context_info($context);
+$parentcontextinfo = capexplorer::get_parent_context_info($context);
 
 $parentcontexts = $context->get_parent_contexts(true);
 $contexts = array_reverse($parentcontexts);
 
-$manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $userid);
-$autoassignments = tool_capexplorer_get_auto_role_assignment_info($userid);
-$assignedroles = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
+$manualassignments = capexplorer::get_role_assignment_info($contexts, $userid);
+$autoassignments = capexplorer::get_auto_role_assignment_info($userid);
+$assignedroles = capexplorer::get_assigned_roles($manualassignments, $autoassignments);
 
 $roleids = array_keys($assignedroles);
 $contextids = array_map(function($context) {return $context->id;}, $contexts);
-$overridedata = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
-$roletotals = tool_capexplorer_merge_permissions_across_contexts(
+$overridedata = capexplorer::get_role_override_info($contextids, $roleids, $capability);
+$roletotals = capexplorer::merge_permissions_across_contexts(
     $contextids,
     $roleids,
     $overridedata
 );
-$overallresult = tool_capexplorer_merge_permissions_across_roles($roletotals);
+$overallresult = capexplorer::merge_permissions_across_roles($roletotals);
 
 $output = $PAGE->get_renderer('tool_capexplorer');
 

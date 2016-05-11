@@ -232,7 +232,7 @@ class tree {
             $parentcontext = \context_course::instance($parentinstanceid);
             break;
         default:
-            throw new Exception("Invalid nodetype '{$parentnodetype}' passed to \\tool_capexplorer\\tree\\get_block_nodes().");
+            throw new \Exception("Invalid nodetype '{$parentnodetype}' passed to \\tool_capexplorer\\tree\\get_block_nodes().");
         }
 
         $sql = "SELECT bi.id, c.id AS contextid, bi.blockname AS name

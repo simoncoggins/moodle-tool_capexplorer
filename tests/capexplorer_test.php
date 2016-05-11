@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Automated unit testing of locallib.php functions.
+ * Automated unit testing of \capexplorer\capexplorer functions.
  *
  * @package     tool_capexplorer
  * @author      Simon Coggins
@@ -25,18 +25,17 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/admin/tool/capexplorer/locallib.php');
 
 /**
  * Unit tests for capexplorer.
  *
  * @group tool_capexplorer
  */
-class tool_capexplorer_locallib_testcase extends advanced_testcase {
+class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
 
     public function test_get_context_info() {
         $systemcontext = context_system::instance();
-        $result = tool_capexplorer_get_context_info($systemcontext);
+        $result = \tool_capexplorer\capexplorer::get_context_info($systemcontext);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertObjectHasAttribute('contextlevel', $result);
         $this->assertObjectHasAttribute('instance', $result);
@@ -46,11 +45,11 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $usercontext = context_user::instance($user->id);
-        $usercontextinfo = tool_capexplorer_get_context_info($usercontext);
+        $usercontextinfo = \tool_capexplorer\capexplorer::get_context_info($usercontext);
         $systemcontext = context_system::instance();
-        $systemcontextinfo = tool_capexplorer_get_context_info($systemcontext);
+        $systemcontextinfo = \tool_capexplorer\capexplorer::get_context_info($systemcontext);
 
-        $parentinfo = tool_capexplorer_get_parent_context_info($usercontext);
+        $parentinfo = \tool_capexplorer\capexplorer::get_parent_context_info($usercontext);
         // Should contain system and user context info.
         $this->assertCount(2, $parentinfo);
         // The first item should be the system context info.
@@ -90,7 +89,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         $this->getDataGenerator()->role_assign($role4, $user->id, $coursecontext->id);
         $this->getDataGenerator()->role_assign($role5, $user->id, $coursecontext->id);
 
-        $result = tool_capexplorer_get_role_assignment_info($contexts, $user->id);
+        $result = \tool_capexplorer\capexplorer::get_role_assignment_info($contexts, $user->id);
 
         $expectedresult = array(
             $systemcontext->id => array(
@@ -125,7 +124,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         set_config('defaultuserroleid', $role1);
         set_config('guestroleid', $role2);
 
-        $result = tool_capexplorer_get_auto_role_assignment_info($user->id);
+        $result = \tool_capexplorer\capexplorer::get_auto_role_assignment_info($user->id);
 
         $expectedresult = array(
             $systemcontext->id => array(
@@ -136,7 +135,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
 
         $this->setGuestUser();
 
-        $result = tool_capexplorer_get_auto_role_assignment_info($USER->id);
+        $result = \tool_capexplorer\capexplorer::get_auto_role_assignment_info($USER->id);
 
         $expectedresult = array(
             $systemcontext->id => array(
@@ -156,9 +155,9 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         set_config('defaultuserroleid', $role1);
         set_config('guestroleid', $role2);
 
-        $this->assertTrue(tool_capexplorer_role_is_auto_assigned($role1));
-        $this->assertTrue(tool_capexplorer_role_is_auto_assigned($role2));
-        $this->assertFalse(tool_capexplorer_role_is_auto_assigned($role3));
+        $this->assertTrue(\tool_capexplorer\capexplorer::role_is_auto_assigned($role1));
+        $this->assertTrue(\tool_capexplorer\capexplorer::role_is_auto_assigned($role2));
+        $this->assertFalse(\tool_capexplorer\capexplorer::role_is_auto_assigned($role3));
     }
 
     public function test_get_assigned_roles() {
@@ -190,15 +189,15 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         $this->getDataGenerator()->role_assign($role2, $user->id, $coursecontext->id);
         $this->getDataGenerator()->role_assign($role3, $user->id, $coursecontext->id);
 
-        $manualassignments = tool_capexplorer_get_role_assignment_info($contexts, $user->id);
+        $manualassignments = \tool_capexplorer\capexplorer::get_role_assignment_info($contexts, $user->id);
 
         // Set a default role.
         $defaultrole = create_role('Default Role', 'defaultrole', 'Default Role description');
         set_config('defaultuserroleid', $defaultrole);
 
-        $autoassignments = tool_capexplorer_get_auto_role_assignment_info($user->id);
+        $autoassignments = \tool_capexplorer\capexplorer::get_auto_role_assignment_info($user->id);
 
-        $result = tool_capexplorer_get_assigned_roles($manualassignments, $autoassignments);
+        $result = \tool_capexplorer\capexplorer::get_assigned_roles($manualassignments, $autoassignments);
         $assignedroleids = array_keys($result);
 
         // Assigned roles should be in the results.
@@ -254,7 +253,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         assign_capability($capability, CAP_ALLOW, $role2, $coursecontext);
         assign_capability($capability, CAP_PROHIBIT, $role3, $coursecontext);
 
-        $result = tool_capexplorer_get_role_override_info($contextids, $roleids, $capability);
+        $result = \tool_capexplorer\capexplorer::get_role_override_info($contextids, $roleids, $capability);
 
         $expectedresult = array(
             $systemcontext->id => array(
@@ -306,7 +305,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
      */
     public function test_merge_permissions($p1, $p2, $expectedresult) {
         $this->assertEquals($expectedresult,
-            tool_capexplorer_merge_permissions($p1, $p2));
+            \tool_capexplorer\capexplorer::merge_permissions($p1, $p2));
     }
 
     public function permissions_across_roles_data() {
@@ -335,10 +334,10 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
      */
     public function test_merge_permissions_across_roles($roletotals, $expectedresult) {
         $this->assertEquals($expectedresult,
-            tool_capexplorer_merge_permissions_across_roles($roletotals));
+            \tool_capexplorer\capexplorer::merge_permissions_across_roles($roletotals));
     }
 
-    public function test_tool_capexplorer_has_capability() {
+    public function test_capexplorer_has_capability() {
         global $DB;
         $this->resetAfterTest();
 
@@ -394,7 +393,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
         set_config('defaultuserroleid', null);
 
         // With no roles assigned, should not have permission.
-        $this->assertFalse(tool_capexplorer_has_capability($capability, $systemcontext, $user->id));
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability, $systemcontext, $user->id));
 
         // Now test assigning a single role at a time with different permissions and overrides.
         // First check capability in block context (below override).
@@ -442,7 +441,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
                     $user->id,
                     $systemcontext->id);
                 $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
-                    tool_capexplorer_has_capability($capability, $blockcontext, $user->id),
+                    \tool_capexplorer\capexplorer::has_capability($capability, $blockcontext, $user->id),
                     "Capability check failed with system permission '{$systempermstr}' and " .
                     "course override '{$overridepermstr}' in block context");
                 role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
@@ -466,7 +465,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
                 $user->id,
                 $systemcontext->id);
             $this->assertEquals($expectedresults[$systempermstr][$overridepermstr],
-                tool_capexplorer_has_capability($capability, $categorycontext, $user->id),
+                \tool_capexplorer\capexplorer::has_capability($capability, $categorycontext, $user->id),
                 "Capability check failed with system permission '{$systempermstr}' and " .
                 "course override '{$overridepermstr}' in category context");
             role_unassign($roles[$systempermstr][$overridepermstr], $user->id, $systemcontext->id);
@@ -480,7 +479,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $user->id,
             $coursecontext->id);
         // Check in front page course.
-        $this->assertFalse(tool_capexplorer_has_capability($capability,
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability,
             $frontpagecoursecontext, $user->id));
         role_unassign($roles['allow']['notset'], $user->id, $coursecontext->id);
 
@@ -494,28 +493,28 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $systemcontext->id);
 
         // Should have access.
-        $this->assertTrue(tool_capexplorer_has_capability($capability,
+        $this->assertTrue(\tool_capexplorer\capexplorer::has_capability($capability,
             $systemcontext, $user->id));
 
         // Prohibit via default role.
         set_config('defaultuserroleid', $roles['prohibit']['notset']);
 
         // Shouldn't have access once default role added.
-        $this->assertFalse(tool_capexplorer_has_capability($capability,
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability,
             $systemcontext, $user->id));
 
         role_unassign($roles['allow']['notset'], $user->id, $systemcontext->id);
 
         // With no roles assigned I shouldn't have access.
         // Shouldn't have access once default role added.
-        $this->assertFalse(tool_capexplorer_has_capability($capability,
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability,
             $blockcontext, $user->id));
 
         // Allow via default role.
         set_config('defaultuserroleid', $roles['allow']['notset']);
 
         // We should now have access.
-        $this->assertTrue(tool_capexplorer_has_capability($capability,
+        $this->assertTrue(\tool_capexplorer\capexplorer::has_capability($capability,
             $blockcontext, $user->id));
 
         set_config('defaultuserroleid', null);
@@ -527,7 +526,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $user->id,
             $systemcontext->id);
         // Shouldn't have access.
-        $this->assertFalse(tool_capexplorer_has_capability($capability,
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability,
             $modulecontext, $user->id));
         // Second role defined as prevent but with an allow override.
         // Assigned at course level.
@@ -536,7 +535,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $user->id,
             $coursecontext->id);
         // Should have overridden other role due to allow.
-        $this->assertTrue(tool_capexplorer_has_capability($capability,
+        $this->assertTrue(\tool_capexplorer\capexplorer::has_capability($capability,
             $modulecontext, $user->id));
         // Add a prohibit with attempt to override with allow (should not work).
         $this->getDataGenerator()->role_assign(
@@ -544,7 +543,7 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $user->id,
             $categorycontext->id);
         // Prohibit in any role should always prevent access.
-        $this->assertFalse(tool_capexplorer_has_capability($capability,
+        $this->assertFalse(\tool_capexplorer\capexplorer::has_capability($capability,
             $modulecontext, $user->id));
 
         role_unassign($roles['prevent']['notset'], $user->id, $systemcontext->id);
@@ -561,31 +560,31 @@ class tool_capexplorer_locallib_testcase extends advanced_testcase {
             $roles['prevent']['allow'],
             $user->id,
             $blockcontext->id);
-        $this->assertTrue(tool_capexplorer_has_capability($capability,
+        $this->assertTrue(\tool_capexplorer\capexplorer::has_capability($capability,
             $blockcontext, $user->id));
         role_unassign($roles['prevent']['allow'], $user->id, $blockcontext->id);
     }
 
-    public function test_tool_capexplorer_is_guest_access_blocked() {
+    public function test_capexplorer_is_guest_access_blocked() {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $writecapability = 'moodle/site:config';
         $readcapability = 'moodle/course:view';
         $riskcapability = 'report/security:view';
         // Real user shouldn't be overridden for any capability type.
-        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+        $this->assertFalse(\tool_capexplorer\capexplorer::is_guest_access_blocked(
             $writecapability, $user->id));
-        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+        $this->assertFalse(\tool_capexplorer\capexplorer::is_guest_access_blocked(
             $readcapability, $user->id));
         // Guest user shouldn't be overridden for read capability.
-        $this->assertFalse(tool_capexplorer_is_guest_access_blocked(
+        $this->assertFalse(\tool_capexplorer\capexplorer::is_guest_access_blocked(
             $readcapability, 1));
         // Guest user should be overridden for write capability.
-        $this->assertTrue(tool_capexplorer_is_guest_access_blocked(
+        $this->assertTrue(\tool_capexplorer\capexplorer::is_guest_access_blocked(
             $writecapability, 1));
         // Guest user should be overridden for a read capability that
         // has config risk.
-        $this->assertTrue(tool_capexplorer_is_guest_access_blocked(
+        $this->assertTrue(\tool_capexplorer\capexplorer::is_guest_access_blocked(
             $riskcapability, 1));
     }
 }
