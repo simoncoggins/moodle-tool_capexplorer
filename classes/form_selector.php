@@ -20,11 +20,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_capexplorer;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir.'/formslib.php');
 
-class capexplorer_selector_form extends moodleform {
+class form_selector extends \moodleform {
 
     /**
      * Form definition.

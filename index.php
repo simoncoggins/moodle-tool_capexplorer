@@ -24,7 +24,6 @@ namespace tool_capexplorer;
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
-require_once('form.php');
 require_once('locallib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
@@ -35,7 +34,7 @@ $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 admin_externalpage_setup('toolcapexplorer');
 
 // First create the form.
-$mform = new \capexplorer_selector_form();
+$mform = new form_selector();
 
 // Default tree for first page load.
 $initialtree = tree::get_system_node();
