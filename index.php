@@ -20,34 +20,35 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_capexplorer;
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once('form.php');
 require_once('locallib.php');
-require_once('treelib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('pluginname', 'tool_capexplorer'));
 $PAGE->set_heading(get_string('pluginname', 'tool_capexplorer'));
 
 admin_externalpage_setup('toolcapexplorer');
 
 // First create the form.
-$mform = new capexplorer_selector_form();
+$mform = new \capexplorer_selector_form();
 
 // Default tree for first page load.
-$initialtree = tool_capexplorer_get_system_node();
+$initialtree = tree::get_system_node();
 $contextids = array();
 
 // Re-open selected tree node if data passed to page.
 if ($data = data_submitted()) {
     if (!empty($data->contextid)) {
         $contextid =  clean_param($data->contextid, PARAM_INT);
-        $context = context::instance_by_id($contextid);
+        $context = \context::instance_by_id($contextid);
         $parentcontextids = $context->get_parent_context_ids(true);
         $contextids = array_reverse($parentcontextids);
-        $initialtree = tool_capexplorer_get_selected_subtree($contextids);
+        $initialtree = tree::get_selected_subtree($contextids);
     }
 }
 
@@ -57,7 +58,7 @@ if ($data = $mform->get_data()) {
     // Process data if submitted.
     $userid = $DB->get_field('user', 'id', array('username' => $data->username));
     $capability = $data->capability;
-    $context = context::instance_by_id($data->contextid);
+    $context = \context::instance_by_id($data->contextid);
 } else {
     // No data yet, just display the form.
 

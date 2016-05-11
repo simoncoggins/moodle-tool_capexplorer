@@ -23,22 +23,23 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_capexplorer;
+
 define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/locallib.php");
-require_once($CFG->dirroot . "/{$CFG->admin}/tool/capexplorer/treelib.php");
 
 $nodetype = required_param('nodetype', PARAM_ALPHA);
 $instanceid   = optional_param('instanceid', 0, PARAM_INT);
 
 require_login();
 
-if (!has_capability('tool/capexplorer:view', context_system::instance())) {
+if (!has_capability('tool/capexplorer:view', \context_system::instance())) {
     print_error('nopermissiontoshow', 'error');
 }
 
 $OUTPUT->header();
-echo json_encode(tool_capexplorer_get_child_nodes($nodetype, $instanceid));
+echo json_encode(tree::get_child_nodes($nodetype, $instanceid));
 $OUTPUT->footer();
 

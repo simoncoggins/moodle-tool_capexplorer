@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Automated unit testing of treelib.php functions.
+ * Automated unit testing of classes/tree.php functions.
  *
  * @package     tool_capexplorer
  * @author      Simon Coggins
@@ -25,14 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/admin/tool/capexplorer/treelib.php');
 
 /**
  * Unit tests for capexplorer treeview.
  *
  * @group tool_capexplorer
  */
-class tool_capexplorer_treelib_testcase extends advanced_testcase {
+class tool_capexplorer_tree_testcase extends advanced_testcase {
 
     /**
      * Helper method to check some common properties of a node.
@@ -48,20 +47,20 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
     public function test_get_user_nodes() {
         $this->resetAfterTest();
 
-        $result = tool_capexplorer_get_user_nodes();
+        $result = \tool_capexplorer\tree::get_user_nodes();
         // Should return admin and guest user.
         $this->assertCount(2, $result);
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
-        $result = tool_capexplorer_get_user_nodes();
+        $result = \tool_capexplorer\tree::get_user_nodes();
 
         // Should include newly created users.
         $this->assertCount(5, $result);
 
         $user4 = $this->getDataGenerator()->create_user(array('deleted' => 1));
-        $result = tool_capexplorer_get_user_nodes();
+        $result = \tool_capexplorer\tree::get_user_nodes();
 
         // Should ignore deleted users.
         $this->assertCount(5, $result);
@@ -86,7 +85,7 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         $course2 = $this->getDataGenerator()->create_course(array('category' => $subcat->id));
         $module3 = $this->getDataGenerator()->create_module('forum', array('course' => $course2->id));
 
-        $result = tool_capexplorer_get_module_nodes($course->id);
+        $result = \tool_capexplorer\tree::get_module_nodes($course->id);
         // Should find the two modules in specified course, but not others.
         $this->assertCount(2, $result);
 
@@ -105,7 +104,7 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         $course3 = $this->getDataGenerator()->create_course(array('category' => $cat2->id));
 
         // Should only count courses in the selected category.
-        $courses = tool_capexplorer_get_course_nodes($cat->id);
+        $courses = \tool_capexplorer\tree::get_course_nodes($cat->id);
         $this->assertCount(2, $courses);
 
         // Check the structure of the first item.
@@ -121,7 +120,7 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         $cat2 = $this->getDataGenerator()->create_category();
         $subcat3 = $this->getDataGenerator()->create_category(array('parent' => $cat2->id));
         // Should only count categories in the selected category.
-        $categories = tool_capexplorer_get_category_nodes($cat->id);
+        $categories = \tool_capexplorer\tree::get_category_nodes($cat->id);
         $this->assertCount(2, $categories);
 
         // Check the structure of the first item.
@@ -137,17 +136,17 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course(array('category' => $cat->id));
         $coursecontext = context_course::instance($course->id);
 
-        $blocksbefore = tool_capexplorer_get_block_nodes('course', $course->id);
+        $blocksbefore = \tool_capexplorer\tree::get_block_nodes('course', $course->id);
         $courseblock = $this->getDataGenerator()->create_block('online_users', array('parentcontextid' => $coursecontext->id));
-        $blocksafter = tool_capexplorer_get_block_nodes('course', $course->id);
+        $blocksafter = \tool_capexplorer\tree::get_block_nodes('course', $course->id);
 
         $blocksdiff = array_diff(array_map('serialize', $blocksafter), array_map('serialize', $blocksbefore));
         $this->assertCount(1, $blocksdiff);
         $this->check_node_structure(unserialize(current($blocksdiff)), 'block');
 
-        $blocksbefore = tool_capexplorer_get_block_nodes('category', $cat->id);
+        $blocksbefore = \tool_capexplorer\tree::get_block_nodes('category', $cat->id);
         $catblock = $this->getDataGenerator()->create_block('online_users', array('parentcontextid' => $categorycontext->id));
-        $blocksafter = tool_capexplorer_get_block_nodes('category', $cat->id);
+        $blocksafter = \tool_capexplorer\tree::get_block_nodes('category', $cat->id);
 
         $blocksdiff = array_diff(array_map('serialize', $blocksafter), array_map('serialize', $blocksbefore));
         $this->assertCount(1, $blocksdiff);
@@ -156,21 +155,21 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
     }
 
     public function test_get_system_node() {
-        $systemnode = tool_capexplorer_get_system_node();
+        $systemnode = \tool_capexplorer\tree::get_system_node();
 
         $this->assertCount(1, $systemnode);
         $this->check_node_structure(current($systemnode), 'system');
     }
 
     public function test_get_frontpage_node() {
-        $frontpagenode = tool_capexplorer_get_frontpage_node();
+        $frontpagenode = \tool_capexplorer\tree::get_frontpage_node();
 
         $this->assertCount(1, $frontpagenode);
         $this->check_node_structure(current($frontpagenode), 'course');
     }
 
     public function test_get_userdir_node() {
-        $userdirnode = tool_capexplorer_get_userdir_node();
+        $userdirnode = \tool_capexplorer\tree::get_userdir_node();
 
         $this->assertCount(1, $userdirnode);
         $this->check_node_structure(current($userdirnode), 'userdir');
@@ -182,7 +181,7 @@ class tool_capexplorer_treelib_testcase extends advanced_testcase {
         $nodeobject->id = 123;
         $nodeobject->contextid = 456;
 
-        $jsnode = tool_capexplorer_get_js_tree_node($nodeobject, 'course');
+        $jsnode = \tool_capexplorer\tree::get_js_tree_node($nodeobject, 'course');
 
         $this->assertObjectHasAttribute('canHaveChildren', $jsnode);
         $this->assertObjectHasAttribute('label', $jsnode);
