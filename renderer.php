@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Output rendering of Language customization admin tool
+ * Output rendering of Capability Explorer admin tool
  *
  * @package    tool_capexplorer
  * @author     Simon Coggins
