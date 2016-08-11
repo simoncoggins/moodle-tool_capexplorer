@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.0.4
+------
+
+* Improvements to AJAX calls, including setting $PAGE context which will fix a debug warning
+* Convert treelib.php, locallib.php and form.php to use class autoloading
+
 v1.0.3
 ------
 
