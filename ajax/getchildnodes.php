@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Return a node's children as an object that can be used as in the JS
- * node children property after converting to JSON.
+ * Return a node's children as an object.
+ *
+ * This can be used as in the JS node children property after converting to JSON.
  *
  * @package     tool_capexplorer
  * @author   Simon Coggins

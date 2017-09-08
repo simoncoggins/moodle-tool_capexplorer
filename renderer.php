@@ -47,8 +47,7 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         );
         $table->data = array();
         foreach ($parentcontexts as $context) {
-            $instance = isset($context->url) ?
-                html_writer::link($context->url, $context->instance) : $context->instance;
+            $instance = isset($context->url) ? html_writer::link($context->url, $context->instance) : $context->instance;
             $row = new html_table_row(array(
                 $context->contextlevel,
                 $instance
@@ -72,9 +71,13 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      *
      * @return string HTML to display the table.
      */
-    public function print_role_permission_and_overrides_table($contexts, $roles, $capability, $includetotals = true, $includechangelinks = true) {
+    public function print_role_permission_and_overrides_table($contexts, $roles, $capability,
+        $includetotals = true, $includechangelinks = true) {
+
         $roleids = array_keys($roles);
-        $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $contextids = array_map(function($context) {
+            return $context->id;
+        }, $contexts);
         $overridedata = \tool_capexplorer\capexplorer::get_role_override_info($contextids, $roleids, $capability);
 
         if ($includetotals) {
@@ -108,8 +111,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $contextid = $context->id;
             $issystemcontext = ($contextid == $systemcontextid);
             $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
-            $instance = isset($contextinfo->url) ?
-                html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
+            $instance = isset($contextinfo->url) ? html_writer::link($contextinfo->url,
+                $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
             $overridableroles = get_overridable_roles($context);
             foreach ($roles as $role) {
@@ -193,7 +196,9 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
      */
     public function print_role_assignment_table($contexts, $roles, $manualassignments, $autoassignments) {
         $roleids = array_keys($roles);
-        $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $contextids = array_map(function($context) {
+            return $context->id;
+        }, $contexts);
         $systemcontext = context_system::instance();
         $hassiteconfig = has_capability('moodle/site:config', $systemcontext);
 
@@ -244,8 +249,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
             $contextid = $context->id;
             $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
             $assignableroles = get_assignable_roles($context);
-            $instance = isset($contextinfo->url) ?
-                html_writer::link($contextinfo->url, $contextinfo->instance) : $contextinfo->instance;
+            $instance = isset($contextinfo->url) ? html_writer::link($contextinfo->url,
+                $contextinfo->instance) : $contextinfo->instance;
             $row = array($contextinfo->contextlevel, $instance);
             foreach ($roles as $role) {
                 $roleid = $role->id;
@@ -452,9 +457,8 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         $contextinfo = \tool_capexplorer\capexplorer::get_context_info($context);
 
         $a = new stdClass();
-        $a->contextstring = isset($contextinfo->url) ?
-            html_writer::link($contextinfo->url, $contextinfo->instance) :
-            $contextinfo->instance;
+        $a->contextstring = isset($contextinfo->url) ? html_writer::link($contextinfo->url,
+            $contextinfo->instance) : $contextinfo->instance;
         $a->contextlevel = $contextinfo->contextlevel;
         return get_string('contextinfo', 'tool_capexplorer', $a);
 

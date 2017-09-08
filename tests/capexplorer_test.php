@@ -209,7 +209,7 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
         $this->assertNotContains($unassigned, $assignedroleids);
 
         // The elements should contain a role database object.
-        $role1object = $DB->get_record('role', array('id'=>$role1), '*', MUST_EXIST);
+        $role1object = $DB->get_record('role', array('id' => $role1), '*', MUST_EXIST);
         $this->assertEquals($role1object, $result[$role1]);
     }
 
@@ -553,9 +553,9 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
         // Check that overrides apply even when assigned below the override (e.g.
         // an override is applied to the role, not the assignment).
         //
-        // system <- define prevent
-        // course <- override with allow
-        // block <- assign and check
+        // system <- define prevent.
+        // course <- override with allow.
+        // block <- assign and check.
         $this->getDataGenerator()->role_assign(
             $roles['prevent']['allow'],
             $user->id,

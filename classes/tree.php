@@ -26,6 +26,9 @@ namespace tool_capexplorer;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class for generating the context tree.
+ */
 class tree {
 
     /**
@@ -222,17 +225,17 @@ class tree {
     public static function get_block_nodes($parentnodetype, $parentinstanceid = 0) {
         global $DB;
         switch ($parentnodetype) {
-        case 'system':
-            $parentcontext = \context_system::instance();
-            break;
-        case 'category':
-            $parentcontext = \context_coursecat::instance($parentinstanceid);
-            break;
-        case 'course':
-            $parentcontext = \context_course::instance($parentinstanceid);
-            break;
-        default:
-            throw new \Exception("Invalid nodetype '{$parentnodetype}' passed to \\tool_capexplorer\\tree\\get_block_nodes().");
+            case 'system':
+                $parentcontext = \context_system::instance();
+                break;
+            case 'category':
+                $parentcontext = \context_coursecat::instance($parentinstanceid);
+                break;
+            case 'course':
+                $parentcontext = \context_course::instance($parentinstanceid);
+                break;
+            default:
+                throw new \Exception("Invalid nodetype '{$parentnodetype}' passed to \\tool_capexplorer\\tree\\get_block_nodes().");
         }
 
         $sql = "SELECT bi.id, c.id AS contextid, bi.blockname AS name
@@ -311,6 +314,7 @@ class tree {
      * needed by the JS.
      *
      * @param object $nodeobject A node object with name and optional id and contextid
+     * @param string $nodetype String describing the type of node
      * i                         properties.
      * @return object An object that matches the JS node syntax when converted to JSON.
      */

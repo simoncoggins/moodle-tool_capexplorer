@@ -26,6 +26,9 @@ namespace tool_capexplorer;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Main class for this admin tool.
+ */
 class capexplorer {
 
     /**
@@ -37,51 +40,51 @@ class capexplorer {
     public static function get_context_info($context) {
         global $DB;
 
-            $item = new \stdClass();
-            $item->contextlevel = $context->get_level_name();
-            switch ($context->contextlevel) {
-            case CONTEXT_SYSTEM:
-                $item->instance = get_string('none', 'tool_capexplorer');
-                break;
-            case CONTEXT_USER:
-                $item->instance = format_string($DB->get_field('user',
-                    $DB->sql_fullname(), array('id' => $context->instanceid)));
-                $item->url = new \moodle_url('/user/profile.php',
-                    array('id' => $context->instanceid));
-                break;
-            case CONTEXT_COURSECAT:
-                $item->instance = format_string($DB->get_field('course_categories',
-                    'name', array('id' => $context->instanceid)));
-                $item->url = new \moodle_url('/course/index.php',
-                    array('categoryid' => $context->instanceid));
-                break;
-            case CONTEXT_COURSE:
-                $coursename = format_string($DB->get_field('course', 'fullname',
-                    array('id' => $context->instanceid)));
-                if ($context->instanceid == SITEID) {
-                    $item->instance = get_string('xfrontpage', 'tool_capexplorer', $coursename);
-                } else {
-                    $item->instance = $coursename;
-                }
-                $item->url = new \moodle_url('/course/view.php',
-                    array('id' => $context->instanceid));
-                break;
-            case CONTEXT_MODULE:
-                $sql = "SELECT cm.id,cm.instance,m.name
-                    FROM {course_modules} cm JOIN {modules} m
-                    ON m.id = cm.module
-                    WHERE cm.id = ?";
-                $modinfo = $DB->get_record_sql($sql, array($context->instanceid));
-                $item->instance = format_string($DB->get_field($modinfo->name, 'name',
-                    array('id' => $modinfo->instance)));
-                $item->url = new \moodle_url("/mod/{$modinfo->name}/view.php",
-                    array('id' => $modinfo->instance));
-                break;
-            case CONTEXT_BLOCK:
-                $blockname = $DB->get_field('block_instances', 'blockname', array('id' => $context->instanceid));
-                $item->instance = get_string('pluginname', "block_{$blockname}");
-                break;
+        $item = new \stdClass();
+        $item->contextlevel = $context->get_level_name();
+        switch ($context->contextlevel) {
+        case CONTEXT_SYSTEM:
+            $item->instance = get_string('none', 'tool_capexplorer');
+            break;
+        case CONTEXT_USER:
+            $item->instance = format_string($DB->get_field('user',
+                $DB->sql_fullname(), array('id' => $context->instanceid)));
+            $item->url = new \moodle_url('/user/profile.php',
+                array('id' => $context->instanceid));
+            break;
+        case CONTEXT_COURSECAT:
+            $item->instance = format_string($DB->get_field('course_categories',
+                'name', array('id' => $context->instanceid)));
+            $item->url = new \moodle_url('/course/index.php',
+                array('categoryid' => $context->instanceid));
+            break;
+        case CONTEXT_COURSE:
+            $coursename = format_string($DB->get_field('course', 'fullname',
+                array('id' => $context->instanceid)));
+            if ($context->instanceid == SITEID) {
+                $item->instance = get_string('xfrontpage', 'tool_capexplorer', $coursename);
+            } else {
+                $item->instance = $coursename;
             }
+            $item->url = new \moodle_url('/course/view.php',
+                array('id' => $context->instanceid));
+            break;
+        case CONTEXT_MODULE:
+            $sql = "SELECT cm.id,cm.instance,m.name
+                FROM {course_modules} cm JOIN {modules} m
+                ON m.id = cm.module
+                WHERE cm.id = ?";
+            $modinfo = $DB->get_record_sql($sql, array($context->instanceid));
+            $item->instance = format_string($DB->get_field($modinfo->name, 'name',
+                array('id' => $modinfo->instance)));
+            $item->url = new \moodle_url("/mod/{$modinfo->name}/view.php",
+                array('id' => $modinfo->instance));
+            break;
+        case CONTEXT_BLOCK:
+            $blockname = $DB->get_field('block_instances', 'blockname', array('id' => $context->instanceid));
+            $item->instance = get_string('pluginname', "block_{$blockname}");
+            break;
+        }
 
         return $item;
     }
@@ -120,7 +123,9 @@ class capexplorer {
             return $out;
         }
 
-        $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $contextids = array_map(function($context) {
+            return $context->id;
+        }, $contexts);
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextids);
 
         $sql = "contextid {$contextsql} AND userid = ?";
@@ -405,7 +410,9 @@ class capexplorer {
 
         // Calculate any role overrides.
         $roleids = array_keys($assignedroles);
-        $contextids = array_map(function($context) {return $context->id;}, $contexts);
+        $contextids = array_map(function($context) {
+            return $context->id;
+        }, $contexts);
         $overridedata = self::get_role_override_info($contextids, $roleids, $capability);
 
         // Aggregate role totals.

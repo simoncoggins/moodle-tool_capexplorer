@@ -36,8 +36,8 @@ M.tool_capexplorer.capexplorer = {
 
         // Load tree with initial data from PHP.
         this.tree = new Y.TreeView({
-            container : '#contexttree',
-            nodes : args.initialtree
+            container: '#contexttree',
+            nodes: args.initialtree
         });
 
         this.tree.on('select', this.tree_set_form_field);
@@ -46,7 +46,7 @@ M.tool_capexplorer.capexplorer = {
 
             // Custom function that Plugin.Tree.Lazy will call when it needs to
             // load the children for a node.
-            load: function (node, callback) {
+            load: function(node, callback) {
                 var instanceId, requestdata;
                 if (node.children !== undefined && node.children.length !== 0) {
                     // Children already expanded.
@@ -55,7 +55,7 @@ M.tool_capexplorer.capexplorer = {
                 }
                 nodeType = node.data.nodeType,
                     instanceId = (node.data.instanceId !== undefined) ? node.data.instanceId : 0,
-                    requestdata = {instanceid : instanceId, nodetype: nodeType, sesskey: M.cfg.sesskey};
+                    requestdata = {instanceid: instanceId, nodetype: nodeType, sesskey: M.cfg.sesskey};
 
                 Y.io(M.cfg.wwwroot + '/' + args.admin +
                     '/tool/capexplorer/ajax/getchildnodes.php', {
@@ -63,8 +63,7 @@ M.tool_capexplorer.capexplorer = {
                         function(id, r) {
                             try {
                                 parsedResponse = Y.JSON.parse(r.responseText);
-                            }
-                            catch (e) {
+                            } catch (e) {
                                 window.alert("JSON Parse failed!");
                                 return;
                             }
@@ -160,11 +159,11 @@ M.tool_capexplorer.capexplorer = {
 
         usernameInput.plug(Y.Plugin.AutoComplete, {
             source: M.cfg.wwwroot + '/' + args.admin +
-                '/tool/capexplorer/ajax/getusers.php?search={query}&sesskey='+M.cfg.sesskey,
+                '/tool/capexplorer/ajax/getusers.php?search={query}&sesskey=' + M.cfg.sesskey,
             resultTextLocator: 'username',
-            resultFilters: function (query, results) {
+            resultFilters: function(query, results) {
                 query = query.toLowerCase();
-                return Y.Array.filter(results, function (result) {
+                return Y.Array.filter(results, function(result) {
                     return result.raw.autocompletestr.toLowerCase().indexOf(query) !== -1;
                 });
             },

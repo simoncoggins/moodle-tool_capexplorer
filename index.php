@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Main page for this tool.
+ *
  * @package    tool_capexplorer
  * @author     Simon Coggins
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,7 +44,7 @@ $contextids = array();
 // Re-open selected tree node if data passed to page.
 if ($data = data_submitted()) {
     if (!empty($data->contextid)) {
-        $contextid =  clean_param($data->contextid, PARAM_INT);
+        $contextid = clean_param($data->contextid, PARAM_INT);
         $context = \context::instance_by_id($contextid);
         $parentcontextids = $context->get_parent_context_ids(true);
         $contextids = array_reverse($parentcontextids);
@@ -90,7 +92,9 @@ $autoassignments = capexplorer::get_auto_role_assignment_info($userid);
 $assignedroles = capexplorer::get_assigned_roles($manualassignments, $autoassignments);
 
 $roleids = array_keys($assignedroles);
-$contextids = array_map(function($context) {return $context->id;}, $contexts);
+$contextids = array_map(function($context) {
+    return $context->id;
+}, $contexts);
 $overridedata = capexplorer::get_role_override_info($contextids, $roleids, $capability);
 $roletotals = capexplorer::merge_permissions_across_contexts(
     $contextids,
