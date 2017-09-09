@@ -282,6 +282,11 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
         $this->assertEquals($expectedresult, $result);
     }
 
+    /**
+     * Return data for use by {@link test_merge_permissions()}.
+     *
+     * @return array Test data.
+     */
     public function permissions_data() {
         return array(
             // Prohibit should always win.
@@ -302,6 +307,11 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
     }
 
     /**
+     * Test merge_permissions() function.
+     *
+     * @param integer $p1 First permission to merge.
+     * @param integer $p2 Second permission to merge.
+     * @param integer $expectedresult Resulting permission.
      * @dataProvider permissions_data
      */
     public function test_merge_permissions($p1, $p2, $expectedresult) {
@@ -309,6 +319,11 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
             \tool_capexplorer\capexplorer::merge_permissions($p1, $p2));
     }
 
+    /**
+     * Return data for use by {@link test_merge_permissions_across_roles()}.
+     *
+     * @return array Test data.
+     */
     public function permissions_across_roles_data() {
         return array(
             // Any prohibit results in false.
@@ -331,6 +346,10 @@ class tool_capexplorer_capexplorer_testcase extends advanced_testcase {
     }
 
     /**
+     * Test merge_permissions_across_roles() function.
+     *
+     * @param array $roletotals Array of permissions from each role.
+     * @param integer $expectedresult Expected result of merge across roles.
      * @dataProvider permissions_across_roles_data
      */
     public function test_merge_permissions_across_roles($roletotals, $expectedresult) {

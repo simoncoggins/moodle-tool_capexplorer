@@ -31,9 +31,10 @@ defined('MOODLE_INTERNAL') || die();
 class tool_capexplorer_renderer extends plugin_renderer_base {
 
     /**
-     * Renders table of parent contexts
+     * Renders table of parent contexts.
      *
-     * @return string HTML
+     * @param array $parentcontexts Array of contexts to be displayed.
+     * @return string HTML of the table.
      */
     public function print_parent_context_table($parentcontexts) {
         $html = '';
@@ -449,6 +450,11 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Return information about a specific context.
+     *
+     * @param context $context Context object to return info about.
+     */
     public function print_human_readable_context_info($context) {
 
         if ($context->contextlevel == CONTEXT_SYSTEM) {
@@ -465,6 +471,15 @@ class tool_capexplorer_renderer extends plugin_renderer_base {
 
     }
 
+    /**
+     * Generate a table displaying the results of a particular capability check.
+     *
+     * @param object $user User object of user being checked.
+     * @param string $capability Capability to check.
+     * @param context $context Context object of context being checked.
+     * @param boolean $result Result of check (true for granted, false for denied).
+     * @return string HTML for table displaying result.
+     */
     public function print_results_table($user, $capability, $context, $result) {
         $html = '';
         $table = new html_table();

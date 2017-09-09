@@ -36,6 +36,9 @@ class tool_capexplorer_tree_testcase extends advanced_testcase {
 
     /**
      * Helper method to check some common properties of a node.
+     *
+     * @param object $item Tree node item.
+     * @param string $nodetype Type of this node.
      */
     protected function check_node_structure($item, $nodetype) {
         $this->assertObjectHasAttribute('label', $item);
